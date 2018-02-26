@@ -7,8 +7,8 @@ steps = [
     "text":[
 u"1. 魔方有6面，6种颜色。总共有27个块，",u"其中有8个角块，12个棱块，6个中心块。",
 u"每个角块有3个面，棱块有2个面， 中心",u"块有一个面。转动时中心面位置不变。",
-u"2. 我们把魔方拿在手上，左前方三层分",u"别为F/f/B面(图8-1）；右前方三层分别为",
-u"R/r/L面(图8-2）；上下三层分别为U/u/D",u"面（图8-3）。",
+u"2. 我们把魔方拿在手上，左前方左后方别",u"为F/B面(图8-1),右前方右后方分别为R/L",
+u"面(图8-2）；最上最下层分别为U/D面（",u"图8-3）,小写字母表示大写字母加中间层。",
 u"3. 右下角按钮，分别表示转动该面，加撇",u"的表示逆时针转，不加撇表示顺时针转。",
 u"每次操作都是旋转90度。"],
     "figures":[(7,0),(7,1),(7,2)]
@@ -99,7 +99,7 @@ u"顶层所有角块调整到正确位置的时候回出现",u"两种情况：",
 u"1. 在顶层侧面找到有两个相同颜色的角块，",u"把这一面定位为前面(如图6-1)，转动公式6",
 u"即可完成。",
 u"2. 若顶层侧面没有找到两个相同颜色的角",u"块(如图6-2)，转动公式6就会变成情况1。",
-u"公式6：Lr' U' R D2 R' UR D2 R2",    u"公式6本质上是三角逆时针互换（顶面右上角",
+u"公式6：l U' R D2 R' UR D2 R2",    u"公式6本质上是三角逆时针互换（顶面右上角",
 u"不参与移动）"],
      "figures":[(5,0),(5,1)]
     },    
@@ -216,32 +216,32 @@ def displayFigure(screen,x,y,figure):
                       (u_points[f[2]][0]+x, u_points[f[2]][1]+y),(u_points[f[3]][0]+x, u_points[f[3]][1]+y)]        
         pygame.draw.polygon(screen,(0,0,0),pointlist,1)
         i += 1
-def displayTutorial(screen):
+def displayTutorial(screen,x_offset,y_offset):
     global refresh
     step = steps[currentStep]["step"]
     title = steps[currentStep]["title"]
-    button(screen,"<<",810,10,40,30,green,bright_green,nextOrPrevious,-1)
-    button(screen,step,880,10,100,30,green,green)
-    button(screen,title,1000,10,200,30,green,green)
-    button(screen,">>",1230,10,40,30,green,bright_green,nextOrPrevious,1)
+    button(screen,"<<",x_offset + 810,y_offset + 10,40,30,green,bright_green,nextOrPrevious,-1)
+    button(screen,step,x_offset + 880,y_offset + 10,100,30,green,green)
+    button(screen,title,x_offset + 1000,y_offset + 10,200,30,green,green)
+    button(screen,">>",x_offset + 1230,y_offset + 10,40,30,green,bright_green,nextOrPrevious,1)
     
  
     texts = steps[currentStep]["text"]
     figures = steps[currentStep].get("figures",[])
     if refresh == 1:
-        pygame.draw.rect(screen,background,(810,45,500,555))
+        pygame.draw.rect(screen,background,(x_offset + 810,y_offset + 45,538,555))
         refresh = 0
         line = 0
         for text in texts:
-            printText(screen,text, "kaiti", 25, 810, 45+28*line, (240,240,240))
+            printText(screen,text, "kaiti", 25, x_offset + 810, y_offset + 45+28*line, (240,240,240))
             line += 1
         x = 880
         y = 500
         offset = 0
         for fig in figures:
-            displayFigure(screen,x+offset,y,figList[fig[0]][fig[1]])
+            displayFigure(screen,x_offset + x + offset,  y_offset + y,figList[fig[0]][fig[1]])
             fig_label = u"图" + str(fig[0]+1)+ "-" + str(fig[1]+1)
-            printText(screen,fig_label, "kaiti", 25, x + offset - 20, y + 65, (200,200,200))
+            printText(screen,fig_label, "kaiti", 25,  x_offset + x + offset - 20,  y_offset + y + 65, (200,200,200))
             offset += 120
     
               

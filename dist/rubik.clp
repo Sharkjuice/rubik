@@ -344,9 +344,12 @@
 (defrule init-phase-hint
 =>
 ;;move the target face to the up position
-(assert (init-hint align_up 2 F'F'))
-(assert (init-hint align_up 4 F'UF))
-(assert (init-hint align_up 8 FU'F'))
+(assert (init-hint 1 align_up 2 F'F'))
+(assert (init-hint 1 align_up 4 F'))
+(assert (init-hint 1 align_up 8 F))
+(assert (init-hint 2 align_up 2 F'F'))
+(assert (init-hint 2 align_up 4 F'UF))
+(assert (init-hint 2 align_up 8 FU'F'))
 ;;if already in up positon, flip 
 (assert (init-hint align_flip 6 FRUR'))
 
@@ -391,9 +394,11 @@
 	(side (id ?id) (color w))
 	(side (id ?id) (side ?s1) (color ?c&~w))
 	(side (id ?id) (type V1) (pos ?p1) (side ?s2))
+	(block (pos 1) (status ?t))
 	(not (face ?s1 ?c))
 	(or (and (test (neq ?s2 F)) (rotate-hint ?s2 ?h))
-		(and (test (eq ?s2 F)) (init-hint align_up ?p1 ?h))
+		(and (test (eq ?s2 F)) (test (eq ?t ok)) (init-hint 2 align_up ?p1 ?h))
+		(and (test (eq ?s2 F)) (test (neq ?t ok)) (init-hint 1 align_up ?p1 ?h))
 	)
 	=>
 	(printout t "t1:(" ?x " " ?y " " ?z ")")
@@ -436,7 +441,7 @@
 (assert (f2l-hint 1 14 0 32 4 "y'(R'URU'2)(R'U'R)"))
 (assert (f2l-hint 1 21 4 8 0 "U'(RU'2R'U)y'(R'U'R)"))
 (assert (f2l-hint 1 22 4 2 0 "y'U(R'URU')(R'U'R)"))
-(assert (f2l-hint 1 23 2 4 0 "(RU'R'U)(RU'R')U2(RU'R')"))
+(assert (f2l-hint 1 23 2 4 0 "(RU'R'U)(RU'R'U)(URU'R')"))
 (assert (f2l-hint 1 24 8 4 0 "U'(RU'R'U)(RUR')"))
 (assert (f2l-hint 1 25 6 0 0 "(RUR')U2(RU'R'U)(RU'R')"))
 (assert (f2l-hint 1 26 0 12 0 "(RU'R'U2)y'(R'U'R)"))
@@ -448,11 +453,11 @@
 ;;F2L PATTERN 2, corner not OK, edge OK.
 (assert (f2l-hint 2 15 0 4 0 "U'(RU'2R'U)(RUR')"))
 (assert (f2l-hint 2 16 4 0 0 "U'(RU'R')U2(RU'R')"))
-(assert (f2l-hint 2 19 0 0 4 "(RUR'U)2(RUR')"))
+(assert (f2l-hint 2 19 0 0 4 "(RUR'U')2(RUR')"))
 
 ;;F2L PATTERN 3,Corner wrong, layer 2 flipped
 (assert (f2l-hint 3 17 0 4 0 "y'U(R'U'RU')y(RUR')"))
-(assert (f2l-hint 3 18 4 0 0 "U'(RUR'U')y'(R'U'R)"))
+(assert (f2l-hint 3 18 4 0 0 "U'(RUR'U)y'(R'U'R)"))
 (assert (f2l-hint 3 20 0 0 4 "U'(R'FRF')(RU'R')"))
 )
 (deffunction f2l-hpos-value (?p ?c ?fc ?rc) 
@@ -694,12 +699,12 @@
 	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:38;p:1;h:" ?h1 crlf) else
-			(if (eq ?s3 F) then (printout t "f:38;p:0;h:y'(R'U)(RU')(R'UR)" crlf) else
-				(printout t "f:38;p:0;h:" ?h2 "y'(R'U)(RU')(R'UR)" crlf))) 
+			(if (eq ?s3 F) then (printout t "f:38;p:0;h:y'(R'UR)U'(R'UR)" crlf) else
+				(printout t "f:38;p:0;h:" ?h2 "y'(R'UR)U'(R'UR)" crlf))) 
 	else 
 		(if (neq ?s1 F) then (printout t "f:39;p:1;h:" ?h1 crlf) else
-			(if (eq ?s3 R) then (printout t "f:39;p:0;h:(RUR'U')(RUR')" crlf) else
-				(printout t "f:39;p:0;h:" ?h3 "(RUR'U')(RUR')" crlf))) 
+			(if (eq ?s3 R) then (printout t "f:39;p:0;h:(RUR')U'(RUR')" crlf) else
+				(printout t "f:39;p:0;h:" ?h3 "(RUR')U'(RUR')" crlf))) 
 	)
 )
 
@@ -719,10 +724,10 @@
 	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:41;p:1;h:" ?h1 crlf) 
-		else (printout t "f:41;p:0;h:" ?h2 "y'(R'U'RU)(R'U'R)" crlf)) 
+		else (printout t "f:41;p:0;h:" ?h2 "y'(R'U'R)U(R'U'R)" crlf)) 
 	else 
 		(if (neq ?s1 F) then (printout t "f:40;p:1;h:" ?h1 crlf) 
-		else (printout t "f:40;p:0;h:" ?h3 "(RU'R'U)(RU'R')" crlf)) 
+		else (printout t "f:40;p:0;h:" ?h3 "(RU'R')U(RU'R')" crlf)) 
 	)
 )
 
@@ -826,7 +831,7 @@
 (assert (oll-hint 37 1185 "(RU'2R'2FRF')(RU'2R')"))
 (assert (oll-hint 38 3488 "r'(U2)(RUR'U)r"))
 (assert (oll-hint 39 1547 "r(U'2)(R'U'RU')r"))
-(assert (oll-hint 40 217 "r(U'RU'R'U2)r"))
+(assert (oll-hint 40 217 "r'(U'RU'R'U2)r"))
 (assert (oll-hint 41 310 "r(UR'URU'2)r'"))
 (assert (oll-hint 42 1444 "r'(R2UR'U)(RU'2R'U)(rR')"))
 (assert (oll-hint 43 1099 "(UF)(RUR'U')F'UF(RUR'U')F'"))
@@ -843,7 +848,7 @@
 (assert (oll-hint 54 149 "(R'U'RU'R'U2)(RFRUR'U'F')"))
 (assert (oll-hint 55 338 "(RUR'U)(RU'2R'F)(RUR'U')F'"))
 (assert (oll-hint 56 282 "(RUR'U)(RU'R'U')(R'FRF')"))
-(assert (oll-hint 57 177 "(R'U'RU')(R'URU)(lU'R'U)"))
+(assert (oll-hint 57 177 "(R'U'RU')(R'U2R)(RUR'U')(R'FRF')"))
 )
 
 (defrule oll-face-value

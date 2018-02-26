@@ -27,6 +27,8 @@ a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
          "B'":{"face":"FRONT","clockwize":-1,"layer":2,"reverse":"B"},
          "L'":{"face":"RIGHT","clockwize":-1,"layer":2,"reverse":"L"},
          "D'":{"face":"UP","clockwize":1,"layer":2,"reverse":"D"},         
+         "d":{"face":"UP","clockwize":-1,"layer":5,"reverse":"d'"},         
+         "d'":{"face":"UP","clockwize":1,"layer":5,"reverse":"d"},         
          "y":{"face":"UP","clockwize":1,"layer":4,"reverse":"y'"},#整体绕U面中心轴顺转
          "y'":{"face":"UP","clockwize":-1,"layer":4,"reverse":"y"},#逆转
          "z":{"face":"FRONT","clockwize":-1,"layer":4,"reverse":"z'"},
@@ -36,9 +38,9 @@ a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
 }
 
 class CubeController:
-    def __init__(self, width,height,init_count, his_count):
-        self.width = width
-        self.height = height
+    def __init__(self, x_offset,y_offset,init_count, his_count):
+        self.x_offset =  x_offset
+        self.y_offset = y_offset
         self.init_count = init_count
         self.his_actions = []
         self.his_count = his_count
@@ -64,10 +66,10 @@ class CubeController:
         #初始化数据模型
         my_cube = cubeModel.Cube()
         self.calculator = cubeCalculator.CubeCalculator(my_cube)
-        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,0,-30)
+        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset-30)
         self.displayCube(screen)
         
-        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12,820,50)
+        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, self.x_offset + 820, self.y_offset + 50)
 
                 
 
@@ -93,7 +95,7 @@ class CubeController:
             fo.close()
             cube = cubeModel.Cube(blocks)
             self.calculator = cubeCalculator.CubeCalculator(cube)             
-            self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, distance,0,-30)
+            self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset-30)
             self.displayCube(screen)
         
  
@@ -111,29 +113,18 @@ class CubeController:
             self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
         self.displayCube(screen)        
         self.his_actions = []
-        pygame.draw.rect(screen,(128,128,128),(250,hight-50,500,30))
         
     def displayCube(self,screen):
         self.my_cube_3d.buildFaces()        
         self.my_cube_3d.displayCube(screen)
-        self.my_cube_3d.displayLayer(screen,"RIGHT",2,-120,-110)
-        self.my_cube_3d.displayLayer(screen,"UP",2,-156,295)
-        self.my_cube_3d.displayLayer(screen,"FRONT",2,360,-110)
-    
-
-    #初始化为原始状态，不是转整齐，就是初始化
-    def resetCube(self,dumy):
-        my_cube = cubeModel.Cube()
-        self.calculator = cubeCalculator.CubeCalculator(my_cube)        
-        self.my_cube_3d.cube = my_cube
-        self.his_actions = []
-        pygame.draw.rect(screen,(128,128,128),(250,hight-50,500,30))
-        self.displayCube(screen)
+        self.my_cube_3d.displayLayer(screen,"RIGHT",2, self.x_offset - 120,self.y_offset -110)
+        self.my_cube_3d.displayLayer(screen,"UP",2,self.x_offset - 156,self.y_offset + 295)
+        self.my_cube_3d.displayLayer(screen,"FRONT",2,self.x_offset + 360, self.y_offset - 110)
     
 
     def helpCube(self,dumy):
         nextOrPrevious(0)
-        pygame.draw.rect(screen,background,(810,0,self.width-810,600))
+        pygame.draw.rect(screen,background,(self.x_offset + 810,self.y_offset + 5,538,595))
     
 
     def snapCube(self,dumy):       
@@ -141,11 +132,11 @@ class CubeController:
         self.sn_cube_3d.cube = snapshot_cube_mode
         self.sn_cube_3d.buildFaces()
         self.comparing = False
-        pygame.draw.rect(screen,background,(810,0,width-810,600))    
+        pygame.draw.rect(screen,background,(self.x_offset + 810, self.y_offset + 5,538,595))    
         self.sn_cube_3d.displayCube(screen)
-        self.sn_cube_3d.displayLayer(screen,"RIGHT",2,180,-70)
-        self.sn_cube_3d.displayLayer(screen,"UP",2,160,260)
-        self.sn_cube_3d.displayLayer(screen,"FRONT",2,510,-70)
+        self.sn_cube_3d.displayLayer(screen,"RIGHT",2, self.x_offset + 180,self.y_offset - 70)
+        self.sn_cube_3d.displayLayer(screen,"UP",2, self.x_offset + 160, self.y_offset + 260)
+        self.sn_cube_3d.displayLayer(screen,"FRONT",2,self.x_offset + 480, self.y_offset - 70)
    
     def compareCube(self,dumy):
         if self.comparing:#已经处于比对状态，就返回
@@ -318,29 +309,30 @@ class CubeController:
             b_y = 610
             for bs in b_map:
                 for b in bs:
-                    button(screen, b, b_x, b_y, 40,30,green,bright_green,self.singleRotate,b)
+                    button(screen, b, self.x_offset +  b_x, self.y_offset + b_y, 40,30,green,bright_green,self.singleRotate,b)
                     b_x += 50
                 b_y += 40
                 b_x = 810
                 
             
-            button(screen,u"重开",1140,610,60,30,green,bright_green,self.resetCube,'X')
-            button(screen,u"帮助",1210,610,60,30,green,bright_green,self.helpCube,"X")  
-            button(screen,u"保存",1280,610,60,30,green,bright_green,self.saveCube,"X")  
+            button(screen,"d",self.x_offset + 1110,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,'d')
+            button(screen,"l",self.x_offset + 1160,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,'l')
+            button(screen,u"帮助",self.x_offset + 1210,self.y_offset + 610,60,30,green,bright_green,self.helpCube,"X")  
+            button(screen,u"保存",self.x_offset + 1280,self.y_offset + 610,60,30,green,bright_green,self.saveCube,"X")  
 
-            button(screen,u"打乱",1140,650,60,30,green,bright_green,self.initCube,"X")
-            button(screen,u"快照",1210,650,60,30,green,bright_green,self.snapCube,"X" )
-            button(screen,u"加载",1280,650,60,30,green,bright_green,self.loadCube,"X")  
+            button(screen,u"打乱",self.x_offset + 1140,self.y_offset + 650,60,30,green,bright_green,self.initCube,"X")
+            button(screen,u"快照",self.x_offset + 1210,self.y_offset + 650,60,30,green,bright_green,self.snapCube,"X" )
+            button(screen,u"加载",self.x_offset + 1280,self.y_offset + 650,60,30,green,bright_green,self.loadCube,"X")  
 
-            button(screen,u"撤销",1140,690,60,30,green,bright_green,self.cancelRotate,"X") 
-            button(screen,u"对比",1210,690,60,30,green,bright_green,self.compareCube,"X") 
-            button(screen,u"退出",1280,690,60,30,green,bright_green,self.cubeQuit,"X") 
+            button(screen,u"撤销",self.x_offset + 1140,self.y_offset + 690,60,30,green,bright_green,self.cancelRotate,"X") 
+            button(screen,u"对比",self.x_offset + 1210,self.y_offset + 690,60,30,green,bright_green,self.compareCube,"X") 
+            button(screen,u"退出",self.x_offset + 1280,self.y_offset + 690,60,30,green,bright_green,self.cubeQuit,"X") 
            
-            button(screen,"M",1140,730,40,30,green,bright_green,self.singleRotate,"M") 
-            button(screen,"M'",1190,730,40,30,green,bright_green,self.singleRotate,"M'") 
-            button(screen,"l",1240,730,40,30,green,bright_green,self.singleRotate,"l")
-            button(screen,"提示",1290,730,50,30,green,bright_green,self.hint,"X")
-            displayTutorial(screen)            
+            button(screen,"M",self.x_offset + 1140,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M") 
+            button(screen,"M'",self.x_offset + 1190,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M'") 
+            button(screen,"l",self.x_offset + 1240,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"l")
+            button(screen,"提示",self.x_offset + 1290,self.y_offset + 730,50,30,green,bright_green,self.hint,"X")
+            displayTutorial(screen, self.x_offset, self.y_offset)            
 
             if self.rotating:
                 self.rotate_angle = self.rotate_angle + 3
@@ -352,22 +344,22 @@ class CubeController:
             if self.rotate_angle == 90:
                 self.my_cube_3d.cube.rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize)
                 self.displayCube(screen)
-                printText(screen,"U", "kaiti", 30, 390, 210, black)
-                printText(screen,"F", "kaiti", 30, 290, 390, black)
-                printText(screen,"R", "kaiti", 30, 500, 400, black)
-                printText(screen,"B", "kaiti", 30, 690, 90, black)
-                printText(screen,"L", "kaiti", 30, 95, 90, black)
-                printText(screen,"D", "kaiti", 30, 120, 600, black)
+                printText(screen,"U", "kaiti", 30, self.x_offset + 390, self.y_offset + 210, black)
+                printText(screen,"F", "kaiti", 30, self.x_offset + 290, self.y_offset + 390, black)
+                printText(screen,"R", "kaiti", 30, self.x_offset + 500, self.y_offset + 400, black)
+                printText(screen,"B", "kaiti", 30, self.x_offset + 690, self.y_offset + 90, black)
+                printText(screen,"L", "kaiti", 30, self.x_offset + 95, self.y_offset + 90, black)
+                printText(screen,"D", "kaiti", 30, self.x_offset + 120, self.y_offset + 600, black)
                 self.rotating = False
                 self.rotate_angle = 0
 
             if self.update_message:
-                pygame.draw.rect(screen,(128,128,128),(220,hight-50,560,30))            
-                printText(screen, self.message, "kaiti", 25, 230, self.height-50, background)
+                pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 690,560,30))            
+                printText(screen, self.message, "kaiti", 25, self.x_offset + 230, self.y_offset + 690, background)
                     
             if self.update_advise:
-                pygame.draw.rect(screen,(128,128,128),(220,hight-80,560,30))            
-                printText(screen, self.advise, "kaiti", 25, 230, self.height-80, background)
+                pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 730,560,30))            
+                printText(screen, self.advise, "kaiti", 25, self.x_offset + 230, self.y_offset + 730, background)
                 
            
             clock.tick(30)
@@ -383,12 +375,31 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
     screen.fill(background)
     pygame.display.set_caption("3D魔方教程")
-    width = screen.get_width()
-    hight = screen.get_height()
-    pygame.draw.line(screen,(128,128,128),(800,0),(800,hight),2)
-    pygame.draw.line(screen,(128,128,128),(800,600),(width,600),2)
+    scn_width = screen.get_width()
+    scn_height = screen.get_height()
+    brd_width = 1350
+    brd_height = 768
+    x_offset = int((scn_width - brd_width)/2)
+    y_offset = int((scn_height - brd_height)/2)
 
-    cubeController = CubeController(width, hight,15,25)
+    pt1 = (x_offset,y_offset)# top left point
+    pt2 = (x_offset + brd_width,y_offset)#top right point
+    pt3 = (x_offset,y_offset + brd_height -2)#bottom left point
+    pt4 = (x_offset + brd_width, y_offset + brd_height-2)
+    
+    
+    
+    pygame.draw.line(screen,(128,128,128),pt1,pt2,2)
+    pygame.draw.line(screen,(128,128,128),pt2,pt4,2)
+    pygame.draw.line(screen,(128,128,128),pt4,pt3,2)
+    pygame.draw.line(screen,(128,128,128),pt3,pt1,2)
+
+    
+    pygame.draw.line(screen,(128,128,128),(x_offset + 800,y_offset),(x_offset + 800,y_offset + brd_height),2)
+    pygame.draw.line(screen,(128,128,128),(x_offset + 800,y_offset + 600),(x_offset + brd_width,y_offset + 600),2)
+
+
+    cubeController = CubeController(x_offset, y_offset,15,25)
 
     
     cubeController.gameLoop()

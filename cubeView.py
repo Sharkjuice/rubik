@@ -84,7 +84,7 @@ class Block3D:
         return self
         
 class Cube3D:
-    def __init__(self, cube,width, height, fov, distance,x_offset,y_offset):
+    def __init__(self, cube,width, height, fov, distance,x_offset,y_offset,x_adj,y_adj):
         self.cube = cube
         self.blocks = []
         self.alpha = -45
@@ -95,7 +95,9 @@ class Cube3D:
         self.fov = fov
         self.distance = distance
         self.x_offset = x_offset
-        self.y_offset = y_offset        
+        self.y_offset = y_offset
+        self.x_adj = x_adj
+        self.y_adj = y_adj
 
     def buildFaces(self):
         self.blocks = []
@@ -106,7 +108,7 @@ class Cube3D:
                                 b.current.y + block_v[i][1],
                                 b.current.z + block_v[i][2])
                 r = point.rotateY(self.alpha).rotateX(self.gama).rotateY(self.beta)
-                p = r.project(self.width, self.height, self.fov, self.distance, self.x_offset,self.y_offset )
+                p = r.project(self.width, self.height, self.fov, self.distance, self.x_offset + self.x_adj,self.y_offset + self.y_adj )
                 block_vertices.append(p)
  
             block_faces = [(0,1,3,2),(1,5,7,3),(5,4,6,7),(4,0,2,6),(0,4,5,1),(2,3,7,6)]
@@ -131,7 +133,7 @@ class Cube3D:
                 r_map = {"FRONT":point.rotateX,"RIGHT":point.rotateZ,"UP":point.rotateY}
                 r1 = r_map[face](angle*clockwize)                
                 r = r1.rotateY(self.alpha).rotateX(self.gama)
-                p = r.project(self.width, self.height, self.fov, self.distance, self.x_offset,self.y_offset )
+                p = r.project(self.width, self.height, self.fov, self.distance,self.x_offset + self.x_adj,self.y_offset + self.y_adj  )
                 block_vertices.append(p)
             b3d.resetVertices(block_vertices)
 
@@ -153,8 +155,8 @@ class Cube3D:
             
     def displayLayer(self,screen,face,layer,x,y):
         face_index = l_map[face]["FACE"]
-        x_offset = x
-        y_offset = y
+        x_offset = x + 0.3*self.x_offset
+        y_offset = y + 0.3*self.y_offset
         
         blocks = [item for item in self.blocks if 
             (item.block.current.x, item.block.current.y, item.block.current.z)
@@ -238,8 +240,7 @@ class Cube3D:
                 if (x > e[0].x and x < e[1].x) or (x < e[0].x and x > e[1].x):
                     ray_point += 1
 
-        return ray_point == 1
-                
+        return ray_point == 1        
             
         
 

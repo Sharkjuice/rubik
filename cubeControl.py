@@ -1,5 +1,5 @@
 ﻿import pygame,sys,time,random,copy,subprocess
-import cubeModel,cubeView,cubeCalculator
+import cubeModel,cubeView
 from cubeGlobal import cube_o,win_height,win_width,fov,distance,background,screen,black,green,bright_green
 from cubeCommon import button,printText
 from cubeTutorial import displayTutorial,nextOrPrevious
@@ -65,11 +65,11 @@ class CubeController:
         self.comparing = False
         #初始化数据模型
         my_cube = cubeModel.Cube()
-        self.calculator = cubeCalculator.CubeCalculator(my_cube)
-        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset-30)
+       
+        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset,0,-30)
         self.displayCube(screen)
         
-        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, self.x_offset + 820, self.y_offset + 50)
+        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, self.x_offset, self.y_offset,820,50)
 
                 
 
@@ -94,8 +94,7 @@ class CubeController:
                     blocks.append(((int(b[2]),int(b[3]),int(b[4])),"".join([b[5],b[6],b[7]])))
             fo.close()
             cube = cubeModel.Cube(blocks)
-            self.calculator = cubeCalculator.CubeCalculator(cube)             
-            self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset-30)
+            self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset,0,-30)
             self.displayCube(screen)
         
  
@@ -117,9 +116,9 @@ class CubeController:
     def displayCube(self,screen):
         self.my_cube_3d.buildFaces()        
         self.my_cube_3d.displayCube(screen)
-        self.my_cube_3d.displayLayer(screen,"RIGHT",2, self.x_offset - 120,self.y_offset -110)
-        self.my_cube_3d.displayLayer(screen,"UP",2,self.x_offset - 156,self.y_offset + 295)
-        self.my_cube_3d.displayLayer(screen,"FRONT",2,self.x_offset + 360, self.y_offset - 110)
+        self.my_cube_3d.displayLayer(screen,"RIGHT",2, -120, -110)
+        self.my_cube_3d.displayLayer(screen,"UP",2, -156, 295)
+        self.my_cube_3d.displayLayer(screen,"FRONT",2, 360, -110)
     
 
     def helpCube(self,dumy):
@@ -134,9 +133,9 @@ class CubeController:
         self.comparing = False
         pygame.draw.rect(screen,background,(self.x_offset + 810, self.y_offset + 5,538,595))    
         self.sn_cube_3d.displayCube(screen)
-        self.sn_cube_3d.displayLayer(screen,"RIGHT",2, self.x_offset + 180,self.y_offset - 70)
-        self.sn_cube_3d.displayLayer(screen,"UP",2, self.x_offset + 160, self.y_offset + 260)
-        self.sn_cube_3d.displayLayer(screen,"FRONT",2,self.x_offset + 480, self.y_offset - 70)
+        self.sn_cube_3d.displayLayer(screen,"RIGHT",2, 180,-70)
+        self.sn_cube_3d.displayLayer(screen,"UP",2, 160, 260)
+        self.sn_cube_3d.displayLayer(screen,"FRONT",2, 480, -70)
    
     def compareCube(self,dumy):
         if self.comparing:#已经处于比对状态，就返回
@@ -315,8 +314,8 @@ class CubeController:
                 b_x = 810
                 
             
-            button(screen,"d",self.x_offset + 1110,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,'d')
-            button(screen,"l",self.x_offset + 1160,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,'l')
+            button(screen,"d",    self.x_offset + 1110,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,'d')
+            button(screen,"d'",    self.x_offset + 1160,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,"d'")
             button(screen,u"帮助",self.x_offset + 1210,self.y_offset + 610,60,30,green,bright_green,self.helpCube,"X")  
             button(screen,u"保存",self.x_offset + 1280,self.y_offset + 610,60,30,green,bright_green,self.saveCube,"X")  
 
@@ -328,10 +327,10 @@ class CubeController:
             button(screen,u"对比",self.x_offset + 1210,self.y_offset + 690,60,30,green,bright_green,self.compareCube,"X") 
             button(screen,u"退出",self.x_offset + 1280,self.y_offset + 690,60,30,green,bright_green,self.cubeQuit,"X") 
            
-            button(screen,"M",self.x_offset + 1140,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M") 
-            button(screen,"M'",self.x_offset + 1190,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M'") 
-            button(screen,"l",self.x_offset + 1240,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"l")
-            button(screen,"提示",self.x_offset + 1290,self.y_offset + 730,50,30,green,bright_green,self.hint,"X")
+            button(screen,"M",    self.x_offset + 1140,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M") 
+            button(screen,"M'",   self.x_offset + 1190,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M'") 
+            button(screen,"l",    self.x_offset + 1240,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"l")
+            button(screen,"提示", self.x_offset + 1290,self.y_offset + 730,50,30,green,bright_green,self.hint,"X")
             displayTutorial(screen, self.x_offset, self.y_offset)            
 
             if self.rotating:

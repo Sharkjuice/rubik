@@ -49,10 +49,8 @@ class CubeController:
         self.rotating = False
 
         self.gameExit = False
-        self.message = ""
-        self.update_message = False
-        self.advise = ""
-        self.update_advise = False
+        self.message = u"操作历史"
+        self.advise = u"下一步提示"
 
         #转动哪一面
         self.rotate_face = ""
@@ -138,8 +136,8 @@ class CubeController:
         self.sn_cube_3d.displayLayer(screen,"FRONT",2, 480, -70)
    
     def compareCube(self,dumy):
-        if self.comparing:#已经处于比对状态，就返回
-            return
+        if self.comparing:#已经处于比对状态，先取消
+            self.cancel(dumy)
         self.comparing = True        
         mark = 1
         for my_b in self.my_cube_3d.blocks:        
@@ -185,7 +183,7 @@ class CubeController:
                     self.his_actions.pop(0)
                     self.his_actions.append(action)
         self.message = "".join(self.his_actions)
-        self.update_message = True
+        #self.update_message = True
                 
     def cubeQuit(self,dumy):
         self.gameExit = True
@@ -220,7 +218,6 @@ class CubeController:
             best = [ adv for adv in adv_p if adv["p"] == 3 ]
         if best != []:
             self.advise = best[0]["h"]
-            self.update_advise = True
             t1 = best[0].get("t1", None)
             t2 = best[0].get("t2", None)
             for my_b in self.my_cube_3d.blocks:
@@ -236,7 +233,7 @@ class CubeController:
                 self.my_cube_3d.displayCube(screen)
             
 
-    def cancelRotate(self,dumy):
+    def cancel(self,dumy):
         if self.comparing:#已经处于比对状态，先撤销次状态
             self.comparing = False        
             mark = 1
@@ -248,7 +245,7 @@ class CubeController:
                     sn_b.mark = "-"
             self.my_cube_3d.displayCube(screen)
             self.sn_cube_3d.displayCube(screen)
-        else:
+        else:#撤销上次的转动
             self.singleRotate(None)    
         
     def detectAction(self,block,face,start,end):
@@ -323,7 +320,7 @@ class CubeController:
             button(screen,u"快照",self.x_offset + 1210,self.y_offset + 650,60,30,green,bright_green,self.snapCube,"X" )
             button(screen,u"加载",self.x_offset + 1280,self.y_offset + 650,60,30,green,bright_green,self.loadCube,"X")  
 
-            button(screen,u"撤销",self.x_offset + 1140,self.y_offset + 690,60,30,green,bright_green,self.cancelRotate,"X") 
+            button(screen,u"撤销",self.x_offset + 1140,self.y_offset + 690,60,30,green,bright_green,self.cancel,"X") 
             button(screen,u"对比",self.x_offset + 1210,self.y_offset + 690,60,30,green,bright_green,self.compareCube,"X") 
             button(screen,u"退出",self.x_offset + 1280,self.y_offset + 690,60,30,green,bright_green,self.cubeQuit,"X") 
            
@@ -352,13 +349,11 @@ class CubeController:
                 self.rotating = False
                 self.rotate_angle = 0
 
-            if self.update_message:
-                pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 690,560,30))            
-                printText(screen, self.message, "kaiti", 25, self.x_offset + 230, self.y_offset + 690, background)
+            pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 690,560,30))            
+            printText(screen, self.message, "kaiti", 25, self.x_offset + 230, self.y_offset + 690, background)
                     
-            if self.update_advise:
-                pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 730,560,30))            
-                printText(screen, self.advise, "kaiti", 25, self.x_offset + 230, self.y_offset + 730, background)
+            pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 730,560,30))            
+            printText(screen, self.advise, "kaiti", 25, self.x_offset + 230, self.y_offset + 730, background)
                 
            
             clock.tick(30)

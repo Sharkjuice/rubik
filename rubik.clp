@@ -432,9 +432,9 @@
 (assert (f2l-hint 1 5 128 4 0 "U'(RUR'U)(RUR')"))
 (assert (f2l-hint 1 6 4 32 0 "y'U(R'U'RU')(R'U'R)"))
 (assert (f2l-hint 1 7 0 132 0 "y'(UR'U'R)(U'2R'UR)"))
-(assert (f2l-hint 1 8 36 0 0 "U'(RUR'U')(RU'2R')"))
-(assert (f2l-hint 1 9 0 36 0 "y'(UR'U2)(RU'2R'UR)"))
-(assert (f2l-hint 1 10 132 0 0 "U'(RU'2)(R'U2)(RU'R')"))
+(assert (f2l-hint 1 8 36 0 0 "U'(RUR')U2(RU'R')"))
+(assert (f2l-hint 1 9 0 36 0 "y'(UR'U')(U'RU)U(R'UR)"))
+(assert (f2l-hint 1 10 132 0 0 "(U'RU)(UR'U')U'(RU'R')"))
 (assert (f2l-hint 1 11 0 128 4 "y'(U'R'U)(URU')(R'UR)"))
 (assert (f2l-hint 1 12 32 0 4 "(URU')(U'R'U)(RU'R'"))
 (assert (f2l-hint 1 13 128 0 4 "(RU'R')U2(RUR')"))
@@ -447,8 +447,8 @@
 (assert (f2l-hint 1 26 0 12 0 "(RU'R'U2)y'(R'U'R)"))
 (assert (f2l-hint 1 34 0 2 4 "y'(R'U2)(RUR'U'R)"))
 (assert (f2l-hint 1 35 2 0 4 "(RUR'U2)(RUR'U')(RUR')"))
-(assert (f2l-hint 1 36 8 0 4 "(RU2R')(U'RUR')"))
-(assert (f2l-hint 1 37 0 8 4 "FU(RU'R'F')(RU'R')"))
+(assert (f2l-hint 1 36 8 0 4 "(RU)(UR'U')RUR')"))
+(assert (f2l-hint 1 37 0 8 4 "(FURU'R'F')(RU'R')"))
 
 ;;F2L PATTERN 2, corner not OK, edge OK.
 (assert (f2l-hint 2 15 0 4 0 "U'(RU'2R'U)(RUR')"))
@@ -532,12 +532,12 @@
 (defrule f2l-pattern-2 "Corner wrong, edge OK."
 	(phase 2)
 	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (status wrong))
-	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (status ok))
+	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (cord ?x1 ?y1 ?z1) (status ok))
 	(side (id ?id1) (type V1) (side ?s1))
 	(side (id ?id1) (type V2) (side ?s2))
 	(face ?s1 ?c1) (face ?s2 ?c2)
 	
-    (block (id ?id5&:(= (block-id w ?c1 ?c2) ?id5)) (cord ?x1 ?y1 ?z1) (layer 3))
+    (block (id ?id5&:(= (block-id w ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
     (side (id ?id5) (side U) (pos ?p5) (color ?c5))
 	(rotate-hint ?s1 ?h1)
 	(f2l-hint 2 ?f ?pv_f ?pv_r ?pv_w ?h2)
@@ -551,6 +551,7 @@
 	
 	(if (nth$ 1 ?m) then 
 		(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");" )	
+		(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");" )	
 		(if (neq ?s1 F) then (printout t "f:" ?f ";p:1;h:" ?h1 crlf) else		
 			(if (eq O (nth$ 2 ?m)) then 
 				(printout t "f:" ?f ";p:0;h:" ?h2 crlf) else
@@ -563,12 +564,12 @@
 (defrule f2l-pattern-3 "Corner wrong, layer 2 flipped"
 	(phase 2)
 	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (status wrong))
-	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (status flipped))
+	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (cord ?x1 ?y1 ?z1) (status flipped))
 	(side (id ?id1) (type V1) (side ?s1))
 	(side (id ?id1) (type V2) (side ?s2))
 	(face ?s1 ?c1) (face ?s2 ?c2)
 	
-    (block (id ?id5&:(= (block-id w ?c1 ?c2) ?id5)) (cord ?x1 ?y1 ?z1) (layer 3))
+    (block (id ?id5&:(= (block-id w ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
     (side (id ?id5) (side U) (pos ?p5) (color ?c5))
 	(rotate-hint ?s1 ?h1)
 	(f2l-hint 3 ?f ?pv_f ?pv_r ?pv_w ?h2)
@@ -582,6 +583,7 @@
 	
 	(if (nth$ 1 ?m) then 
 		(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");" )	
+		(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");" )	
 		(if (neq ?s1 F) then (printout t "f:" ?f ";p:1;h:" ?h1 crlf) else		
 			(if (eq O (nth$ 2 ?m)) then 
 				(printout t "f:" ?f ";p:0;h:" ?h2 crlf) else
@@ -658,20 +660,20 @@
 
 (defrule f2l-pattern-7 "Corner OK, edge on layer 3"
 	(phase 2)
-	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (status ok))
+	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (cord ?x1 ?y1 ?z1) (status ok))
 	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (status wrong))
 	(side (id ?id1) (type V1) (side ?s1))
 	(side (id ?id1) (type V2) (side ?s2))
 	(face ?s1 ?c1) (face ?s2 ?c2)
 	
-    (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x1 ?y1 ?z1) (layer 3))
+    (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
 	(side (id ?id5) (type V1) (side ?s3) (color ?c3))	
 	(rotate-hint ?s1 ?h1)
 	(up-rotate-hint ?s3 F ?h2)
 	(up-rotate-hint ?s3 R ?h3)
 	=>
-	;(printout t ?s1 " " ?s3 " " ?c1 " " ?c3 crlf)
 	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:32;p:1;h:" ?h1 crlf) else
 			(if (eq ?s3 F) then (printout t "f:32;p:0;h:(URU'R'U')y'(R'UR)" crlf) else
@@ -685,18 +687,19 @@
 
 (defrule f2l-pattern-8-1 "Corner flipped, edge on layer 3, pattern 1"
 	(phase 2)
-	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (status flipped))
+	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (cord ?x1 ?y1 ?z1) (status flipped))
 	(side (id ?id1) (type V1) (side ?s1)) 
 	(side (id ?id1) (type V2) (side ?s2) (color w))
 	(face ?s1 ?c1) (face ?s2 ?c2)
 	
-    (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x1 ?y1 ?z1) (layer 3))
+    (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
 	(side (id ?id5) (type V1) (side ?s3) (color ?c3))	
 	(rotate-hint ?s1 ?h1)
 	(up-rotate-hint ?s3 F ?h2)
 	(up-rotate-hint ?s3 R ?h3)
 	=>
 	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:38;p:1;h:" ?h1 crlf) else
 			(if (eq ?s3 F) then (printout t "f:38;p:0;h:y'(R'UR)U'(R'UR)" crlf) else
@@ -710,24 +713,27 @@
 
 (defrule f2l-pattern-8-2 "Corner flipped, edge on layer 3, pattern 2"
 	(phase 2)
-	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (status flipped))
+	(block (id ?id1) (pos ?p1) (layer 1) (type corner) (cord ?x1 ?y1 ?z1) (status flipped))
 	(side (id ?id1) (type V1) (side ?s1) (color w)) 
 	(side (id ?id1) (type V2) (side ?s2))
 	(face ?s1 ?c1) (face ?s2 ?c2)
 	
-    (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x1 ?y1 ?z1) (layer 3))
+    (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
 	(side (id ?id5) (type V1) (side ?s3) (color ?c3))	
 	(rotate-hint ?s1 ?h1)
 	(up-rotate-hint ?s3 F ?h2)
 	(up-rotate-hint ?s3 R ?h3)
 	=>
 	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
-		(if (neq ?s1 F) then (printout t "f:41;p:1;h:" ?h1 crlf) 
-		else (printout t "f:41;p:0;h:" ?h2 "y'(R'U'R)U(R'U'R)" crlf)) 
+		(if (neq ?s1 F) then (printout t "f:41;p:1;h:" ?h1 crlf) else
+			(if (eq ?s3 F) then (printout t "f:41;p:0;h:y'(R'U'R)U(R'U'R)" crlf) else
+				(printout t "f:41;p:0;h:" ?h2 "y'(R'U'R)U(R'U'R)" crlf))) 
 	else 
-		(if (neq ?s1 F) then (printout t "f:40;p:1;h:" ?h1 crlf) 
-		else (printout t "f:40;p:0;h:" ?h3 "(RU'R')U(RU'R')" crlf)) 
+		(if (neq ?s1 F) then (printout t "f:40;p:1;h:" ?h1 crlf) else
+			(if (eq ?s3 R) then (printout t "f:40;p:0;h:(RU'R')U(RU'R')"  crlf) else
+				(printout t "f:40;p:0;h:" ?h3 "(RU'R')U(RU'R')" crlf)))
 	)
 )
 
@@ -745,19 +751,20 @@
 
 (defrule f2l-pattern-10 "edge not in place, but is a layer 2 edge"
 	(phase 2)
-	(block (id ?id1) (pos ?p1) (layer 2) (type edge) (status wrong))
+	(block (id ?id1) (pos ?p1) (layer 2) (type edge) (cord ?x1 ?y1 ?z1) (status wrong))
 	(not (side (id ?id1) (color w|y)))
 	(side (id ?id1) (type V1) (side ?s1))
 	(side (id ?id1) (type V2) (side ?s2))
 	(face ?s1 ?c1) (face ?s2 ?c2)
 	
-	(block (id ?id2&:(= ?id2 (block-id - ?c1 ?c2))) (cord ?x1 ?y1 ?z1) (layer 3))
+	(block (id ?id2&:(= ?id2 (block-id - ?c1 ?c2))) (cord ?x2 ?y2 ?z2) (layer 3))
 	(side (id ?id2) (side ?s3) (type V1) (color ?c3))	
 	(rotate-hint ?s1 ?h1)
 	(up-rotate-hint ?s3 F ?h2)
 	(up-rotate-hint ?s2 R ?h3)
 	=>
 	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:32;p:3;h:" ?h1 crlf) 
 		else (printout t "f:32;p:2;h:" ?h2 "(URU'R'U')y'(R'UR)" crlf)) 
@@ -776,7 +783,7 @@
 	(face ?s1 ?c1) (face ?s2 ?c2)
 	
 	(block (id ?id2&:(= ?id2 (block-id - ?c1 ?c2)))  (layer 2))	
-	(block (id ?id3) (layer 3) (type edge))
+	(block (id ?id3) (layer 3) (cord ?x2 ?y2 ?z2) (type edge))
 	(side (id ?id3) (color y))
 	(side (id ?id3) (type V1) (side ?s3))
 	(not (and (block (id ?id4&:(< ?id4 ?id3)) (layer 3) (type edge))
@@ -785,6 +792,7 @@
 	(up-rotate-hint ?s3 R ?h2)		  
 	=>
 	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (neq ?s1 F) then (printout t "f:33;p:3;h:" ?h1 crlf) else 
 	(if (neq ?s3 R) then (printout t "f:33;p:2;h:" ?h2 "(R'F'RU)(RU'R'F)" crlf) else 
 		(printout t "f:33;p:2;h:(R'F'RU)(RU'R'F)"  crlf)))
@@ -824,7 +832,7 @@
 (assert (oll-hint 30 674 "(RUR2U')(R'F)(RURU')F"))
 (assert (oll-hint 31 1080 "(R'U')(R'FRF')(UR)"))
 (assert (oll-hint 32 1283 "(R'U'F)(URU'R')(F'R)"))
-(assert (oll-hint 33 1409 "(RU)(B'U)(R'URBR')"))
+(assert (oll-hint 33 1409 "(RU)(B'U')(R'URBR')"))
 (assert (oll-hint 34 184 "(B'U')(R'URB)"))
 (assert (oll-hint 35 3712 "f(RUR'U')f'"))
 (assert (oll-hint 36 51 "F(RU'R'U'RU)(R'F')"))
@@ -841,7 +849,7 @@
 (assert (oll-hint 47 2772 "B'(R'U'RU)2B"))
 (assert (oll-hint 48 469 "(r'U2)(RUR'U')(RUR'U)r"))
 (assert (oll-hint 49 2646 "F(RUR'U')2F'"))
-(assert (oll-hint 50 3780 "(r'U)(r2U'R'2U')(r2Ur')"))
+(assert (oll-hint 50 3780 "(r'U)(r2U'r'2U')(r2Ur')"))
 (assert (oll-hint 51 441 "(RB')(R2F)(R2B)(R2F'R)"))
 (assert (oll-hint 52 3208 "f(RUR'2U')(R'U)(R2U'R')f'"))
 (assert (oll-hint 53 275 "(RUR'U')(RU'R'F'U'F)(RUR')"))

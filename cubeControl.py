@@ -44,6 +44,9 @@ class CubeController:
         self.init_count = init_count
         self.his_actions = []
         self.his_count = his_count
+        #self.dk_count = 0
+        #self.dk_time = 0
+
         #控制动画显示某一层的转动
         #是否在转动中， 用户启动转动，转动90度后自动停止
         self.rotating = False
@@ -296,8 +299,16 @@ class CubeController:
                                             (mouse_up_x,mouse_up_y))
                             if action != "-":
                                 self.singleRotate(action)
-                        
-        
+                            #double click, seems difficult to use
+                            #self.dk_count += 1
+                            #if self.dk_count == 1:
+                            #    self.dk_time = pygame.time.get_ticks()
+                            #if self.dk_count == 2:
+                            #    if (pygame.time.get_ticks() - self.dk_time) < 500:
+                            #        action = cube_o[hit_b][1][hit_f].get("DC","-")  
+                            #    if action != "-":
+                            #        self.singleRotate(action)
+                            #    self.dk_count = 0                                   
             #显示控制按钮
             b_map = [["F","F'","f","f'","B","B'"],["R","R'","r","r'","L","L'",],
                      ["U","U'","u","u'","D","D'"],["x","x'","y","y'","z","z'"]]

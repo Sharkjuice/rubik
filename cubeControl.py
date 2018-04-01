@@ -342,7 +342,7 @@ class CubeController:
             displayTutorial(screen, self.x_offset, self.y_offset)            
 
             if self.rotating:
-                self.rotate_angle = self.rotate_angle + 3
+                self.rotate_angle = self.rotate_angle + 6
                 self.my_cube_3d.rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize,self.rotate_angle)
                 self.my_cube_3d.clearCube(screen)
                 self.my_cube_3d.displayCube(screen)

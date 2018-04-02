@@ -2,3 +2,7 @@
 __pycache__/
 mycube.clp
 dist/mycube.clp
+dist/lib/email
+dist/lib/http
+dist/lib/url
+dist/lib/xml

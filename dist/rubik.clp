@@ -339,7 +339,7 @@
 	(facelet (id ?id) (facelet ?s&~D) (color w))
 	(zero-macro ?s ?h)
 	=>
-	(printout t "p:1;h:" ?h crlf)
+	(printout t "s:0;p:1;h:" ?h crlf)
 )
 (defrule init-phase-macro
 =>
@@ -369,8 +369,8 @@
 		(and (test (eq ?s F)) (init-macro align_down ?p ?h))
 	)
 	=>
-	(printout t "t1:(" ?x " " ?y " " ?z ")")
-	(printout t ";f:1;p:0;h:" ?h crlf)
+	(printout t "t1:(" ?x " " ?y " " ?z ");")
+	(printout t "s:1;f:1;p:0;h:" ?h crlf)
 )
 
 (defrule init-phase-next-2 "edge is on layer3 but fliped"
@@ -384,8 +384,8 @@
 		(and (test (eq ?s1 F)) (init-macro align_flip 6 ?h))
 	)
 	=>
-	(printout t "t1:(" ?x " " ?y " " ?z ")")
-	(printout t ";f:2;p:1;h:" ?h crlf)
+	(printout t "t1:(" ?x " " ?y " " ?z ");")
+	(printout t "s:1;f:2;p:1;h:" ?h crlf)
 )
 
 (defrule init-phase-next-3 "the edge is flipped, move to layer 3"
@@ -401,8 +401,8 @@
 		(and (test (eq ?s2 F)) (test (neq ?t ok)) (init-macro 1 align_up ?p1 ?h))
 	)
 	=>
-	(printout t "t1:(" ?x " " ?y " " ?z ")")
-	(printout t ";f:3;p:2;h:" ?h crlf)
+	(printout t "t1:(" ?x " " ?y " " ?z ");")
+	(printout t "s:1;f:3;p:2;h:" ?h crlf)
 )
 
 (defrule init-phase-next-4 "the edge on layer 3, adust face"
@@ -417,8 +417,8 @@
 		(and (test (eq ?s2 F)) (up-rotate-macro ?s1 F ?h))
 	)
 	=>
-	(printout t "t1:(" ?x " " ?y " " ?z ")")
-	(printout t ";f:4;p:1;h:" ?h crlf)
+	(printout t "t1:(" ?x " " ?y " " ?z ");")
+	(printout t "s:1;f:4;p:1;h:" ?h crlf)
 ) 
 
 
@@ -518,7 +518,7 @@
 	(bind ?hv_w (+ ?hv1_3 ?hv2_3))
 	(bind ?m (f2l-pattern-match ?pv_f ?pv_r ?pv_w ?hv_f ?hv_r ?hv_w))
 	(if (nth$ 1 ?m) then 
-		(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+		(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 		(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 		(if (neq ?s1 F) then (printout t "f:" ?f ";p:1;h:" ?h1 crlf) else		
 			(if (eq O (nth$ 2 ?m)) then 
@@ -550,7 +550,7 @@
 	(bind ?m (f2l-pattern-match ?pv_f ?pv_r ?pv_w ?hv_f ?hv_r ?hv_w))
 	
 	(if (nth$ 1 ?m) then 
-		(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");" )	
+		(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");" )	
 		(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");" )	
 		(if (neq ?s1 F) then (printout t "f:" ?f ";p:1;h:" ?h1 crlf) else		
 			(if (eq O (nth$ 2 ?m)) then 
@@ -582,7 +582,7 @@
 	(bind ?m (f2l-pattern-match ?pv_f ?pv_r ?pv_w ?hv_f ?hv_r ?hv_w))
 	
 	(if (nth$ 1 ?m) then 
-		(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");" )	
+		(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");" )	
 		(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");" )	
 		(if (neq ?s1 F) then (printout t "f:" ?f ";p:1;h:" ?h1 crlf) else		
 			(if (eq O (nth$ 2 ?m)) then 
@@ -600,7 +600,7 @@
 	(facelet (id ?id1) (type V1) (facelet ?s1))
 	(rotate-macro ?s1 ?h1)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (neq ?s1 F) then (printout t "f:31;p:1;h:" ?h1 crlf) else
 	(printout t "f:31;p:0;h:(RU'R'U)y'(R'U2RU'2)(R'UR)" crlf))
@@ -613,7 +613,7 @@
 	(facelet (id ?id1) (type V1) (facelet ?s1) (color w))
 	(rotate-macro ?s1 ?h1)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (neq ?s1 F) then (printout t "p:1;h:" ?h1 crlf) else
 	(printout t "f:28;p:0;h:(RUR'U')(RU'2R'U')(RUR')"  crlf))
@@ -626,7 +626,7 @@
 	(facelet (id ?id1) (type V1) (facelet ?s1) (color ~w))
 	(rotate-macro ?s1 ?h1)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (neq ?s1 F) then (printout t "f:27;p:3;h:" ?h1 crlf) else
 	(printout t "f:27;p:0;h:(RU'R'U)(RU2)(R'URU'R')"  crlf))
@@ -639,7 +639,7 @@
 	(facelet (id ?id1) (type V1) (facelet ?s1) (color w))
 	(rotate-macro ?s1 ?h)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (neq ?s1 F) then (printout t "f:30;p:1;h:" ?h crlf) else
 	(printout t "f:30;p:0;h:(RU'R')(U'RU'R'U)y'(R'U'R)" crlf))
@@ -652,7 +652,7 @@
 	(facelet (id ?id1) (type V1) (facelet ?s1) (color ~w))
 	(rotate-macro ?s1 ?h)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (neq ?s1 F) then (printout t "f:29;p:1;h:" ?h crlf) else
 	(printout t "f:29;p:0;h:(RU)F(RUR'U')(F'R')"  crlf))
@@ -672,7 +672,7 @@
 	(up-rotate-macro ?s3 F ?h2)
 	(up-rotate-macro ?s3 R ?h3)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:32;p:1;h:" ?h1 crlf) else
@@ -698,7 +698,7 @@
 	(up-rotate-macro ?s3 F ?h2)
 	(up-rotate-macro ?s3 R ?h3)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:38;p:1;h:" ?h1 crlf) else
@@ -724,7 +724,7 @@
 	(up-rotate-macro ?s3 F ?h2)
 	(up-rotate-macro ?s3 R ?h3)
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:41;p:1;h:" ?h1 crlf) else
@@ -744,7 +744,7 @@
 	(facelet (id ?id1) (facelet ?s1) (type V1))	
 	(rotate-macro ?s1 ?h)	
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(if (neq ?s1 F) then (printout t "f:42;p:3;h:" ?h crlf) else 
 	(printout t "f:42;p:2;h:(RUR')"  crlf))
 )
@@ -763,6 +763,8 @@
 	(up-rotate-macro ?s3 F ?h2)
 	(up-rotate-macro ?s3 R ?h3)
 	=>
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (eq ?c3 ?c1) then 
 		(if (neq ?s1 F) then (printout t "f:32;p:1;h:" ?h1 crlf) else
 			(if (eq ?s3 F) then (printout t "f:32;p:0;h:(URU'R'U')y'(R'UR)" crlf) else
@@ -793,7 +795,7 @@
 	(rotate-macro ?s1 ?h1)
 	(up-rotate-macro ?s3 R ?h2)		  
 	=>
-	(printout t "t1:(" ?x1 " " ?y1 " " ?z1 ");")	
+	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
 	(if (neq ?s1 F) then (printout t "f:33;p:3;h:" ?h1 crlf) else 
 	(if (neq ?s3 R) then (printout t "f:33;p:2;h:" ?h2 "(R'F'RU)(RU'R'F)" crlf) else 
@@ -802,9 +804,9 @@
 
 (defrule init-oll-macro 
 =>
-(assert (oll-macro 1 521 "RU(UR'U'R)U'R'"))
-(assert (oll-macro 2 292 "RU(R'URU')U'R'"))
-(assert (oll-macro 3 325 "RU(UR'U'R)(UR'U'R)U'R'"))
+(assert (oll-macro 1 521 "RU2R'U'RU'R'"))
+(assert (oll-macro 2 292 "RUR'(URU'2R')"))
+(assert (oll-macro 3 325 "(RU)(UR'U'R)2(U'R')"))
 (assert (oll-macro 4 2628 "(RU2)(R2U')(R2U')(R2U2R)"))
 (assert (oll-macro 5 257 "(rUR'U')(rFRF')"))
 (assert (oll-macro 6 320 "(R2D')(RU2R'D)(RU2R)"))
@@ -841,17 +843,17 @@
 (assert (oll-macro 37 1185 "(RU'2R'2FRF')(RU'2R')"))
 (assert (oll-macro 38 3488 "r'(U2)(RUR'U)r"))
 (assert (oll-macro 39 1547 "r(U'2)(R'U'RU')r'"))
-(assert (oll-macro 40 217 "r'(U'RU'R'U2)r"))
+(assert (oll-macro 40 217 "(r'U')(RU'R'U)(Ur)"))
 (assert (oll-macro 41 310 "r(UR'URU'2)r'"))
 (assert (oll-macro 42 1444 "r'(R2UR'U)(RU'2R'U)(rR')"))
 (assert (oll-macro 43 1099 "(UF)(RUR'U')F'UF(RUR'U')F'"))
 (assert (oll-macro 44 595 "(RUR'U')(R'FR2)(UR'U'F')"))
 (assert (oll-macro 45 2452 "(RUR'U)(R'FRF')(RU'2R')"))
-(assert (oll-macro 46 343 "(rU'2)(R'U'RUR'U')(RU'r')"))
+(assert (oll-macro 46 343 "(rU)(UR'U'R)2(U'r')"))
 (assert (oll-macro 47 2772 "B'(R'U'RU)2B"))
-(assert (oll-macro 48 469 "(r'U2)(RUR'U')(RUR'U)r"))
+(assert (oll-macro 48 469 "(r'U')(U'RUR')2(Ur)"))
 (assert (oll-macro 49 2646 "F(RUR'U')2F'"))
-(assert (oll-macro 50 3780 "(r'U)(r2U'r'2U')(r2Ur')"))
+(assert (oll-macro 50 3780 "(r'U)(r2U'r'2U'r2)Ur')"))
 (assert (oll-macro 51 441 "(RB')(R2F)(R2B)(R2F'R)"))
 (assert (oll-macro 52 3208 "f(RUR'2U')(R'U)(R2U'R')f'"))
 (assert (oll-macro 53 275 "(RUR'U')(RU'R'F'U'F)(RUR')"))
@@ -875,13 +877,13 @@
 	(oll-macro ?f ?pv ?h)
 	=>
 	(if (= ?*oll-pv* ?pv) then 
-		(printout t "p:0;h:" ?h ";f:" ?f crlf) else 
+		(printout t "s:3;p:0;h:" ?h ";f:" ?f crlf) else 
 	(if (= ?*oll-pv* (mod (* ?pv 8) 4095)) then 
-		(printout t "p:1;h:U;f:" ?f crlf) else
+		(printout t "s:3;p:1;h:U;f:" ?f crlf) else
 	(if (= ?*oll-pv* (mod (* ?pv 64) 4095)) then 
-		(printout t "p:1;h:UU;f:" ?f crlf) else
+		(printout t "s:3;p:1;h:UU;f:" ?f crlf) else
 	(if (= ?*oll-pv* (mod (* ?pv 512) 4095)) then 
-		(printout t "p:1;h:U';f:" ?f crlf)
+		(printout t "s:3;p:1;h:U';f:" ?f crlf)
 	))))
 )
 
@@ -937,7 +939,7 @@
 (defrule pll-pattern-default
 	(phase 4)
 	=>
-	(printout t "f:0;p:1;h:U" crlf)  
+	(printout t "s:4;f:0;p:1;h:U" crlf)  
 )
 
 (defrule pll-pattern
@@ -947,9 +949,9 @@
 	(bind ?m (pll-pattern-match ?pv))
 	(if (nth$ 1 ?m) then 
 		(if (eq O (nth$ 2 ?m)) then 
-			(printout t "f:" ?f ";p:0;h:" ?h crlf)  
+			(printout t "s:4;f:" ?f ";p:0;h:" ?h crlf)  
 		else
-			(printout t "f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf)  
+			(printout t "s:4;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf)  
 		)
 	)
 )
@@ -959,14 +961,14 @@
 	(if (nth$ 1 ?m) then
 		(if (eq O (nth$ 2 ?m)) then 
 			(if (eq ?c1 ?c3) then
-				(if (= 1 ?d) then (printout t "f:" ?f ";p:0;h:" ?h crlf))
+				(if (= 1 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" ?h crlf))
 			else 
-				(if (= 2 ?d) then (printout t "f:" ?f ";p:0;h:" ?h crlf)))
+				(if (= 2 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" ?h crlf)))
 		else
 			(if (eq ?c1 ?c3) then
-				(if (= 1 ?d) then (printout t "f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf))
+				(if (= 1 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf))
 			else 
-				(if (= 2 ?d) then (printout t "f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf)))
+				(if (= 2 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf)))
 		)
 	)	
 )

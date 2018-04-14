@@ -224,6 +224,7 @@ def displayTutorial(screen,x_offset,y_offset):
     button(screen,step,x_offset + 880,y_offset + 10,100,30,green,green)
     button(screen,title,x_offset + 1000,y_offset + 10,200,30,green,green)
     button(screen,">>",x_offset + 1230,y_offset + 10,40,30,green,bright_green,nextOrPrevious,1)
+    button(screen,"X",x_offset + 1300,y_offset + 10,40,30,green,bright_green,nextOrPrevious,1)
     
  
     texts = steps[currentStep]["text"]

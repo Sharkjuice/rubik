@@ -43,9 +43,8 @@ class CubeController:
         self.y_offset = y_offset
         self.init_count = init_count
         self.his_actions = []
+        self.auto_actions = []
         self.his_count = his_count
-        #self.dk_count = 0
-        #self.dk_time = 0
 
         #控制动画显示某一层的转动
         #是否在转动中， 用户启动转动，转动90度后自动停止
@@ -54,6 +53,8 @@ class CubeController:
         self.gameExit = False
         self.message = u"操作历史"
         self.advise = u"下一步提示"
+        self.stage = 0
+		
 
         #转动哪一面
         self.rotate_face = ""
@@ -165,7 +166,7 @@ class CubeController:
     def singleRotate(self,action):
         reverse = False
         if self.rotating:
-            return
+            return False
         if action == None:
             if len(self.his_actions) > 0:
                 pre_action = self.his_actions.pop(-1)
@@ -186,10 +187,54 @@ class CubeController:
                     self.his_actions.pop(0)
                     self.his_actions.append(action)
         self.message = "".join(self.his_actions)
-        #self.update_message = True
-                
+        return True
+    
     def cubeQuit(self,dumy):
         self.gameExit = True
+
+    def stepOver(self,dumy):
+        self.hint(dumy)
+        self.auto_actions = self.parseAdvice()
+
+    def parseAdvice(self):
+        macro = self.advise
+        l = len(macro)
+        if l == 0 : return
+        ci = l-1
+        pass1 = []
+        while ci >= 0:
+            a = macro[ci]
+            if a == "'":
+                ci -= 1
+                pass1.insert(0,macro[ci] + a)
+                ci -= 1            
+            else:
+                ci -= 1            
+                pass1.insert(0,a)
+                
+        si = 0
+        l = len(pass1)
+        pass2 = []
+        tmp = []
+        ci = 0
+        while ci < l:
+            a = pass1[ci]
+            if a == "(" :
+                ci += 1
+                si = ci
+            elif a == ")":
+                #pass2.extend(pass1[si:ci])
+                tmp = pass1[si:ci]
+                ci += 1
+            elif a == "2":
+                pass2.extend(tmp)
+                ci += 1
+            else:
+                pass2.append(a)
+                tmp = [a]
+                ci += 1
+                
+        return pass2
 
     def hint(self,dumy):
         self.saveCube(dumy)
@@ -204,7 +249,8 @@ class CubeController:
                 adv_m = {}
                 for item in adv_l:
                     item1 = item.split(":")
-                    adv_v = {"f":lambda x:int(x),
+                    adv_v = {"s":lambda x:int(x),
+                             "f":lambda x:int(x),
                              "p":lambda x:int(x),
                              "h":lambda x:x,
                              "t1":lambda x: x.strip("()").split(" "),
@@ -221,6 +267,7 @@ class CubeController:
             best = [ adv for adv in adv_p if adv["p"] == 3 ]
         if best != []:
             self.advise = best[0]["h"]
+            self.stage = best[0]["s"]
             t1 = best[0].get("t1", None)
             t2 = best[0].get("t2", None)
             for my_b in self.my_cube_3d.blocks:
@@ -299,16 +346,6 @@ class CubeController:
                                             (mouse_up_x,mouse_up_y))
                             if action != "-":
                                 self.singleRotate(action)
-                            #double click, seems difficult to use
-                            #self.dk_count += 1
-                            #if self.dk_count == 1:
-                            #    self.dk_time = pygame.time.get_ticks()
-                            #if self.dk_count == 2:
-                            #    if (pygame.time.get_ticks() - self.dk_time) < 500:
-                            #        action = cube_o[hit_b][1][hit_f].get("DC","-")  
-                            #    if action != "-":
-                            #        self.singleRotate(action)
-                            #    self.dk_count = 0                                   
             #显示控制按钮
             b_map = [["F","F'","f","f'","B","B'"],["R","R'","r","r'","L","L'",],
                      ["U","U'","u","u'","D","D'"],["x","x'","y","y'","z","z'"]]
@@ -320,8 +357,7 @@ class CubeController:
                     b_x += 50
                 b_y += 40
                 b_x = 810
-                
-            
+            button(screen,"X",self.x_offset + 1300,y_offset + 10,40,30,green,bright_green,self.cubeQuit,"X")
             button(screen,"d",    self.x_offset + 1110,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,'d')
             button(screen,"d'",    self.x_offset + 1160,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,"d'")
             button(screen,u"帮助",self.x_offset + 1210,self.y_offset + 610,60,30,green,bright_green,self.helpCube,"X")  
@@ -331,9 +367,9 @@ class CubeController:
             button(screen,u"快照",self.x_offset + 1210,self.y_offset + 650,60,30,green,bright_green,self.snapCube,"X" )
             button(screen,u"加载",self.x_offset + 1280,self.y_offset + 650,60,30,green,bright_green,self.loadCube,"X")  
 
-            button(screen,u"撤销",self.x_offset + 1140,self.y_offset + 690,60,30,green,bright_green,self.cancel,"X") 
+            button(screen,u"自动",self.x_offset + 1140,self.y_offset + 690,60,30,green,bright_green,self.stepOver,"X") 
             button(screen,u"对比",self.x_offset + 1210,self.y_offset + 690,60,30,green,bright_green,self.compareCube,"X") 
-            button(screen,u"退出",self.x_offset + 1280,self.y_offset + 690,60,30,green,bright_green,self.cubeQuit,"X") 
+            button(screen,u"撤销",self.x_offset + 1280,self.y_offset + 690,60,30,green,bright_green,self.cancel,"X") 
            
             button(screen,"M",    self.x_offset + 1140,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M") 
             button(screen,"M'",   self.x_offset + 1190,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M'") 
@@ -359,6 +395,13 @@ class CubeController:
                 printText(screen,"D", "kaiti", 30, self.x_offset + 120, self.y_offset + 600, black)
                 self.rotating = False
                 self.rotate_angle = 0
+
+
+            if not self.rotating:
+                if len(self.auto_actions) > 0:
+                    action = self.auto_actions.pop(0)
+                    self.singleRotate(action)
+
 
             pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 690,560,30))            
             printText(screen, self.message, "kaiti", 25, self.x_offset + 230, self.y_offset + 690, background)

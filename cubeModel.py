@@ -1,4 +1,4 @@
-# -*- coding: cp936 -*-
+# -*- coding: utf-8 -*-  
 import cubeGlobal
 import pdb
 class Point:
@@ -7,9 +7,13 @@ class Point:
     def __eq__(self,other):
         if isinstance(other,self.__class__):
             return self.__dict__ == other.__dict__
+        if type(other) == tuple:
+            return (self.x,self.y,self.z) == other
     def __ne__(self,other):
         if isinstance(other,self.__class__):
             return self.__dict__ != other.__dict__       
+        if type(other) == tuple:
+            return (self.x,self.y,self.z) != other
 
 class Block:
     def __init__(self, x, y, z, colors):
@@ -25,7 +29,7 @@ class Cube:
             block = Block(aBlock[0][0],aBlock[0][1],aBlock[0][2],aBlock[1])
             self.blocks.append(block)
  
-    #ÑØxÖá·´Ê±Õë×ª
+    #æ²¿xè½´åæ—¶é’ˆè½¬
     def rotateX(self,block,clockwize = 1):
         """ Rotates the point around the X axis by 90. """
         tmp = block.current.y
@@ -39,7 +43,7 @@ class Cube:
         block.colors[2] = block.colors[1]
         block.colors[1] = tmp
         
-     #ÑØyÖáË³Ê±Õë×ª£¬×¢ÒâºÍx¡¢zÖá²»Ò»Ñù
+     #æ²¿yè½´é¡ºæ—¶é’ˆè½¬ï¼Œæ³¨æ„å’Œxã€zè½´ä¸ä¸€æ ·
     def rotateY(self, block,clockwize = True):
         """ Rotates the point around the Y axis by the given angle in degrees. """
         tmp = block.current.z
@@ -52,7 +56,7 @@ class Cube:
         tmp = block.colors[2]
         block.colors[2] = block.colors[0]
         block.colors[0] = tmp
-    #ÑØzÖáÄæÊ±Õë×ª
+    #æ²¿zè½´é€†æ—¶é’ˆè½¬
     def rotateZ(self, block,clockwize = True):
         """ Rotates the point around the Y axis by the given angle in degrees. """
         tmp = block.current.x

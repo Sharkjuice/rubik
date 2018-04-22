@@ -1,6 +1,7 @@
-﻿import pygame,sys,time,random,copy,subprocess
+# -*- coding: utf-8 -*-  
+import pygame,sys,time,random,copy,subprocess
 import cubeModel,cubeView
-from cubeGlobal import cube_o,win_height,win_width,fov,distance,background,screen,black,green,bright_green
+from cubeGlobal import cube_o,win_height,win_width,fov,distance,background,screen,black,green,bright_green,colors_r,colors_n
 from cubeCommon import button,printText
 from cubeTutorial import displayTutorial,nextOrPrevious
 
@@ -54,7 +55,12 @@ class CubeController:
         self.message = u"操作历史"
         self.advise = u"下一步提示"
         self.stage = 0
-		
+        self.dk_count = 0
+        self.dk_time = 0
+        self.brush_color = "-"
+        self.brush_block = (-100,-100,-100)
+        self.brush_face = -1
+        self.brush_status = 0 #0: None, 1: Copy, 2:Brush
 
         #转动哪一面
         self.rotate_face = ""
@@ -100,6 +106,12 @@ class CubeController:
             self.displayCube(screen)
         
  
+    def resetCube(self,dumy):
+        my_cube = cubeModel.Cube()
+        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset,0,-30)
+        self.displayCube(screen)
+        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, self.x_offset, self.y_offset,820,50)
+        self.his_actions = []
         
 
 #随机生成一个初始乱的魔方
@@ -284,7 +296,13 @@ class CubeController:
             
 
     def cancel(self,dumy):
-        if self.comparing:#已经处于比对状态，先撤销次状态
+        if self.brush_status != 0:
+            self.brush_color = "-"
+            self.brush_block = (-100,-100,-100)
+            self.brush_face = -1
+            self.brush_status = 0
+            self.message = u"操作历史"
+        elif self.comparing:#已经处于比对状态，先撤销次状态
             self.comparing = False        
             mark = 1
             for my_b in self.my_cube_3d.blocks:        
@@ -346,6 +364,30 @@ class CubeController:
                                             (mouse_up_x,mouse_up_y))
                             if action != "-":
                                 self.singleRotate(action)
+                                
+                            #double click, to copy facelet color
+                            self.dk_count += 1
+                            if self.dk_count == 1:
+                                self.dk_time = pygame.time.get_ticks()
+                            if self.dk_count == 2:
+                                if (pygame.time.get_ticks() - self.dk_time) < 500:
+                                    self.brush_block = hit_b
+                                    self.brush_face  = hit_f
+                                    self.brush_status = 2
+                                self.dk_time = pygame.time.get_ticks()
+                            if self.dk_count == 3:
+                                if (pygame.time.get_ticks() - self.dk_time) < 500:
+                                    blocks = [item for item in self.my_cube_3d.blocks if item.block.current == hit_b]                                   
+                                    self.brush_color = colors_r[blocks[0].colors[hit_f]]
+                                    self.dk_count = 0
+                                    self.brush_block = (-100, -100, -100)
+                                    self.brush_face  = -1
+                                    self.brush_status = 1
+                                    self.message = u"开始设置方块颜色。当前颜色：" + colors_n[self.brush_color]
+                                    print("Start paste, block: ",hit_b," facelet:  ", hit_f," color: ", self.brush_color)
+                                self.dk_time = pygame.time.get_ticks()
+                                    
+
             #显示控制按钮
             b_map = [["F","F'","f","f'","B","B'"],["R","R'","r","r'","L","L'",],
                      ["U","U'","u","u'","D","D'"],["x","x'","y","y'","z","z'"]]
@@ -363,19 +405,25 @@ class CubeController:
             button(screen,u"帮助",self.x_offset + 1210,self.y_offset + 610,60,30,green,bright_green,self.helpCube,"X")  
             button(screen,u"保存",self.x_offset + 1280,self.y_offset + 610,60,30,green,bright_green,self.saveCube,"X")  
 
-            button(screen,u"打乱",self.x_offset + 1140,self.y_offset + 650,60,30,green,bright_green,self.initCube,"X")
+
+            button(screen,"M",    self.x_offset + 1110,self.y_offset + 650,40,30,green,bright_green,self.singleRotate,"M") 
+            button(screen,"M'",   self.x_offset + 1160,self.y_offset + 650,40,30,green,bright_green,self.singleRotate,"M'") 
+
+
             button(screen,u"快照",self.x_offset + 1210,self.y_offset + 650,60,30,green,bright_green,self.snapCube,"X" )
             button(screen,u"加载",self.x_offset + 1280,self.y_offset + 650,60,30,green,bright_green,self.loadCube,"X")  
 
+
+            button(screen,"l",    self.x_offset + 1110,self.y_offset + 690,20,30,green,bright_green,self.singleRotate,"l")
             button(screen,u"自动",self.x_offset + 1140,self.y_offset + 690,60,30,green,bright_green,self.stepOver,"X") 
             button(screen,u"对比",self.x_offset + 1210,self.y_offset + 690,60,30,green,bright_green,self.compareCube,"X") 
             button(screen,u"撤销",self.x_offset + 1280,self.y_offset + 690,60,30,green,bright_green,self.cancel,"X") 
            
-            button(screen,"M",    self.x_offset + 1140,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M") 
-            button(screen,"M'",   self.x_offset + 1190,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"M'") 
-            button(screen,"l",    self.x_offset + 1240,self.y_offset + 730,40,30,green,bright_green,self.singleRotate,"l")
-            button(screen,"提示", self.x_offset + 1290,self.y_offset + 730,50,30,green,bright_green,self.hint,"X")
-            displayTutorial(screen, self.x_offset, self.y_offset)            
+
+            button(screen,u"打乱",self.x_offset + 1140,self.y_offset + 730,60,30,green,bright_green,self.initCube,"X")
+            button(screen,u"开始",self.x_offset + 1210,self.y_offset + 730,60,30,green,bright_green,self.resetCube,"X")
+            button(screen,"提示", self.x_offset + 1280,self.y_offset + 730,60,30,green,bright_green,self.hint,"X")
+            displayTutorial(screen, self.x_offset, self.y_offset)
 
             if self.rotating:
                 self.rotate_angle = self.rotate_angle + 6
@@ -402,7 +450,33 @@ class CubeController:
                     action = self.auto_actions.pop(0)
                     self.singleRotate(action)
 
+            if (pygame.time.get_ticks() - self.dk_time) > 600:
+                self.dk_count = 0
+                
+                if self.brush_status == 2:
+                    self.brush_status = 0
+                    if self.brush_color != "-":
+                        self.message = u"开始设置方块颜色。当前颜色：" + colors_n[self.brush_color]
+                        self.my_cube_3d.cube
+                        model_b = [item.block for item in self.my_cube_3d.blocks if item.block.current == self.brush_block][0]                                   
+                        
+                        b = self.brush_block
+                        if b[0] == -1 and self.brush_face == 3:
+                            model_b.colors[0] = self.brush_color
+                        if (b[0] == 1 and self.brush_face == 1):
+                            model_b.colors[0] = self.brush_color
+                        if (b[1] == -1 and self.brush_face == 5 ):
+                            model_b.colors[1] = self.brush_color
+                        if (b[1] == 1 and self.brush_face == 4):
+                            model_b.colors[1] = self.brush_color
+                        if (b[2] == -1 and self.brush_face == 0):
+                            model_b.colors[2] = self.brush_color
+                        if (b[2] == 1 and self.brush_face == 2):
+                            model_b.colors[2] = self.brush_color
+                        self.my_cube_3d.buildFaces()        
+                        self.my_cube_3d.displayCube(screen)
 
+                
             pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 690,560,30))            
             printText(screen, self.message, "kaiti", 25, self.x_offset + 230, self.y_offset + 690, background)
                     

@@ -1,17 +1,11 @@
-    # -*- coding: cp936 -*-
-"""
- Simulation of a rotating 3D Cube
- Developed by Leonel Machava <leonelmachava@gmail.com>
-
- http://codeNtronix.com
-"""
+# -*- coding: utf-8 -*- 
 import sys, math, pygame
 from operator import itemgetter
 import cubeModel
 from cubeGlobal import block_v, black,cube_o,faces,colors,background
 from cubeCommon import printText
 
-#ÔÚ²à±ßÏÔÊ¾ºó¡¢ÏÂ¡¢×óÈıÃæµÄĞÅÏ¢
+#åœ¨ä¾§è¾¹æ˜¾ç¤ºåã€ä¸‹ã€å·¦ä¸‰é¢çš„ä¿¡æ¯
 l_map = {"FRONT":{"FACE":1}, "UP":{"FACE":5},"RIGHT":{"FACE":2}}
 
 class Point3D:
@@ -176,12 +170,12 @@ class Cube3D:
                 printText(screen, b.mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
             
   
-    #·µ»ØcubeÏÔÊ¾µÄÇøÓò£¬ÔÚ¶¯»­¹ı³ÌÖĞÒªÇå³ıÕâ¸öÇøÓò£¬È»ºó²ÅÖØĞÂ»æÖÆ
+    #è¿”å›cubeæ˜¾ç¤ºçš„åŒºåŸŸï¼Œåœ¨åŠ¨ç”»è¿‡ç¨‹ä¸­è¦æ¸…é™¤è¿™ä¸ªåŒºåŸŸï¼Œç„¶åæ‰é‡æ–°ç»˜åˆ¶
     def clearCube(self,screen):
         pygame.draw.circle(screen,background,(400 + self.x_offset,350 + self.y_offset),250)
 
         
-    #ÔÚÕıÖĞ¼äÏÔÊ¾Ä§·½µÄÖ÷Ìå£¬Á¢ÌåÏÔÊ¾£¬Í¨¹ıÊÓ½Ç¿ØÖÆ£¬ÏÔÊ¾Ç°Ãæ¡¢ÓÒÃæ¡¢ÉÏÃæ
+    #åœ¨æ­£ä¸­é—´æ˜¾ç¤ºé­”æ–¹çš„ä¸»ä½“ï¼Œç«‹ä½“æ˜¾ç¤ºï¼Œé€šè¿‡è§†è§’æ§åˆ¶ï¼Œæ˜¾ç¤ºå‰é¢ã€å³é¢ã€ä¸Šé¢
     def displayCube(self,screen):
         avg_z = []
         b_i = 0
@@ -232,7 +226,7 @@ class Cube3D:
         edges = [(p0,p1),(p1,p2),(p2,p3),(p3,p0)]
         cross = []
         ray_point = 0
-        for e in edges:#Ïß¶Î·½³Ì£º y = ax + b
+        for e in edges:#çº¿æ®µæ–¹ç¨‹ï¼š y = ax + b
             a = (e[1].y-e[0].y)/(e[1].x-e[0].x+0.1)
             b = (e[0].y*e[1].x - e[1].y*e[0].x)/(e[1].x-e[0].x+0.1)
             cross_y = x*a + b

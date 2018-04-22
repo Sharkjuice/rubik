@@ -817,7 +817,7 @@
 (assert (oll-macro 11 1691 "f(RUR'U')f'UF(RUR'U')F'"))
 (assert (oll-macro 12 3282 "(RUR'U)(R'FRF')U2(R'FRF')"))
 (assert (oll-macro 13 1175 "r(UR'URU2)r'r'(U'RU'R'U2)r"))
-(assert (oll-macro 14 3226 "(r'RUR)U(R'U'rR')(R'FRF')"))
+(assert (oll-macro 14 3226 "(r'RUR)U(R'U'R'r)(R'FRF')"))
 (assert (oll-macro 15 1170 "(rUR'U')M'2U(RU'R'U')M'"))
 (assert (oll-macro 16 2758 "f(RUR'U')2f'"))
 (assert (oll-macro 17 3668 "(R'F'U'FU')(RUR'UR)"))

@@ -205,10 +205,13 @@ class CubeController:
         self.gameExit = True
 
     def stepOver(self,dumy):
+        self.advise = ""
         self.hint(dumy)
         self.auto_actions = self.parseAdvice()
 
     def parseAdvice(self):
+        if self.advise == "":
+            return ""
         macro = self.advise
         l = len(macro)
         if l == 0 : return

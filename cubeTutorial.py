@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-  
 import pygame
 from cubeGlobal import background,screen,green,bright_green,colors
-from cubeCommon import button,message,printText
+from cubeCommon import button,printText
 steps = [
     {"step":u"前提", "title":u"基本常识",
     "text":[
@@ -216,33 +216,35 @@ def displayFigure(screen,x,y,figure):
                       (u_points[f[2]][0]+x, u_points[f[2]][1]+y),(u_points[f[3]][0]+x, u_points[f[3]][1]+y)]        
         pygame.draw.polygon(screen,(0,0,0),pointlist,1)
         i += 1
-def displayTutorial(screen,x_offset,y_offset):
+def displayTutorial(screen,x_scale,y_scale):
     global refresh
+    ft_size = int(x_scale*25)
     step = steps[currentStep]["step"]
     title = steps[currentStep]["title"]
-    button(screen,"<<",x_offset + 810,y_offset + 10,40,30,green,bright_green,nextOrPrevious,-1)
-    button(screen,step,x_offset + 880,y_offset + 10,100,30,green,green)
-    button(screen,title,x_offset + 1000,y_offset + 10,200,30,green,green)
-    button(screen,">>",x_offset + 1230,y_offset + 10,40,30,green,bright_green,nextOrPrevious,1)
-    button(screen,"X",x_offset + 1300,y_offset + 10,40,30,green,bright_green,nextOrPrevious,1)
+    button(screen,"<<",ft_size,x_scale*810,y_scale*10,x_scale*40,y_scale*30,green,bright_green,nextOrPrevious,-1)
+    button(screen,step,ft_size,x_scale*880,y_scale*10,x_scale*100,y_scale*30,green,green)
+    button(screen,title,ft_size,x_scale*1000,y_scale*10,x_scale*200,y_scale*30,green,green)
+    button(screen,">>",ft_size,x_scale*1230,y_scale*10,x_scale*40,y_scale*30,green,bright_green,nextOrPrevious,1)
     
  
     texts = steps[currentStep]["text"]
     figures = steps[currentStep].get("figures",[])
+    
+    ln_size = y_scale*28
     if refresh == 1:
-        pygame.draw.rect(screen,background,(x_offset + 810,y_offset + 45,538,555))
+        pygame.draw.rect(screen,background,(x_scale*810,y_scale*45,x_scale*538,y_scale*550))
         refresh = 0
         line = 0
         for text in texts:
-            printText(screen,text, "kaiti", 25, x_offset + 810, y_offset + 45+28*line, (240,240,240))
+            printText(screen,text, "kaiti", ft_size, x_scale*810, y_scale*45+ln_size*line, (240,240,240))
             line += 1
-        x = 880
-        y = 500
+        x = x_scale*880
+        y = y_scale*500
         offset = 0
         for fig in figures:
-            displayFigure(screen,x_offset + x + offset,  y_offset + y,figList[fig[0]][fig[1]])
+            displayFigure(screen,x+offset, y,figList[fig[0]][fig[1]])
             fig_label = u"图" + str(fig[0]+1)+ "-" + str(fig[1]+1)
-            printText(screen,fig_label, "kaiti", 25,  x_offset + x + offset - 20,  y_offset + y + 65, (200,200,200))
-            offset += 120
+            printText(screen,fig_label, "kaiti", ft_size,  x + offset - x_scale*20,  y + y_scale*65, (200,200,200))
+            offset += x_scale*120
     
               

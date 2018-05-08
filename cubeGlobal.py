@@ -76,11 +76,8 @@ background = (32,32,32)
 #0,1,2,3为正面的4个点， 4,5,6,7位背面的4个点
 block_v = [(x,y,z) for z in (-0.5,0.5) for y in (0.5,-0.5) for x in (-0.5,0.5)]
 screen = None		  
-win_height = 768
-win_width = 800
-fov = 700
-distance = 8
-
+x_scale = 1
+y_scale = 1
 #按钮颜色
 red = (255,0,0)
 black = (0,0,0)
@@ -88,3 +85,4 @@ green = (0,255,0)
 bright_green = (240,0,0)
 bright_red = (0,240,0)
 
+mouse_status=[0,0,0]

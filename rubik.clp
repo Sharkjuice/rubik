@@ -896,7 +896,7 @@
 (assert (pll-macro 2 4 2925 "M'U(M'2U)2M'U2M'2U'"))
 (assert (pll-macro 2 5 1938 "x'R2D2(R'U'R)D2(R'UR')"))
 (assert (pll-macro 1 6 1938 "x'(RU'R)D2(R'UR)(D2R2)"))
-(assert (pll-macro 5 7 1170 "x'(RU'R'D)(RUR'D')(RUR'D)(RU'R'D')x"))
+(assert (pll-macro 4 7 1170 "x'(RU'R'D)(RUR'D')(RUR'D)(RU'R'D')x"));this is a symetric pattern
 (assert (pll-macro 5 8 2947 "(RUR'U')(R'F)(R2U'R'U')(RUR'F')"))
 (assert (pll-macro 5 9 3857 "(R'U'F')(RUR'U')(R'F)(R2U'R'U')(RUR'UR)"))
 (assert (pll-macro 5 10 3171 "(R'UR'd')(R'F'R2U')(R'UR'FRF)"))
@@ -1041,4 +1041,27 @@
 	(face ?s2 ?c1)
 	=>
 	(pll-pattern-out ?c1 ?c3 ?d ?f ?pv ?h)
+)
+
+(defrule pll-pattern-7
+	(phase 4)
+	(pll-macro 4 ?f ?pv ?h)
+	(block (id ?id1) (layer 3) (type corner))
+	(facelet (id ?id1) (pos 1) (facelet U))	
+	(facelet (id ?id1) (type V1) (color ?c1))
+	
+	(block (id ?id2) (layer 3) (type corner))
+	(facelet (id ?id2) (pos 3) (facelet U))	
+	(facelet (id ?id2) (type V1) (facelet ?s))
+	
+	(face ?s ?c2)
+	=>
+	(bind ?m (pll-pattern-match ?pv))
+	(if (nth$ 1 ?m) then 
+		(if (eq ?c1 ?c2) then 
+			(printout t "s:4;f:" ?f ";p:0;h:y"  crlf)
+		 else
+			(printout t "s:4;f:" ?f ";p:0;h:" ?h crlf)  
+		)
+	)
 )

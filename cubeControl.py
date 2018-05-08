@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-  
-import pygame,sys,time,random,copy,subprocess
+import pygame,sys,time,random,copy,subprocess,ctypes
 import cubeModel,cubeView
-from cubeGlobal import cube_o,win_height,win_width,fov,distance,background,screen,black,green,bright_green,colors_r,colors_n
+from cubeGlobal import mouse_status,cube_o,x_scale,y_scale,background,screen,black,green,bright_green,colors_r,colors_n
 from cubeCommon import button,printText
 from cubeTutorial import displayTutorial,nextOrPrevious
 
@@ -37,11 +37,20 @@ a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
          "x":{"face":"RIGHT","clockwize":-1,"layer":4,"reverse":"x'"},
          "x'":{"face":"RIGHT","clockwize":1,"layer":4,"reverse":"x"}
 }
+#显示魔方区域的高度和宽度
+win_height = 768
+win_width = 800
+#3D显示参数
+fov = 700
+distance = 8
+#屏幕的最小宽度和高度
+min_scn_w = 1350
+min_scn_h = 768
 
 class CubeController:
-    def __init__(self, x_offset,y_offset,init_count, his_count):
-        self.x_offset =  x_offset
-        self.y_offset = y_offset
+    def __init__(self, x_scale,y_scale,init_count, his_count):
+        self.x_scale =  x_scale
+        self.y_scale = y_scale
         self.init_count = init_count
         self.his_actions = []
         self.auto_actions = []
@@ -74,10 +83,10 @@ class CubeController:
         #初始化数据模型
         my_cube = cubeModel.Cube()
        
-        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset,0,-30)
+        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,self.x_scale,self.y_scale,0,-30)
         self.displayCube(screen)
         
-        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, self.x_offset, self.y_offset,820,50)
+        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, self.x_scale,self.y_scale,820,50)
 
                 
 
@@ -102,15 +111,18 @@ class CubeController:
                     blocks.append(((int(b[2]),int(b[3]),int(b[4])),"".join([b[5],b[6],b[7]])))
             fo.close()
             cube = cubeModel.Cube(blocks)
-            self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset,0,-30)
+            self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, 
+				distance,self.x_scale,self.y_scale,0,-30)
             self.displayCube(screen)
         
  
     def resetCube(self,dumy):
         my_cube = cubeModel.Cube()
-        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,self.x_offset,self.y_offset,0,-30)
+        self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, 
+			distance,self.x_scale,self.y_scale,0,-30)
         self.displayCube(screen)
-        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, self.x_offset, self.y_offset,820,50)
+        self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, 
+			self.x_scale, self.y_scale,820,50)
         self.his_actions = []
         
 
@@ -118,12 +130,25 @@ class CubeController:
     def initCube(self,dumy):
         ra_map = ["F", "R", "U", "F'", "R'", "U'","f", "r","u","f'", "r'","u'",
           "B", "L", "D", "B'", "L'", "D'"]
+        self.stage = 0
         for i in range(self.init_count):
             r = int(random.random()*18)
             face = a_map[ra_map[r]]["face"]
             layer = a_map[ra_map[r]]["layer"]
             clockwize = a_map[ra_map[r]]["clockwize"]
             self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
+
+        #rotate to F2L stage
+        while self.stage < 2:
+            self.advise = ""
+            self.hint(dumy)
+            auto_actions = self.parseAdvice()
+            for a in auto_actions:
+                face = a_map[a]["face"]
+                layer = a_map[a]["layer"]
+                clockwize = a_map[a]["clockwize"]
+                self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
+                
         self.displayCube(screen)        
         self.his_actions = []
         
@@ -137,7 +162,8 @@ class CubeController:
 
     def helpCube(self,dumy):
         nextOrPrevious(0)
-        pygame.draw.rect(screen,background,(self.x_offset + 810,self.y_offset + 5,538,595))
+        pygame.draw.rect(screen,background,(self.x_scale*810,
+			self.y_scale*5,self.x_scale*538,self.y_scale*595))
     
 
     def snapCube(self,dumy):       
@@ -145,7 +171,8 @@ class CubeController:
         self.sn_cube_3d.cube = snapshot_cube_mode
         self.sn_cube_3d.buildFaces()
         self.comparing = False
-        pygame.draw.rect(screen,background,(self.x_offset + 810, self.y_offset + 5,538,595))    
+        pygame.draw.rect(screen,background,(self.x_scale*810, 
+			self.y_scale*5,self.x_scale*538,self.y_scale*595))    
         self.sn_cube_3d.displayCube(screen)
         self.sn_cube_3d.displayLayer(screen,"RIGHT",2, 180,-70)
         self.sn_cube_3d.displayLayer(screen,"UP",2, 160, 260)
@@ -347,6 +374,7 @@ class CubeController:
         return cube_o[block][1][face].get(dir,"-")  
 
     def gameLoop(self):
+        global mouse_status
         hit_b = ""
         hit_f = -1      
         clock = pygame.time.Clock()
@@ -357,10 +385,18 @@ class CubeController:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1 and (not self.rotating):
                         mouse_down_x,mouse_down_y = event.pos
+                        mouse_status[0] = 0
+                        mouse_status[1] = mouse_down_x
+                        mouse_status[2] = mouse_down_y
+                        #print("mouse pressed, ", mouse_status)
                         hit_b,hit_f = self.my_cube_3d.hitBlock(mouse_down_x,mouse_down_y)
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and (not self.rotating):
                         mouse_up_x,mouse_up_y = event.pos
+                        mouse_status[0] = 1
+                        mouse_status[1] = mouse_up_x
+                        mouse_status[2] = mouse_up_y
+                        #print("mouse released, ", mouse_status)
                         if hit_f != -1:
                             action = self.detectAction(hit_b,hit_f,
                                             (mouse_down_x,mouse_down_y),
@@ -389,44 +425,38 @@ class CubeController:
                                     self.message = u"开始设置方块颜色。当前颜色：" + colors_n[self.brush_color]
                                     print("Start paste, block: ",hit_b," facelet:  ", hit_f," color: ", self.brush_color)
                                 self.dk_time = pygame.time.get_ticks()
+                
                                     
 
             #显示控制按钮
             b_map = [["F","F'","f","f'","B","B'"],["R","R'","r","r'","L","L'",],
                      ["U","U'","u","u'","D","D'"],["x","x'","y","y'","z","z'"]]
-            b_x = 810
-            b_y = 610
+            b_x = self.x_scale*810
+            b_y = self.y_scale*610
+            b_h = self.y_scale*30
             for bs in b_map:
                 for b in bs:
-                    button(screen, b, self.x_offset +  b_x, self.y_offset + b_y, 40,30,green,bright_green,self.singleRotate,b)
-                    b_x += 50
-                b_y += 40
-                b_x = 810
-            button(screen,"X",self.x_offset + 1300,y_offset + 10,40,30,green,bright_green,self.cubeQuit,"X")
-            button(screen,"d",    self.x_offset + 1110,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,'d')
-            button(screen,"d'",    self.x_offset + 1160,self.y_offset + 610,40,30,green,bright_green,self.singleRotate,"d'")
-            button(screen,u"帮助",self.x_offset + 1210,self.y_offset + 610,60,30,green,bright_green,self.helpCube,"X")  
-            button(screen,u"保存",self.x_offset + 1280,self.y_offset + 610,60,30,green,bright_green,self.saveCube,"X")  
-
-
-            button(screen,"M",    self.x_offset + 1110,self.y_offset + 650,40,30,green,bright_green,self.singleRotate,"M") 
-            button(screen,"M'",   self.x_offset + 1160,self.y_offset + 650,40,30,green,bright_green,self.singleRotate,"M'") 
-
-
-            button(screen,u"快照",self.x_offset + 1210,self.y_offset + 650,60,30,green,bright_green,self.snapCube,"X" )
-            button(screen,u"加载",self.x_offset + 1280,self.y_offset + 650,60,30,green,bright_green,self.loadCube,"X")  
-
-
-            button(screen,"l",    self.x_offset + 1110,self.y_offset + 690,20,30,green,bright_green,self.singleRotate,"l")
-            button(screen,u"自动",self.x_offset + 1140,self.y_offset + 690,60,30,green,bright_green,self.stepOver,"X") 
-            button(screen,u"对比",self.x_offset + 1210,self.y_offset + 690,60,30,green,bright_green,self.compareCube,"X") 
-            button(screen,u"撤销",self.x_offset + 1280,self.y_offset + 690,60,30,green,bright_green,self.cancel,"X") 
-           
-
-            button(screen,u"打乱",self.x_offset + 1140,self.y_offset + 730,60,30,green,bright_green,self.initCube,"X")
-            button(screen,u"开始",self.x_offset + 1210,self.y_offset + 730,60,30,green,bright_green,self.resetCube,"X")
-            button(screen,"提示", self.x_offset + 1280,self.y_offset + 730,60,30,green,bright_green,self.hint,"X")
-            displayTutorial(screen, self.x_offset, self.y_offset)
+                    button(screen, b, ft_sz, b_x, b_y, self.x_scale*40,b_h,green,bright_green,self.singleRotate,b)
+                    b_x += self.x_scale*50
+                b_y += self.y_scale*40
+                b_x = self.x_scale*810
+            button(screen,"X",ft_sz,self.x_scale*1300,y_scale*10,self.x_scale*40,b_h,green,bright_green,self.cubeQuit,"X")
+            button(screen,"d",ft_sz,self.x_scale*1110,self.y_scale*610,self.x_scale*40,b_h,green,bright_green,self.singleRotate,'d')
+            button(screen,"d'",ft_sz,self.x_scale*1160,self.y_scale*610,self.x_scale*40,b_h,green,bright_green,self.singleRotate,"d'")
+            button(screen,u"帮助",ft_sz,self.x_scale*1210,self.y_scale*610,self.x_scale*60,b_h,green,bright_green,self.helpCube,"X")  
+            button(screen,u"保存",ft_sz,self.x_scale*1280,self.y_scale*610,self.x_scale*60,b_h,green,bright_green,self.saveCube,"X")  
+            button(screen,"M",ft_sz,self.x_scale*1110,self.y_scale*650,self.x_scale*40,b_h,green,bright_green,self.singleRotate,"M") 
+            button(screen,"M'",ft_sz,self.x_scale*1160,self.y_scale*650,self.x_scale*40,b_h,green,bright_green,self.singleRotate,"M'") 
+            button(screen,u"快照",ft_sz,self.x_scale*1210,self.y_scale*650,self.x_scale*60,b_h,green,bright_green,self.snapCube,"X" )
+            button(screen,u"加载",ft_sz,self.x_scale*1280,self.y_scale*650,self.x_scale*60,b_h,green,bright_green,self.loadCube,"X")  
+            button(screen,"l",ft_sz,self.x_scale*1110,self.y_scale*690,self.x_scale*20,b_h,green,bright_green,self.singleRotate,"l")
+            button(screen,u"自动",ft_sz,self.x_scale*1140,self.y_scale*690,self.x_scale*60,b_h,green,bright_green,self.stepOver,"X") 
+            button(screen,u"对比",ft_sz,self.x_scale*1210,self.y_scale*690,self.x_scale*60,b_h,green,bright_green,self.compareCube,"X") 
+            button(screen,u"撤销",ft_sz,self.x_scale*1280,self.y_scale*690,self.x_scale*60,b_h,green,bright_green,self.cancel,"X") 
+            button(screen,u"打乱",ft_sz,self.x_scale*1140,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.initCube,"X")
+            button(screen,u"开始",ft_sz,self.x_scale*1210,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.resetCube,"X")
+            button(screen,"提示",ft_sz,self.x_scale*1280,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.hint,"X")
+            displayTutorial(screen, self.x_scale, self.y_scale)
 
             if self.rotating:
                 self.rotate_angle = self.rotate_angle + 6
@@ -438,12 +468,12 @@ class CubeController:
             if self.rotate_angle == 90:
                 self.my_cube_3d.cube.rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize)
                 self.displayCube(screen)
-                printText(screen,"U", "kaiti", 30, self.x_offset + 390, self.y_offset + 210, black)
-                printText(screen,"F", "kaiti", 30, self.x_offset + 290, self.y_offset + 390, black)
-                printText(screen,"R", "kaiti", 30, self.x_offset + 500, self.y_offset + 400, black)
-                printText(screen,"B", "kaiti", 30, self.x_offset + 690, self.y_offset + 90, black)
-                printText(screen,"L", "kaiti", 30, self.x_offset + 95, self.y_offset + 90, black)
-                printText(screen,"D", "kaiti", 30, self.x_offset + 120, self.y_offset + 600, black)
+                printText(screen,"U", "kaiti", ft_sz, self.x_scale*390, self.y_scale*220, black)
+                printText(screen,"F", "kaiti", ft_sz, self.x_scale*290, self.y_scale*390, black)
+                printText(screen,"R", "kaiti", ft_sz, self.x_scale*500, self.y_scale*400, black)
+                printText(screen,"B", "kaiti", ft_sz, self.x_scale*690, self.y_scale*90, black)
+                printText(screen,"L", "kaiti", ft_sz, self.x_scale*95, self.y_scale*93, black)
+                printText(screen,"D", "kaiti", ft_sz, self.x_scale*120, self.y_scale*600, black)
                 self.rotating = False
                 self.rotate_angle = 0
 
@@ -480,11 +510,11 @@ class CubeController:
                         self.my_cube_3d.displayCube(screen)
 
                 
-            pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 690,560,30))            
-            printText(screen, self.message, "kaiti", 25, self.x_offset + 230, self.y_offset + 690, background)
+            pygame.draw.rect(screen,(128,128,128),(self.x_scale*220,self.y_scale*690,self.x_scale*560,self.y_scale*30))            
+            printText(screen, self.message, "kaiti", ft_sz, self.x_scale*230, self.y_scale*690, background)
                     
-            pygame.draw.rect(screen,(128,128,128),(x_offset + 220,y_offset + 730,560,30))            
-            printText(screen, self.advise, "kaiti", 25, self.x_offset + 230, self.y_offset + 730, background)
+            pygame.draw.rect(screen,(128,128,128),(self.x_scale*220,self.y_scale*730,self.x_scale*560,self.y_scale*30))            
+            printText(screen, self.advise, "kaiti", ft_sz, self.x_scale*230, self.y_scale*730, background)
                 
            
             clock.tick(30)
@@ -493,39 +523,34 @@ class CubeController:
 
         
 if __name__ == "__main__":
-    global screen
+    global screen,x_scale,y_scale
+
 
     #初始化pygame屏幕
     pygame.init()
-    screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+    ctypes.windll.user32.SetProcessDPIAware()
+    scn_w, scn_h = (ctypes.windll.user32.GetSystemMetrics(0),ctypes.windll.user32.GetSystemMetrics(1))
+    screen = pygame.display.set_mode((scn_w, scn_h),pygame.FULLSCREEN)
     screen.fill(background)
     pygame.display.set_caption("3D魔方教程")
-    scn_width = screen.get_width()
-    scn_height = screen.get_height()
-    brd_width = 1350
-    brd_height = 768
-    x_offset = int((scn_width - brd_width)/2)
-    y_offset = int((scn_height - brd_height)/2)
+    x_scale = scn_w/min_scn_w
+    y_scale = scn_h/min_scn_h
+    ft_sz = int(x_scale*25)
 
-    pt1 = (x_offset,y_offset)# top left point
-    pt2 = (x_offset + brd_width,y_offset)#top right point
-    pt3 = (x_offset,y_offset + brd_height -2)#bottom left point
-    pt4 = (x_offset + brd_width, y_offset + brd_height-2)
-    
-    
+    pt1 = (0,0)# top left point
+    pt2 = (scn_w-2,0)#top right point
+    pt3 = (0, scn_h-2)#bottom left point
+    pt4 = (scn_w-2, scn_h-2)
     
     pygame.draw.line(screen,(128,128,128),pt1,pt2,2)
     pygame.draw.line(screen,(128,128,128),pt2,pt4,2)
     pygame.draw.line(screen,(128,128,128),pt4,pt3,2)
     pygame.draw.line(screen,(128,128,128),pt3,pt1,2)
-
     
-    pygame.draw.line(screen,(128,128,128),(x_offset + 800,y_offset),(x_offset + 800,y_offset + brd_height),2)
-    pygame.draw.line(screen,(128,128,128),(x_offset + 800,y_offset + 600),(x_offset + brd_width,y_offset + 600),2)
+    pygame.draw.line(screen,(128,128,128),(x_scale*800,0),(x_scale*800,scn_h-2),2)
+    pygame.draw.line(screen,(128,128,128),(x_scale*800,y_scale*600),(scn_w-2,y_scale*600),2)
 
-
-    cubeController = CubeController(x_offset, y_offset,15,25)
-
+    cubeController = CubeController(x_scale, y_scale,15,25)
     
     cubeController.gameLoop()
     pygame.quit()

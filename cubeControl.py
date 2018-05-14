@@ -139,18 +139,20 @@ class CubeController:
             self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
 
         #rotate to F2L stage
+        auto_actions = []
         while self.stage < 2:
-            self.advise = ""
-            self.hint(dumy)
-            auto_actions = self.parseAdvice()
             for a in auto_actions:
                 face = a_map[a]["face"]
                 layer = a_map[a]["layer"]
                 clockwize = a_map[a]["clockwize"]
                 self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
+            self.advise = ""
+            self.hint(dumy)
+            auto_actions = self.parseAdvice()
                 
-        self.displayCube(screen)        
         self.his_actions = []
+        self.advise = ""
+        self.displayCube(screen)        
         
     def displayCube(self,screen):
         self.my_cube_3d.buildFaces()        

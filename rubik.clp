@@ -838,7 +838,7 @@
 (assert (oll-macro 32 1283 "(R'U'F)(URU'R')(F'R)"))
 (assert (oll-macro 33 1409 "(RU)(B'U')(R'URBR')"))
 (assert (oll-macro 34 184 "(B'U')(R'URB)"))
-(assert (oll-macro 35 3712 "f(RUR'U')f'"))
+(assert (oll-macro 35 3712 "fRUR'U'f'"))
 (assert (oll-macro 36 51 "(FRU'R')U'(RUR'F')"))
 (assert (oll-macro 37 1185 "(RU2R')(R'FRF')(RU2R')"))
 (assert (oll-macro 38 3488 "(r'U')(U'RUR')(Ur)"))
@@ -900,15 +900,15 @@
 (assert (pll-macro 5 8 2947 "(RUR'U')(R'F)(R2U'R'U')(RUR'F')"))
 (assert (pll-macro 5 9 3857 "(R'U'F')(RUR'U')(R'F)(R2U'R'U')(RUR'UR)"))
 (assert (pll-macro 5 10 3171 "(R'UR'd')(R'F'R2U')(R'UR'FRF)"))
-(assert (pll-macro 5 11 2163  "F(RU'R'U')(RUR'F')(RUR'U')(R'FRF')"))
+(assert (pll-macro 5 11 2163  "(FRU'R')U'(RUR'F')(RUR'U')(R'FRF')"))
 (assert (pll-macro 5 12 2016 "z(U'RD')(R2UR'U')R2U(DR')"))
 (assert (pll-macro 5 13 3969 "(RUR'F')(RUR'U')(R'F)(R2U'R'U')"))
-(assert (pll-macro 5 14 3213 "(R'U2)(RU'2)(R'FRUR'U')(R'F'R2U')"))
+(assert (pll-macro 5 14 3213 "(R'U2)(RU2R')(FRU)R'(U'R'F')R2U')"))
 (assert (pll-macro 5 15 2835 "(RU'R'U')(RURD)(R'U'RD')(R'U2R'U')"))
 (assert (pll-macro 1 16 224 "(R'2u'RU'R)(UR'u)(R2fR'f')"))
 (assert (pll-macro 2 17 28  "(RUR')y'(R2u'RU')(R'UR'uR2)"))
 (assert (pll-macro 1 18 14  "(R2u)(R'UR'U')(Ru')(R'2F'UF)"))
-(assert (pll-macro 2 19 112 "(R'd'F)(R2u)(R'U)(RU'Ru'R'2)"))
+(assert (pll-macro 2 19 112 "(R'd'F)(R2u)(R'U)(RU'Ru'R2)"))
 (assert (pll-macro 5 20 2275 "(R'URU')(R'F'U')(FRUR'F)(R'F'RU'R)"))
 (assert (pll-macro 5 21 910  "(RUR'U)(RUR'F')(RUR'U')(R'F)(R2U'R'U2)(RU'R')"))
 ;(assert (pll-macro 5 22 1904  "(RUR'U)(RUR'F')(RUR'U')(R'F)(R2U'R'U2)(RU'R')"))
@@ -968,10 +968,33 @@
 				)
 			)
 		else
-			(if (eq ?c1 ?c1) then
+			(if (eq ?c1 ?c2) then
 				(if (= 1 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf))
 			else 
 				(if (eq ?c1 ?c3) then
+					(if (= 2 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf))
+				)
+			)
+		)
+	)	
+)
+
+(deffunction pll-pattern-out-ex (?c1 ?c2 ?c3 ?c4 ?c5 ?c6 ?d ?f ?pv ?h)
+	(bind ?m (pll-pattern-match ?pv))
+	(if (nth$ 1 ?m) then
+		(if (eq O (nth$ 2 ?m)) then 
+			(if (and (eq ?c1 ?c3) (eq ?c5 ?c4)) then
+				(if (= 1 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" ?h crlf))
+			else 
+				(if (and (eq ?c2 ?c4) (eq ?c6 ?c3)) then
+					(if (= 2 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" ?h crlf))
+				)
+			)
+		else
+			(if (and (eq ?c1 ?c3) (eq ?c5 ?c4)) then
+				(if (= 1 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf))
+			else 
+				(if (and (eq ?c2 ?c4) (eq ?c6 ?c3)) then
 					(if (= 2 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf))
 				)
 			)
@@ -1014,12 +1037,19 @@
 	(face ?s3 ?c3)
 	
 	=>
-	(if (and (neq ?c1 ?c2) (neq ?c1 ?c3)) then 
-		(printout t "s:4;f:" ?f ";p:0;h:y" crlf)
-	else 
-		(pll-pattern-out ?c1 ?c2 ?c3 ?d ?f ?pv ?h)
+	(if (= ?*pll-pv* ?pv) then 
+		(if (and (neq ?c1 ?c2) (neq ?c1 ?c3)) then 
+			(printout t "s:4;f:" ?f ";p:0;h:y" crlf)
+		else 
+			(if(eq ?c1 ?c2) then
+				(if (= 1 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" ?h crlf))
+			else 
+				(if (eq ?c1 ?c3) then
+					(if (= 2 ?d) then (printout t "s:4;f:" ?f ";p:0;h:" ?h crlf))
+				)
+			)
+		)
 	)
-	
 )
 
 (defrule pll-pattern-4
@@ -1046,17 +1076,19 @@
 	(block (id ?id0) (layer 3) (type corner) (status ok))
 	(facelet (id ?id0) (pos ?p0) (side U))	
 	(facelet (id ?id1) (pos ?p1&:(= 4 (distance ?p0 ?p1))) (side U))
-	(facelet (id ?id2) (pos ?p2&:(= 2 (distance ?p2 ?p1))) (side U))	
-	(facelet (id ?id3) (pos ?p3&:(= 2 (distance ?p1 ?p3))) (side U))	
 
-	(facelet (id ?id1) (type V1) (color ?c1))
-	(facelet (id ?id2) (type V1) (side ?s2))
-	(facelet (id ?id3) (type V1) (side ?s3))
+	(facelet (id ?id1) (type V1) (color ?c1) (side ?s1))
+	(facelet (id ?id1) (type V2) (color ?c2) (side ?s2))
+	(face ?s2 ?c3)
+	(face ?s1 ?c4)
 
-	(face ?s2 ?c2)
-	(face ?s3 ?c3)
+	(facelet (id ?id2) (pos ?p2&:(= 1 (distance ?p2 ?p1))) (side U))	
+	(facelet (id ?id3) (pos ?p3&:(= 1 (distance ?p1 ?p3))) (side U))	
+	(facelet (id ?id2) (type V1) (color ?c5))
+	(facelet (id ?id3) (type V1) (color ?c6))
+
 	=>
-	(pll-pattern-out ?c1 ?c2 ?c3 ?d ?f ?pv ?h)
+	(pll-pattern-out-ex ?c1 ?c2 ?c3 ?c4 ?c5 ?c6 ?d ?f ?pv ?h)
 )
 
 (defrule pll-pattern-6
@@ -1065,17 +1097,18 @@
 	(block (id ?id0) (layer 3) (type corner) (status ok))
 	(facelet (id ?id0) (pos ?p0) (side U))	
 	(facelet (id ?id1) (pos ?p1&:(= 4 (distance ?p0 ?p1))) (side U))
-	(facelet (id ?id2) (pos ?p2&:(= 2 (distance ?p1 ?p2))) (side U))
-	(facelet (id ?id3) (pos ?p3&:(= 2 (distance ?p3 ?p1))) (side U))
-	
-	(facelet (id ?id1) (type V1) (color ?c1))
-	(facelet (id ?id2) (type V1) (side ?s2))
-	(facelet (id ?id3) (type V1) (side ?s3))
 
-	(face ?s2 ?c2)
-	(face ?s3 ?c3)
+	(facelet (id ?id1) (type V2) (color ?c1) (side ?s1))
+	(facelet (id ?id1) (type V1) (color ?c2) (side ?s2))
+	(face ?s2 ?c3)
+	(face ?s1 ?c4)
+
+	(facelet (id ?id2) (pos ?p2&:(= 1 (distance ?p1 ?p2))) (side U))	
+	(facelet (id ?id3) (pos ?p3&:(= 1 (distance ?p3 ?p1))) (side U))	
+	(facelet (id ?id2) (type V1) (color ?c5))
+	(facelet (id ?id3) (type V1) (color ?c6))
 	=>
-	(pll-pattern-out ?c1 ?c2 ?c3 ?d ?f ?pv ?h)
+	(pll-pattern-out-ex ?c1 ?c2 ?c3 ?c4 ?c5 ?c6 ?d ?f ?pv ?h)
 )
 
 (defrule pll-pattern-7

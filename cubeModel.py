@@ -92,6 +92,22 @@ class Cube:
             self.rotateLayer(face,1,clockwize)
             self.rotateLayer(face,2,clockwize)
             
+    def validateCube(self):
+        colors = {"w":0,"y":0,"r":0,"b":0,"g":0,"o":0,"-":1}
+	         		
+        #map(count_colors, self.blocks)
+        for b in self.blocks:
+            for c in b.colors:
+                if c != "-":
+                    colors[c] += 1
+        v = 1
+        for c,x in colors.items():
+            v *= x
+        #print("Total value ", v)
+        if v != 531441:
+            return False
+        else:
+            return True		
         
   
 

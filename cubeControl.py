@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-  
 import pygame,sys,time,random,copy,subprocess,ctypes
 import cubeModel,cubeView
-from cubeGlobal import mouse_status,cube_o,x_scale,y_scale,background,screen,black,green,bright_green,colors_r,colors_n
+from cubeGlobal import mouse_status,cube_o,x_scale,y_scale,background,\
+    screen,black,green,bright_green,colors_r,colors_n,colors
 from cubeCommon import button,printText
 from cubeTutorial import displayTutorial,nextOrPrevious
 
@@ -68,9 +69,6 @@ class CubeController:
         self.dk_count = 0
         self.dk_time = 0
         self.brush_color = "-"
-        self.brush_block = (-100,-100,-100)
-        self.brush_face = -1
-        self.brush_brushing = 0 #0: no pending brush; 1: waiting for brush
         self.brush_copy  = 0 #0: not starting copy 1: in copy status
 
         #转动哪一面
@@ -99,8 +97,8 @@ class CubeController:
                 return 0
             else:
                 self.brush_copy = 0
-                self.advise = u"颜色设置完成。"				
-			
+                self.advise = u"颜色设置完成。"                
+            
         fo = open(".\\mycube.clp", "w", 1)
         fo.write("(defrule start-up =>\n")
         for block in self.my_cube_3d.cube.blocks:
@@ -122,17 +120,17 @@ class CubeController:
             fo.close()
             cube = cubeModel.Cube(blocks)
             self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, 
-				distance,self.x_scale,self.y_scale,0,-30)
+                distance,self.x_scale,self.y_scale,0,-30)
             self.displayCube(screen)
         
  
     def resetCube(self,dumy):
         my_cube = cubeModel.Cube()
         self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, 
-			distance,self.x_scale,self.y_scale,0,-30)
+            distance,self.x_scale,self.y_scale,0,-30)
         self.displayCube(screen)
         self.sn_cube_3d = cubeView.Cube3D(my_cube,500, 500, 700, 12, 
-			self.x_scale, self.y_scale,820,50)
+            self.x_scale, self.y_scale,820,50)
         self.his_actions = []
         
 
@@ -175,7 +173,7 @@ class CubeController:
     def helpCube(self,dumy):
         nextOrPrevious(0)
         pygame.draw.rect(screen,background,(self.x_scale*810,
-			self.y_scale*5,self.x_scale*538,self.y_scale*595))
+            self.y_scale*5,self.x_scale*538,self.y_scale*595))
     
 
     def snapCube(self,dumy):       
@@ -184,7 +182,7 @@ class CubeController:
         self.sn_cube_3d.buildFaces()
         self.comparing = False
         pygame.draw.rect(screen,background,(self.x_scale*810, 
-			self.y_scale*5,self.x_scale*538,self.y_scale*595))    
+            self.y_scale*5,self.x_scale*538,self.y_scale*595))    
         self.sn_cube_3d.displayCube(screen)
         self.sn_cube_3d.displayLayer(screen,"RIGHT",2, 180,-70)
         self.sn_cube_3d.displayLayer(screen,"UP",2, 160, 260)
@@ -393,7 +391,36 @@ class CubeController:
                 dir = "Ru"
             else:
                 dir = "Ld"
-        return cube_o[block][1][face].get(dir,"-")  
+    def selectColor(self,c):
+        self.brush_color = c
+        self.brush_copy = 1
+        self.message = u"开始设置，按'保存'完成设置。当前颜色：" + colors_n[self.brush_color]
+
+    def brushColor(self,b,f):
+        if self.brush_color != "-":
+            model_b = [item.block for item in self.my_cube_3d.blocks if item.block.current == b][0]                                   
+            
+            if b[0] == -1 and f == 3:
+                self.his_colors.append((model_b,0,model_b.colors[0]))
+                model_b.colors[0] = self.brush_color
+            if (b[0] == 1 and f == 1):
+                self.his_colors.append((model_b,0,model_b.colors[0]))
+                model_b.colors[0] = self.brush_color
+            if (b[1] == -1 and self.brush_face == 5 ):
+                self.his_colors.append((model_b,1,model_b.colors[1]))
+                model_b.colors[1] = self.brush_color
+            if (b[1] == 1 and f == 4):
+                self.his_colors.append((model_b,1,model_b.colors[1]))
+                model_b.colors[1] = self.brush_color
+            if (b[2] == -1 and f == 0):
+                self.his_colors.append((model_b,2,model_b.colors[2]))
+                model_b.colors[2] = self.brush_color
+            if (b[2] == 1 and f == 2):
+                self.his_colors.append((model_b,2,model_b.colors[2]))
+                model_b.colors[2] = self.brush_color
+            
+            self.my_cube_3d.buildFaces()        
+            self.my_cube_3d.displayCube(screen)
 
     def gameLoop(self):
         global mouse_status
@@ -431,22 +458,10 @@ class CubeController:
                             if self.dk_count == 1:
                                 self.dk_time = pygame.time.get_ticks()
                             if self.dk_count == 2:
-                                if (pygame.time.get_ticks() - self.dk_time) < 500:
+                                self.dk_count = 0
+                                if (pygame.time.get_ticks() - self.dk_time) < 250:
                                     if self.brush_copy == 1:
-                                        self.brush_block = hit_b
-                                        self.brush_face  = hit_f
-                                        self.brush_brushing = 1
-                                self.dk_time = pygame.time.get_ticks()
-                            if self.dk_count == 3:
-                                if (pygame.time.get_ticks() - self.dk_time) < 500:
-                                    blocks = [item for item in self.my_cube_3d.blocks if item.block.current == hit_b]                                   
-                                    self.brush_color = colors_r[blocks[0].colors[hit_f]]
-                                    self.dk_count = 0
-                                    self.brush_copy = 1
-                                    self.brush_brushing = 0									
-                                    self.message = u"开始设置，按'保存'完成设置。当前颜色：" + colors_n[self.brush_color]
-                                    #print("Start paste, block: ",hit_b," facelet:  ", hit_f," color: ", self.brush_color)
-                                self.dk_time = pygame.time.get_ticks()
+                                        self.brushColor(hit_b,hit_f)
                 
                                     
 
@@ -479,6 +494,19 @@ class CubeController:
             button(screen,u"开始",ft_sz,self.x_scale*1210,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.resetCube,"X")
             button(screen,"提示",ft_sz,self.x_scale*1280,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.hint,"X")
             displayTutorial(screen, self.x_scale, self.y_scale)
+            #显示设置颜色块
+            button(screen,"",ft_sz,self.x_scale*250,y_scale*10,self.x_scale*40,self.x_scale*40,
+                colors["r"],bright_green,self.selectColor,"r")
+            button(screen,"",ft_sz,self.x_scale*300,y_scale*10,self.x_scale*40,self.x_scale*40,
+                colors["b"],bright_green,self.selectColor,"b")
+            button(screen,"",ft_sz,self.x_scale*350,y_scale*10,self.x_scale*40,self.x_scale*40,
+                colors["g"],bright_green,self.selectColor,"g")
+            button(screen,"",ft_sz,self.x_scale*400,y_scale*10,self.x_scale*40,self.x_scale*40,
+                colors["o"],bright_green,self.selectColor,"o")
+            button(screen,"",ft_sz,self.x_scale*450,y_scale*10,self.x_scale*40,self.x_scale*40,
+                colors["y"],bright_green,self.selectColor,"y")
+            button(screen,"",ft_sz,self.x_scale*500,y_scale*10,self.x_scale*40,self.x_scale*40,
+                colors["w"],bright_green,self.selectColor,"w")
 
             if self.rotating:
                 self.rotate_angle = self.rotate_angle + 6
@@ -504,37 +532,6 @@ class CubeController:
                 if len(self.auto_actions) > 0:
                     action = self.auto_actions.pop(0)
                     self.singleRotate(action)
-
-            if (pygame.time.get_ticks() - self.dk_time) > 600:
-                self.dk_count = 0
-                
-                if self.brush_brushing == 1:
-                    self.brush_brushing = 0
-                    if self.brush_color != "-":
-                        model_b = [item.block for item in self.my_cube_3d.blocks if item.block.current == self.brush_block][0]                                   
-                        
-                        b = self.brush_block
-                        if b[0] == -1 and self.brush_face == 3:
-                            self.his_colors.append((model_b,0,model_b.colors[0]))
-                            model_b.colors[0] = self.brush_color
-                        if (b[0] == 1 and self.brush_face == 1):
-                            self.his_colors.append((model_b,0,model_b.colors[0]))
-                            model_b.colors[0] = self.brush_color
-                        if (b[1] == -1 and self.brush_face == 5 ):
-                            self.his_colors.append((model_b,1,model_b.colors[1]))
-                            model_b.colors[1] = self.brush_color
-                        if (b[1] == 1 and self.brush_face == 4):
-                            self.his_colors.append((model_b,1,model_b.colors[1]))
-                            model_b.colors[1] = self.brush_color
-                        if (b[2] == -1 and self.brush_face == 0):
-                            self.his_colors.append((model_b,2,model_b.colors[2]))
-                            model_b.colors[2] = self.brush_color
-                        if (b[2] == 1 and self.brush_face == 2):
-                            self.his_colors.append((model_b,2,model_b.colors[2]))
-                            model_b.colors[2] = self.brush_color
-                        
-                        self.my_cube_3d.buildFaces()        
-                        self.my_cube_3d.displayCube(screen)
 
                 
             pygame.draw.rect(screen,(128,128,128),(self.x_scale*220,self.y_scale*690,self.x_scale*560,self.y_scale*30))            

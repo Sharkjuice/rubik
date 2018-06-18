@@ -205,8 +205,6 @@ class Cube3D:
                 pygame.draw.polygon(screen,(0,0,0),pointlist,2)
                 if  self.blocks[b_i].mark != "-":
                     printText(screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
-
-
                 
     def hitBlock(self,x,y):
         for b in self.blocks:

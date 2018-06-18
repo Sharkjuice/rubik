@@ -91,14 +91,6 @@ class CubeController:
                 
 
     def saveCube(self,dumy):
-        if self.brush_copy == 1:
-            if not self.my_cube_3d.cube.validateCube():
-                self.advise = u"颜色设置没有完成，请继续完成设置！"
-                return 0
-            else:
-                self.brush_copy = 0
-                self.advise = u"颜色设置完成。"                
-            
         fo = open(".\\mycube.clp", "w", 1)
         fo.write("(defrule start-up =>\n")
         for block in self.my_cube_3d.cube.blocks:
@@ -391,10 +383,12 @@ class CubeController:
                 dir = "Ru"
             else:
                 dir = "Ld"
+        return cube_o[block][1][face].get(dir,"-")
+        
     def selectColor(self,c):
         self.brush_color = c
         self.brush_copy = 1
-        self.message = u"开始设置，按'保存'完成设置。当前颜色：" + colors_n[self.brush_color]
+        self.message = u"选择色块，双击魔方设置颜色。当前选中:" + colors_n[self.brush_color]
 
     def brushColor(self,b,f):
         if self.brush_color != "-":
@@ -422,6 +416,15 @@ class CubeController:
             self.my_cube_3d.buildFaces()        
             self.my_cube_3d.displayCube(screen)
 
+    def endBrush(self,dumy):
+        if self.brush_copy == 1:
+            if not self.my_cube_3d.cube.validateCube():
+                self.advise = u"颜色设置没有完成，请继续完成设置！"
+                return 0
+            else:
+                self.brush_copy = 0
+                self.advise = u"颜色设置完成。"                
+
     def gameLoop(self):
         global mouse_status
         hit_b = ""
@@ -439,6 +442,7 @@ class CubeController:
                         mouse_status[2] = mouse_down_y
                         #print("mouse pressed, ", mouse_status)
                         hit_b,hit_f = self.my_cube_3d.hitBlock(mouse_down_x,mouse_down_y)
+                        #print("hit block:",hit_b, " hit face:", hit_f)
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and (not self.rotating):
                         mouse_up_x,mouse_up_y = event.pos
@@ -452,16 +456,17 @@ class CubeController:
                                             (mouse_up_x,mouse_up_y))
                             if action != "-":
                                 self.singleRotate(action)
-                                
-                            #double click, to copy facelet color
-                            self.dk_count += 1
-                            if self.dk_count == 1:
-                                self.dk_time = pygame.time.get_ticks()
-                            if self.dk_count == 2:
                                 self.dk_count = 0
-                                if (pygame.time.get_ticks() - self.dk_time) < 250:
-                                    if self.brush_copy == 1:
-                                        self.brushColor(hit_b,hit_f)
+                            else:    
+                                #double click, to copy facelet color
+                                self.dk_count += 1
+                                if self.dk_count == 1:
+                                    self.dk_time = pygame.time.get_ticks()
+                                if self.dk_count == 2:
+                                    self.dk_count = 0
+                                    if (pygame.time.get_ticks() - self.dk_time) < 250:
+                                        if self.brush_copy == 1:
+                                            self.brushColor(hit_b,hit_f)
                 
                                     
 
@@ -489,24 +494,28 @@ class CubeController:
             button(screen,"l",ft_sz,self.x_scale*1110,self.y_scale*690,self.x_scale*20,b_h,green,bright_green,self.singleRotate,"l")
             button(screen,u"自动",ft_sz,self.x_scale*1140,self.y_scale*690,self.x_scale*60,b_h,green,bright_green,self.stepOver,"X") 
             button(screen,u"对比",ft_sz,self.x_scale*1210,self.y_scale*690,self.x_scale*60,b_h,green,bright_green,self.compareCube,"X") 
-            button(screen,u"撤销",ft_sz,self.x_scale*1280,self.y_scale*690,self.x_scale*60,b_h,green,bright_green,self.cancel,"X") 
+            button(screen,u"撤销",ft_sz,self.x_scale*1280,self.y_scale*690,self.x_scale*60,b_h,green,bright_green,self.cancel,"X")
+            button(screen,"l'",ft_sz,self.x_scale*1110,self.y_scale*730,self.x_scale*20,b_h,green,bright_green,self.singleRotate,"l'")
             button(screen,u"打乱",ft_sz,self.x_scale*1140,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.initCube,"X")
             button(screen,u"开始",ft_sz,self.x_scale*1210,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.resetCube,"X")
             button(screen,"提示",ft_sz,self.x_scale*1280,self.y_scale*730,self.x_scale*60,b_h,green,bright_green,self.hint,"X")
             displayTutorial(screen, self.x_scale, self.y_scale)
             #显示设置颜色块
-            button(screen,"",ft_sz,self.x_scale*250,y_scale*10,self.x_scale*40,self.x_scale*40,
+            button(screen,"",ft_sz,self.x_scale*230,y_scale*10,self.x_scale*40,self.x_scale*40,
                 colors["r"],bright_green,self.selectColor,"r")
-            button(screen,"",ft_sz,self.x_scale*300,y_scale*10,self.x_scale*40,self.x_scale*40,
+            button(screen,"",ft_sz,self.x_scale*280,y_scale*10,self.x_scale*40,self.x_scale*40,
                 colors["b"],bright_green,self.selectColor,"b")
-            button(screen,"",ft_sz,self.x_scale*350,y_scale*10,self.x_scale*40,self.x_scale*40,
+            button(screen,"",ft_sz,self.x_scale*330,y_scale*10,self.x_scale*40,self.x_scale*40,
                 colors["g"],bright_green,self.selectColor,"g")
-            button(screen,"",ft_sz,self.x_scale*400,y_scale*10,self.x_scale*40,self.x_scale*40,
+            button(screen,"",ft_sz,self.x_scale*380,y_scale*10,self.x_scale*40,self.x_scale*40,
                 colors["o"],bright_green,self.selectColor,"o")
-            button(screen,"",ft_sz,self.x_scale*450,y_scale*10,self.x_scale*40,self.x_scale*40,
+            button(screen,"",ft_sz,self.x_scale*430,y_scale*10,self.x_scale*40,self.x_scale*40,
                 colors["y"],bright_green,self.selectColor,"y")
-            button(screen,"",ft_sz,self.x_scale*500,y_scale*10,self.x_scale*40,self.x_scale*40,
+            button(screen,"",ft_sz,self.x_scale*480,y_scale*10,self.x_scale*40,self.x_scale*40,
                 colors["w"],bright_green,self.selectColor,"w")
+            button(screen,u"完成",ft_sz,self.x_scale*530,y_scale*10,self.x_scale*50,self.x_scale*40,
+                (224,224,224),bright_green,self.endBrush,"x")
+                
 
             if self.rotating:
                 self.rotate_angle = self.rotate_angle + 6

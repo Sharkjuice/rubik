@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-  
 import pygame
-from cubeGlobal import background,screen,green,bright_green,colors
+from cubeGlobal import background,green,bright_green,colors,getDisplayParams
 from cubeCommon import button,printText
 steps = [
     {"step":u"前提", "title":u"基本常识",
@@ -155,19 +155,6 @@ figList = [
 ("yrgyrgyrg","yrgyrgyrg","---------")],
 ] 
 
-currentStep = 0
-refresh = 1
-def nextOrPrevious(isNext):
-    global currentStep,refresh
-    currentStep += isNext
-    refresh = 1
-    if currentStep < 0:
-        currentStep = 0
-    elif currentStep > 11:
-        currentStep = 11
-    
-
-
 f_points = [
 (0,0),(0,20),(0,40),(0,60),(-16,-12),(-16,8),(-16,28),(-16,48),
 (-32,-24),(-32,-4),(-32,16),(-32,36),(-48,-36),(-48,-16),(-48,4),(-48,24)
@@ -185,66 +172,84 @@ u_points = [
 (32,-24),(16,-36),(0,-48),(-16,-60),(48,-36),(32,-48),(16,-60),(0,-72)
 ]
 
-def displayFigure(screen,x,y,figure):
-    f_colors = [colors[c] for c in figure[0]]
-    r_colors = [colors[c] for c in figure[1]]
-    u_colors = [colors[c] for c in figure[2]]
-    i = 0
-    for f in faces:
-        pointlist = [(r_points[f[0]][0]+x, r_points[f[0]][1]+y),(r_points[f[1]][0]+x, r_points[f[1]][1]+y),
-                     (r_points[f[2]][0]+x, r_points[f[2]][1]+y),(r_points[f[3]][0]+x, r_points[f[3]][1]+y)]
-        pygame.draw.polygon(screen,r_colors[i],pointlist)   
-        pointlist = [(r_points[f[0]][0]+x, r_points[f[0]][1]+y),(r_points[f[1]][0]+x, r_points[f[1]][1]+y),
-                     (r_points[f[2]][0]+x, r_points[f[2]][1]+y),(r_points[f[3]][0]+x, r_points[f[3]][1]+y)]        
-        pygame.draw.polygon(screen,(0,0,0),pointlist,1)
-        i += 1
-    i = 0        
-    for f in faces:
-        pointlist = [(f_points[f[0]][0]+x, f_points[f[0]][1]+y),(f_points[f[1]][0]+x, f_points[f[1]][1]+y),
-                     (f_points[f[2]][0]+x, f_points[f[2]][1]+y),(f_points[f[3]][0]+x, f_points[f[3]][1]+y)]
-        pygame.draw.polygon(screen,f_colors[i],pointlist)
-        pointlist = [(f_points[f[0]][0]+x, f_points[f[0]][1]+y),(f_points[f[1]][0]+x, f_points[f[1]][1]+y),
-                     (f_points[f[2]][0]+x, f_points[f[2]][1]+y),(f_points[f[3]][0]+x, f_points[f[3]][1]+y)]        
-        pygame.draw.polygon(screen,(0,0,0),pointlist,1)
-        i += 1
-    i = 0
-    for f in faces:
-        pointlist = [(u_points[f[0]][0]+x, u_points[f[0]][1]+y),(u_points[f[1]][0]+x, u_points[f[1]][1]+y),
-                      (u_points[f[2]][0]+x, u_points[f[2]][1]+y),(u_points[f[3]][0]+x, u_points[f[3]][1]+y)]        
-        pygame.draw.polygon(screen,u_colors[i],pointlist)
-        pointlist = [(u_points[f[0]][0]+x, u_points[f[0]][1]+y),(u_points[f[1]][0]+x, u_points[f[1]][1]+y),
-                      (u_points[f[2]][0]+x, u_points[f[2]][1]+y),(u_points[f[3]][0]+x, u_points[f[3]][1]+y)]        
-        pygame.draw.polygon(screen,(0,0,0),pointlist,1)
-        i += 1
-def displayTutorial(screen,x_scale,y_scale):
-    global refresh
-    ft_size = int(x_scale*25)
-    step = steps[currentStep]["step"]
-    title = steps[currentStep]["title"]
-    button(screen,"<<",ft_size,x_scale*810,y_scale*10,x_scale*40,y_scale*30,green,bright_green,nextOrPrevious,-1)
-    button(screen,step,ft_size,x_scale*880,y_scale*10,x_scale*100,y_scale*30,green,green)
-    button(screen,title,ft_size,x_scale*1000,y_scale*10,x_scale*200,y_scale*30,green,green)
-    button(screen,">>",ft_size,x_scale*1230,y_scale*10,x_scale*40,y_scale*30,green,bright_green,nextOrPrevious,1)
+class CubeTutorial:
+    def __init__(self):
+        self.currentStep = 0
+        self.refresh = 1
+        
+    def nextOrPrevious(self,isNext):
+        self.currentStep += isNext
+        self.refresh = 1
+        if self.currentStep < 0:
+            self.currentStep = 0
+        elif self.currentStep > 11:
+            self.currentStep = 11
+        self.displayTutorial()
     
- 
-    texts = steps[currentStep]["text"]
-    figures = steps[currentStep].get("figures",[])
-    
-    ln_size = y_scale*28
-    if refresh == 1:
-        pygame.draw.rect(screen,background,(x_scale*810,y_scale*45,x_scale*538,y_scale*550))
-        refresh = 0
-        line = 0
-        for text in texts:
-            printText(screen,text, "kaiti", ft_size, x_scale*810, y_scale*45+ln_size*line, (240,240,240))
-            line += 1
-        x = x_scale*880
-        y = y_scale*500
-        offset = 0
-        for fig in figures:
-            displayFigure(screen,x+offset, y,figList[fig[0]][fig[1]])
-            fig_label = u"图" + str(fig[0]+1)+ "-" + str(fig[1]+1)
-            printText(screen,fig_label, "kaiti", ft_size,  x + offset - x_scale*20,  y + y_scale*65, (200,200,200))
-            offset += x_scale*120
+
+    def displayFigure(self,screen,x,y,figure):
+        f_colors = [colors[c] for c in figure[0]]
+        r_colors = [colors[c] for c in figure[1]]
+        u_colors = [colors[c] for c in figure[2]]
+        i = 0
+        for f in faces:
+            pointlist = [(r_points[f[0]][0]+x, r_points[f[0]][1]+y),(r_points[f[1]][0]+x, r_points[f[1]][1]+y),
+                         (r_points[f[2]][0]+x, r_points[f[2]][1]+y),(r_points[f[3]][0]+x, r_points[f[3]][1]+y)]
+            pygame.draw.polygon(screen,r_colors[i],pointlist)   
+            pointlist = [(r_points[f[0]][0]+x, r_points[f[0]][1]+y),(r_points[f[1]][0]+x, r_points[f[1]][1]+y),
+                         (r_points[f[2]][0]+x, r_points[f[2]][1]+y),(r_points[f[3]][0]+x, r_points[f[3]][1]+y)]        
+            pygame.draw.polygon(screen,(0,0,0),pointlist,1)
+            i += 1
+        i = 0        
+        for f in faces:
+            pointlist = [(f_points[f[0]][0]+x, f_points[f[0]][1]+y),(f_points[f[1]][0]+x, f_points[f[1]][1]+y),
+                         (f_points[f[2]][0]+x, f_points[f[2]][1]+y),(f_points[f[3]][0]+x, f_points[f[3]][1]+y)]
+            pygame.draw.polygon(screen,f_colors[i],pointlist)
+            pointlist = [(f_points[f[0]][0]+x, f_points[f[0]][1]+y),(f_points[f[1]][0]+x, f_points[f[1]][1]+y),
+                         (f_points[f[2]][0]+x, f_points[f[2]][1]+y),(f_points[f[3]][0]+x, f_points[f[3]][1]+y)]        
+            pygame.draw.polygon(screen,(0,0,0),pointlist,1)
+            i += 1
+        i = 0
+        for f in faces:
+            pointlist = [(u_points[f[0]][0]+x, u_points[f[0]][1]+y),(u_points[f[1]][0]+x, u_points[f[1]][1]+y),
+                          (u_points[f[2]][0]+x, u_points[f[2]][1]+y),(u_points[f[3]][0]+x, u_points[f[3]][1]+y)]        
+            pygame.draw.polygon(screen,u_colors[i],pointlist)
+            pointlist = [(u_points[f[0]][0]+x, u_points[f[0]][1]+y),(u_points[f[1]][0]+x, u_points[f[1]][1]+y),
+                          (u_points[f[2]][0]+x, u_points[f[2]][1]+y),(u_points[f[3]][0]+x, u_points[f[3]][1]+y)]        
+            pygame.draw.polygon(screen,(0,0,0),pointlist,1)
+            i += 1
+
+    def displayHeader(self):
+        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        step = steps[self.currentStep]["step"]
+        title = steps[self.currentStep]["title"]
+        button(screen,"<<",ft_sz,x_scale*810,y_scale*10,x_scale*40,y_scale*30,green,bright_green,self.nextOrPrevious,-1)
+        button(screen,step,ft_sz,x_scale*880,y_scale*10,x_scale*100,y_scale*30,green,green)
+        button(screen,title,ft_sz,x_scale*1000,y_scale*10,x_scale*200,y_scale*30,green,green)
+        button(screen,">>",ft_sz,x_scale*1230,y_scale*10,x_scale*40,y_scale*30,green,bright_green,self.nextOrPrevious,1)
+
+    def displayTutorial(self):
+        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        step = steps[self.currentStep]["step"]
+        title = steps[self.currentStep]["title"]
+        texts = steps[self.currentStep]["text"]
+        figures = steps[self.currentStep].get("figures",[])
+        
+        ln_size = y_scale*28
+        if self.refresh == 1:
+            pygame.draw.rect(screen,background,(x_scale*810,y_scale*45,x_scale*538,y_scale*550))
+            self.refresh = 0
+            line = 0
+            for text in texts:
+                printText(screen,text, "kaiti", ft_sz, x_scale*810, y_scale*45+ln_size*line, (240,240,240))
+                line += 1
+            x = x_scale*880
+            y = y_scale*500
+            offset = 0
+            for fig in figures:
+                self.displayFigure(screen,x+offset, y,figList[fig[0]][fig[1]])
+                fig_label = u"图" + str(fig[0]+1)+ "-" + str(fig[1]+1)
+                printText(screen,fig_label, "kaiti", ft_sz,  x + offset - x_scale*20,  y + y_scale*65, (200,200,200))
+                offset += x_scale*120
     
               

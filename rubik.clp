@@ -903,7 +903,7 @@
 (assert (pll-macro 5 11 2163  "(FRU'R')U'(RUR'F')(RUR'U')(R'FRF')"))
 (assert (pll-macro 5 12 2016 "z(U'RD')(R2UR'U')R2U(DR')"))
 (assert (pll-macro 5 13 3969 "(RUR'F')(RUR'U')(R'F)(R2U'R'U')"))
-(assert (pll-macro 5 14 3213 "(R'U2)(RU2R')(FRU)R'(U'R'F')R2U')"))
+(assert (pll-macro 5 14 3213 "(R'U2)(RU2R')(FRU)R'(U'R'F')(R2U')"))
 (assert (pll-macro 5 15 2835 "(RU'R'U')(RURD)(R'U'RD')(R'U2R'U')"))
 (assert (pll-macro 1 16 224 "(R2u'RU')R(UR'uR2)(fR'f')"))
 (assert (pll-macro 2 17 28  "(RUR')y'(R2u'RU')R'(UR'uR2)"))

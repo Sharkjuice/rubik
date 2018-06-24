@@ -2,7 +2,7 @@
 import sys, math, pygame
 from operator import itemgetter
 import cubeModel
-from cubeGlobal import block_v, black,cube_o,faces,colors,background
+from cubeGlobal import block_v, black,cube_o,faces,colors,background,getDisplayParams
 from cubeCommon import printText
 
 #在侧边显示后、下、左三面的信息
@@ -78,7 +78,8 @@ class Block3D:
         return self
         
 class Cube3D:
-    def __init__(self, cube,width, height, fov, distance,x_scale,y_scale,x_adj,y_adj):
+    def __init__(self, cube,width, height, fov, distance,x_adj,y_adj):
+        screen,_,x_scale,y_scale= getDisplayParams()
         self.cube = cube
         self.blocks = []
         self.alpha = -45
@@ -88,10 +89,9 @@ class Cube3D:
         self.height = y_scale*height
         self.fov = (x_scale+y_scale)*fov/2
         self.distance = distance
-        self.x_scale = x_scale
-        self.y_scale = y_scale
         self.x_adj = x_scale*x_adj
         self.y_adj = y_scale*y_adj
+        self.screen,self.x_scale,self.y_scale = screen,x_scale,y_scale
 
     def buildFaces(self):
         self.blocks = []
@@ -147,7 +147,7 @@ class Cube3D:
             self.rotateLayer(face,2,clockwize,angle)
             
             
-    def displayLayer(self,screen,face,layer,x,y):
+    def displayLayer(self,face,layer,x,y):
         face_index = l_map[face]["FACE"]
         x_offset = self.x_scale*x
         y_offset = self.y_scale*y
@@ -164,21 +164,22 @@ class Cube3D:
             f = b.faces[face_index]
             pointlist = [(t[f[0]].x, t[f[0]].y), (t[f[1]].x, t[f[1]].y),
                      (t[f[2]].x, t[f[2]].y), (t[f[3]].x, t[f[3]].y)]                
-            pygame.draw.polygon(screen,c,pointlist)
-            pygame.draw.polygon(screen,(0,0,0),pointlist,2)     
+            pygame.draw.polygon(self.screen,c,pointlist)
+            pygame.draw.polygon(self.screen,(0,0,0),pointlist,2)     
             if  b.mark != "-":
-                printText(screen, b.mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
+                printText(self.screen, b.mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
             
   
     #返回cube显示的区域，在动画过程中要清除这个区域，然后才重新绘制
-    def clearCube(self,screen):
-        pygame.draw.circle(screen,background,(int(self.x_scale*400), int(self.y_scale*350)),int((self.x_scale+self.y_scale)*125))
+    def clearCube(self):
+        pygame.draw.circle(self.screen,background,(int(self.x_scale*400), int(self.y_scale*350)),int((self.x_scale+self.y_scale)*125))
 
         
     #在正中间显示魔方的主体，立体显示，通过视角控制，显示前面、右面、上面
-    def displayCube(self,screen):
+    def displayCube(self):
         avg_z = []
         b_i = 0
+
         for b in self.blocks:
             f_i = 0
             for f in b.faces:
@@ -201,10 +202,10 @@ class Cube3D:
                 pointlist = [(t[f[0]].x, t[f[0]].y), (t[f[1]].x, t[f[1]].y),
                          (t[f[2]].x, t[f[2]].y), (t[f[3]].x, t[f[3]].y)]
                 
-                pygame.draw.polygon(screen,c,pointlist)
-                pygame.draw.polygon(screen,(0,0,0),pointlist,2)
+                pygame.draw.polygon(self.screen,c,pointlist)
+                pygame.draw.polygon(self.screen,(0,0,0),pointlist,2)
                 if  self.blocks[b_i].mark != "-":
-                    printText(screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
+                    printText(self.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
                 
     def hitBlock(self,x,y):
         for b in self.blocks:

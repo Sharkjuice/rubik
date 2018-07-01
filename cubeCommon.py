@@ -12,9 +12,9 @@ def button(screen,msg,Textsize,x,y,w,h,ic,ac,action=None,param=None):
         mouse_current = mouse_status[0]
         if mouse_current == 1 and action != None:
             action(param)
-            mouse_status[0] = 0
-            mouse_status[1] = 0
-            mouse_status[1] = 0
+        mouse_status[0] = 0
+        mouse_status[1] = 0
+        mouse_status[2] = 0
     else:
         pygame.draw.rect(screen, ic,(x,y,w,h))
     smallText = pygame.font.SysFont("kaiti",Textsize)

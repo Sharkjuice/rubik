@@ -855,7 +855,7 @@
 (assert (oll-macro 49 2646 "F(RUR'U')2F'"))
 (assert (oll-macro 50 3780 "(r'U)(r2U'(r2U')(r2)(Ur')"))
 (assert (oll-macro 51 441 "(RB')(R2F)(R2B)(R2F'R)"))
-(assert (oll-macro 52 3208 "f(RUR'2U')(R'U)(R2U'R')f'"))
+(assert (oll-macro 52 3208 "(fRUR2U')R'(UR2U'R'f')"))
 (assert (oll-macro 53 275 "(RUR')(U'RU'R')(F'U'F)(RUR')"))
 (assert (oll-macro 54 149 "(R'U')(RU'R'U)(UR)(FRUR'U'F')"))
 (assert (oll-macro 55 338 "(RUR')(URU2R')(FRUR'U'F')"))
@@ -892,8 +892,8 @@
 ;clockwize/anticlockwize =1/2, figure number in the manual card, and pattern number, macro
 (assert (pll-macro 1 1 3053 "(RU'R)(URUR)(U'R'U'R2)"))
 (assert (pll-macro 2 2 3053 "(R2U)(RUR'U')(R'U')(R'UR')"))
-(assert (pll-macro 1 3 2925 "M2UM2U2M2UM2"))
-(assert (pll-macro 2 4 2925 "M'U(M'2U)2M'U2M'2U'"))
+(assert (pll-macro 1 3 2925 "(M2U)(M2U)U(M2U)(M2)"))
+(assert (pll-macro 2 4 2925 "(M'UM')(M'UM')(M'UM')U2M2U'"))
 (assert (pll-macro 1 5 1938 "x'(R2D2)(R'U'R)D2(R'UR')"))
 (assert (pll-macro 2 6 1938 "x'(RU'R)D2(R'UR)(D2R2)"))
 (assert (pll-macro 4 7 1170 "x'(RU'R'D)(RUR'D')(RUR'D)(RU'R'D')x"));this is a symetric pattern

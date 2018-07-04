@@ -180,7 +180,7 @@ class CubeController:
                         my_b.mark = str_mark
                         sn_b.mark = str_mark
                         mark += 1
-                    elif my_b.block.colors[0] != sn_b.block.colors[0]:
+                    elif my_b.block.colors != sn_b.block.colors:
                         str_mark = str(mark)
                         my_b.mark = str_mark
                         sn_b.mark = str_mark
@@ -402,7 +402,7 @@ class CubeController:
                 model_b.colors[2] = self.brush_color
             
             self.my_cube_3d.buildFaces()        
-            self.my_cube_3d.displayCube(screen)
+            self.my_cube_3d.displayCube()
 
     def endBrush(self,dumy):
         if self.brush_copy == 1:

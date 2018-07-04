@@ -8,9 +8,9 @@ import cubeView,cubeModel
 class CubeSnapshot:
     def __init__(self,cube,width, height, fov, distance,x_adj,y_adj):
         self.total =  0
-        self.total_page = 1
-        self.current = 1
-        self.current_page = 1
+        self.total_page = 0
+        self.current = -1
+        self.current_page = -1
         self.next_index = 0
         self.snapshots = []
         self.x_adj = x_adj
@@ -77,6 +77,8 @@ class CubeSnapshot:
         self.selectSnapshot(self.current)
 		
     def selectSnapshot(self,b):        
+        if self.total == 0:
+            return		
         self.current = b
         fo = open(".\\snapshots\\" + self.snapshots[b-1], "r", 1)
         blocks = []
@@ -92,6 +94,8 @@ class CubeSnapshot:
             self.displayCube()
 			
     def setCurrent(self,c):
+        if self.total == 0:
+            return		
         self.current = c
         m,r = divmod(c,10)
         if (m + r) != 0:

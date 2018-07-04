@@ -33,9 +33,11 @@ class CubeSnapshot:
             fo.close()   
         if len(self.snapshots) > 0:
             self.setTotal(len(self.snapshots))
+            self.setCurrent(1)		
             last = self.snapshots[-1]
             last_index = int(last[7:-4])
             self.next_index = last_index
+			
 
     def saveCube(self,cube,flag):
         if flag == 0:
@@ -72,7 +74,7 @@ class CubeSnapshot:
         self.setTotal(self.total - 1)
         if self.current > 0:
             self.setCurrent(self.current - 1)
-        else:
+        if self.current == 0:
             self.setCurrent(self.current + 1)
         self.selectSnapshot(self.current)
 		

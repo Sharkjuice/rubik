@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-  
-import pygame,sys,time,copy,random,subprocess,ctypes
+import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial
-from cubeGlobal import mouse_status,cube_o,setDisplayParams,getDisplayParams,\
+from cubeGlobal import mouse_status,cube_o,getDisplayParams,\
     background,black,green,bright_green,colors_r,colors_n,colors
 from cubeCommon import button,printText
+
+#显示魔方区域的高度和宽度
+win_height = 768
+win_width = 800
+#3D显示参数
+fov = 700
+distance = 8
+
 
 #action map用户在几面上的按钮，对应的数据模型
 a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
@@ -37,23 +45,15 @@ a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
          "x":{"face":"RIGHT","clockwize":-1,"layer":4,"reverse":"x'"},
          "x'":{"face":"RIGHT","clockwize":1,"layer":4,"reverse":"x"}
 }
-#显示魔方区域的高度和宽度
-win_height = 768
-win_width = 800
-#3D显示参数
-fov = 700
-distance = 8
-#屏幕的最小宽度和高度
-min_scn_w = 1350
-min_scn_h = 768
 
 class CubeController:
-    def __init__(self, init_count, his_count):
+    def __init__(self, init_count, his_count,auto_level=2):
         self.init_count = init_count
         self.his_actions = []
         self.auto_actions = []
         self.his_colors = []
         self.his_count = his_count
+        self.auto_level = auto_level
         
         self.snapshot_or_tutorial = 0; #0 表示显示tutorial， 1表示显示snapshot
 
@@ -129,7 +129,7 @@ class CubeController:
 
         #rotate to F2L stage
         auto_actions = []
-        while self.stage < 2:
+        while self.stage < self.auto_level:
             for a in auto_actions:
                 face = a_map[a]["face"]
                 layer = a_map[a]["layer"]
@@ -154,17 +154,14 @@ class CubeController:
     def helpCube(self,dumy):
         self.snapshot_or_tutorial = 0            
         self.my_tutorial.nextOrPrevious(0)
-        #self.my_tutorial.displayHeader()
-        #self.my_tutorial.displayTutorial()
 
     def snapCube(self,dumy): 
+        screen,ft_sz,x_scale,y_scale= getDisplayParams()
         pygame.draw.rect(screen,background,(x_scale*810,
             y_scale*5,x_scale*538,y_scale*595))    
         self.snapshot_or_tutorial = 1
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_cube_3d.cube)
-        #self.my_snapshot.displayHeader()
-        #self.my_snapshot.displayCube()
    
     def compareCube(self,dumy):
         if self.comparing:#已经处于比对状态，先取消
@@ -347,6 +344,8 @@ class CubeController:
             self.singleRotate(None)    
         
     def detectAction(self,block,face,start,end):
+        _, _, x_scale,_ = getDisplayParams()
+        motion_sz = 50*x_scale		
         rel_y = end[1] - start[1]
         rel_x = end[0] - start[0]
         dir = "-"
@@ -548,36 +547,4 @@ class CubeController:
             clock.tick(30)
             pygame.display.update()
     
-
-        
-if __name__ == "__main__":
-    #初始化pygame屏幕
-    pygame.init()
-    ctypes.windll.user32.SetProcessDPIAware()
-    scn_w, scn_h = (ctypes.windll.user32.GetSystemMetrics(0),ctypes.windll.user32.GetSystemMetrics(1))
-    screen = pygame.display.set_mode((scn_w, scn_h),pygame.FULLSCREEN)
-    screen.fill(background)
-    pygame.display.set_caption("3D魔方教程")
-    x_scale = scn_w/min_scn_w
-    y_scale = scn_h/min_scn_h
-    ft_sz = int(x_scale*25)
-    motion_sz = 50*x_scale
-    setDisplayParams(screen,25,x_scale,y_scale)    
-    pt1 = (0,0)# top left point
-    pt2 = (scn_w-2,0)#top right point
-    pt3 = (0, scn_h-2)#bottom left point
-    pt4 = (scn_w-2, scn_h-2)
-    
-    pygame.draw.line(screen,(128,128,128),pt1,pt2,2)
-    pygame.draw.line(screen,(128,128,128),pt2,pt4,2)
-    pygame.draw.line(screen,(128,128,128),pt4,pt3,2)
-    pygame.draw.line(screen,(128,128,128),pt3,pt1,2)
-    
-    pygame.draw.line(screen,(128,128,128),(x_scale*800,0),(x_scale*800,scn_h-2),2)
-    pygame.draw.line(screen,(128,128,128),(x_scale*800,y_scale*600),(scn_w-2,y_scale*600),2)
-
-    cubeController = CubeController(15,25)
-    
-    cubeController.gameLoop()
-    pygame.quit()
   

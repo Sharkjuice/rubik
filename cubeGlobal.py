@@ -88,24 +88,6 @@ gray = (128,128,128)
 ft_sz = 25
 mouse_status=[0,0,0]
 
-def getScale():
-    return x_scale,y_scale
-def setScale(x,y):
-    x_scale = x
-    y_scale = y
-
-def setFontSize(fs):
-    ft_sz = int(ft_sz*x_scale)
-
-def getFontSize():
-    return ft_sz
-
-def setScreen(scn):
-    screen = scn
-    
-def getScreen(scn):
-    return scn
-
 def getDisplayParams():
     return screen,ft_sz,x_scale,y_scale
 def setDisplayParams(scn,ft,x,y):

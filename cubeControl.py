@@ -95,7 +95,6 @@ class CubeController:
         if flag == 1:
             self.message = u"保存为第" + str(self.my_snapshot.getTotal()) + "份魔方"    
             self.snapshot_or_tutorial = 1
-            #self.my_snapshot.displayCube()		
 
     def loadCube(self,dumy):
         self.his_actions = []
@@ -185,7 +184,10 @@ class CubeController:
                         
         if mark > 1:
             self.my_cube_3d.displayCube()
-            sn_cube_3d.displayCube()
+            self.my_cube_3d.displayLayer("RIGHT",2, -120, -110)
+            self.my_cube_3d.displayLayer("UP",2, -156, 295)
+            self.my_cube_3d.displayLayer("FRONT",2, 360, -110)
+            self.my_snapshot.displayCube()
                     
 
     def singleRotate(self,action):
@@ -431,16 +433,13 @@ class CubeController:
                         mouse_status[0] = 0
                         mouse_status[1] = mouse_down_x
                         mouse_status[2] = mouse_down_y
-                        #print("mouse pressed, ", mouse_status)
                         hit_b,hit_f = self.my_cube_3d.hitBlock(mouse_down_x,mouse_down_y)
-                        #print("hit block:",hit_b, " hit face:", hit_f)
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and (not self.rotating):
                         mouse_up_x,mouse_up_y = event.pos
                         mouse_status[0] = 1
                         mouse_status[1] = mouse_up_x
                         mouse_status[2] = mouse_up_y
-                        #print("mouse released, ", mouse_status)
                         if hit_f != -1:
                             action = self.detectAction(hit_b,hit_f,
                                             (mouse_down_x,mouse_down_y),
@@ -449,7 +448,6 @@ class CubeController:
                                 self.singleRotate(action)
                                 self.dk_count = 0
                             else:    
-                                #double click, to copy facelet color
                                 self.dk_count += 1
                                 if self.dk_count == 1:
                                     self.dk_time = pygame.time.get_ticks()

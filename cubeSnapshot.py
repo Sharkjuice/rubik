@@ -93,6 +93,7 @@ class CubeSnapshot:
             cube = cubeModel.Cube(blocks)
             self.sn_cube_3d = cubeView.Cube3D(cube,self.width, self.height, self.fov, 
                 self.distance,self.x_adj,self.y_adj)
+            self.sn_cube_3d.buildFaces()
             self.displayCube()
 			
     def setCurrent(self,c):
@@ -164,6 +165,7 @@ class CubeSnapshot:
 			
     def takeSnapshot(self,cube):
         self.sn_cube_3d.cube = copy.deepcopy(cube)
+        self.sn_cube_3d.buildFaces()
         self.displayCube()
         
     def displayCube(self):   
@@ -171,8 +173,6 @@ class CubeSnapshot:
         pygame.draw.rect(screen,background,(x_scale*810,
                 y_scale*5,x_scale*538,y_scale*595))    
 		
-        self.sn_cube_3d.buildFaces()
-        #pygame.draw.rect(screen,background,(x_scale*810,y_scale*5,x_scale*538,y_scale*595))    
         self.sn_cube_3d.displayCube()
         self.sn_cube_3d.displayLayer("RIGHT",2, 180,-70)
         self.sn_cube_3d.displayLayer("UP",2, 160, 260)

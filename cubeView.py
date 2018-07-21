@@ -2,7 +2,7 @@
 import sys, math, pygame
 from operator import itemgetter
 import cubeModel
-from cubeGlobal import block_v, black,cube_o,faces,colors,background,getDisplayParams
+from cubeGlobal import block_v, cube_o,faces,colors,background,getDisplayParams
 from cubeCommon import printText
 
 #在侧边显示后、下、左三面的信息
@@ -165,9 +165,12 @@ class Cube3D:
             pointlist = [(t[f[0]].x, t[f[0]].y), (t[f[1]].x, t[f[1]].y),
                      (t[f[2]].x, t[f[2]].y), (t[f[3]].x, t[f[3]].y)]                
             pygame.draw.polygon(self.screen,c,pointlist)
-            pygame.draw.polygon(self.screen,(0,0,0),pointlist,2)     
+            pygame.draw.polygon(self.screen,(0,0,0),pointlist,2) 
             if  b.mark != "-":
-                printText(self.screen, b.mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
+                if c == (0,0,255):#蓝色的块，要先是白色的字，不然看不清
+                    printText(self.screen,b.mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (255,255,255))
+                else:
+                    printText(self.screen,b.mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (0,0,0))
             
   
     #返回cube显示的区域，在动画过程中要清除这个区域，然后才重新绘制
@@ -204,9 +207,13 @@ class Cube3D:
                 
                 pygame.draw.polygon(self.screen,c,pointlist)
                 pygame.draw.polygon(self.screen,(0,0,0),pointlist,2)
+				
                 if  self.blocks[b_i].mark != "-":
-                    printText(self.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, black)
-                
+                    if c == (0,0,255):#蓝色的块，要先是白色的字，不然看不清
+                        printText(self.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (255,255,255))
+                    else:
+                        printText(self.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (0,0,0))
+					
     def hitBlock(self,x,y):
         for b in self.blocks:
             b1 = b.block

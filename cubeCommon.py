@@ -17,7 +17,7 @@ def button(screen,msg,Textsize,x,y,w,h,ic,ac,action=None,param=None):
         mouse_status[2] = 0
     else:
         pygame.draw.rect(screen, ic,(x,y,w,h))
-    smallText = pygame.font.SysFont("kaiti",Textsize)
+    smallText = pygame.font.SysFont("fangsong",Textsize)
     textSurf, textRect = text_objects(msg, smallText)
     textRect.center = ( (x+(w/2)), (y+(h/2)) )
     screen.blit(textSurf, textRect)

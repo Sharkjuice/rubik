@@ -155,10 +155,12 @@ class CubeController:
         self.my_tutorial.nextOrPrevious(0)
 
     def snapshot(self,dumy): 
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        pygame.draw.rect(screen,background,(x_scale*810,
-            y_scale*5,x_scale*538,y_scale*595))    
-        self.snapshot_or_tutorial = 1
+        if self.snapshot_or_tutorial == 0:
+            screen,ft_sz,x_scale,y_scale= getDisplayParams()
+            pygame.draw.rect(screen,background,(x_scale*810,
+                y_scale*5,x_scale*538,y_scale*595))    
+            self.snapshot_or_tutorial = 1
+	
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_cube_3d.cube)
    
@@ -422,12 +424,14 @@ class CubeController:
                 self.brush_copy = 0
                 self.advise = u"颜色设置完成。"
     def level(self,value):
-        self.my_snapshot.setLevel(value)
         self.auto_level = value        
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        pygame.draw.rect(screen,background,(x_scale*810,
-            y_scale*5,x_scale*538,y_scale*595))    
-        self.snapshot_or_tutorial = 1
+        if self.snapshot_or_tutorial == 0:
+            screen,ft_sz,x_scale,y_scale= getDisplayParams()
+            pygame.draw.rect(screen,background,(x_scale*810,
+                y_scale*5,x_scale*538,y_scale*595))    
+            self.snapshot_or_tutorial = 1
+        self.my_snapshot.setLevel(value)
+        self.my_snapshot.selectSnapshot()
 
     def gameLoop(self):
         global mouse_status
@@ -490,8 +494,8 @@ class CubeController:
                 b_y += y_scale*40; b_x = x_scale*650
                 
             #显示控制按钮
-            b_map = [[(u"自定",self.level,0),("十字",self.level,1),("F2",self.level,2),
-                    ("oll",self.level,3),(u"pll",self.level,4),(u"帮助",self.help,0),
+            b_map = [[(u"自定",self.level,0),("十字",self.level,1),("F2L",self.level,2),
+                    ("OLL",self.level,3),(u"PLL",self.level,4),(u"帮助",self.help,0),
                     (u"删除",self.delete,0), (u"提示",self.hint,1)],
                      [(u"保存",self.save,1),(u"快照",self.snapshot,0),(u"加载",self.load,0),
                      (u"自动",self.step,0),(u"对比",self.compare,0),(u"撤销",self.cancel,0),
@@ -527,12 +531,12 @@ class CubeController:
             if self.rotate_angle == 90:
                 self.my_cube_3d.cube.rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize)
                 self.displayCube()
-                printText(screen,"U", "kaiti", ft_sz, x_scale*390, y_scale*220, black)
-                printText(screen,"F", "kaiti", ft_sz, x_scale*290, y_scale*390, black)
-                printText(screen,"R", "kaiti", ft_sz, x_scale*500, y_scale*400, black)
-                printText(screen,"B", "kaiti", ft_sz, x_scale*690, y_scale*90, black)
-                printText(screen,"L", "kaiti", ft_sz, x_scale*95, y_scale*93, black)
-                printText(screen,"D", "kaiti", ft_sz, x_scale*120, y_scale*600, black)
+                printText(screen,"U", "arial", ft_sz, x_scale*390, y_scale*220, black)
+                printText(screen,"F", "arial", ft_sz, x_scale*290, y_scale*390, black)
+                printText(screen,"R", "arial", ft_sz, x_scale*500, y_scale*400, black)
+                printText(screen,"B", "arial", ft_sz, x_scale*690, y_scale*90, black)
+                printText(screen,"L", "arial", ft_sz, x_scale*95, y_scale*93, black)
+                printText(screen,"D", "arial", ft_sz, x_scale*120, y_scale*600, black)
                 self.rotating = False
                 self.rotate_angle = 0
 
@@ -544,10 +548,10 @@ class CubeController:
 
                 
             pygame.draw.rect(screen,(128,128,128),(x_scale*220,y_scale*690,x_scale*560,y_scale*30))            
-            printText(screen, self.message, "kaiti", ft_sz, x_scale*230, y_scale*690, background)
+            printText(screen, self.message, "fangsong", ft_sz, x_scale*230, y_scale*690, background)
                     
             pygame.draw.rect(screen,(128,128,128),(x_scale*220,y_scale*730,x_scale*560,y_scale*30))            
-            printText(screen, self.advise, "kaiti", ft_sz, x_scale*230, y_scale*730, background)
+            printText(screen, self.advise, "fangsong", ft_sz, x_scale*230, y_scale*730, background)
             
             if self.snapshot_or_tutorial == 1:
                 self.my_snapshot.displayHeader()

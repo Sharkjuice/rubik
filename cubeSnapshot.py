@@ -98,11 +98,12 @@ class CubeSnapshot:
             self.setCurrent(self.current + 1)
         self.selectSnapshot(self.current)
 		
-    def selectSnapshot(self,b):        
+    def selectSnapshot(self,b=None):        
         if self.total == 0:
             return		
-        self.current = b
-        fo = open(self.snapshots_dir + self.snapshots[b-1][0], "r", 1)
+        if b != None:
+            self.current = b
+        fo = open(self.snapshots_dir + self.snapshots[self.current-1][0], "r", 1)
         blocks = []
         if fo != None:
             for line in fo.readlines():
@@ -184,8 +185,8 @@ class CubeSnapshot:
         s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2题库",3:u"oll题库",4:u"pll题库"}
 		
         pygame.draw.rect(screen,(128,128,128),(x_scale*1070,y_scale*650,x_scale*280,y_scale*30))            
-        printText(screen,u"当前是" + s_map[self.level], "kaiti", ft_sz, x_scale*1075, y_scale*653, black)
-        self.selectSnapshot(self.current)	
+        printText(screen,u"当前是" + s_map[self.level], "fangsong", ft_sz, x_scale*1075, y_scale*653, black)
+        #self.selectSnapshot(self.current)	
 		
     def takeSnapshot(self,cube):
         self.sn_cube_3d.cube = copy.deepcopy(cube)
@@ -206,3 +207,4 @@ class CubeSnapshot:
         self.level = value
         self.snapshots_dir = ".\\snapshots_" + str(value) + "\\"
         self.build()
+        #self.selectSnapshot(self.current)

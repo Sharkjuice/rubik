@@ -265,7 +265,10 @@ class CubeController:
                 ci += 1
         return pass2
     def delete(self,dumy):
-        msg = self.my_snapshot.deleteSnapshot()
+        if self.snapshot_or_tutorial == 0:
+            msg = u"当前是帮助窗口，不能删除."
+        else:
+            msg = self.my_snapshot.deleteSnapshot()
         if msg != None:
             self.message = msg
     def hint(self,show):

@@ -32,22 +32,22 @@
 
 (defrule rotate-macro "rotate a face to F "
 =>
-(assert (rotate-macro B yy))
-(assert (rotate-macro R y))
-(assert (rotate-macro L y'))
-(assert (rotate-macro F o))
+(assert (rotate-macro B yy 100))
+(assert (rotate-macro R y 101))
+(assert (rotate-macro L y' 102))
+(assert (rotate-macro F o 103))
 )
 
 (defrule up-rotate-macro "rotate the up layer facelet to F or R"
 =>
-(assert (up-rotate-macro B F UU))
-(assert (up-rotate-macro R F U))
-(assert (up-rotate-macro L F U'))
-(assert (up-rotate-macro F F O))
-(assert (up-rotate-macro B R U))
-(assert (up-rotate-macro R R O))
-(assert (up-rotate-macro L R UU))
-(assert (up-rotate-macro F R U'))
+(assert (up-rotate-macro B F UU 200))
+(assert (up-rotate-macro R F U 201))
+(assert (up-rotate-macro L F U' 202))
+(assert (up-rotate-macro F F O 203))
+(assert (up-rotate-macro B R U 204))
+(assert (up-rotate-macro R R O 205))
+(assert (up-rotate-macro L R UU 206))
+(assert (up-rotate-macro F R U' 207))
 )
   
 (defrule init-cord-facelet
@@ -266,7 +266,8 @@
    =>
 	(assert (face ?s ?c))
 )
-
+;;Confirm if the bottom center is white,
+;;if it is, enter phase 1
 (defrule confirm-init-phase
 	?f <- (phase 0)
 	(not (blk $?))
@@ -277,12 +278,13 @@
 	(retract ?f)
 	(assert (phase 1))
 )
-
+;;Confirm if the bottom center is white,
+;;if it is, enter phase 1
 (defrule confirm-f2l-phase
 	?f <- (phase 1)
 	(forall 
 	(block (id ?id) (layer 1) (type edge))
-	(facelet (id ?id) (side D) (color w)))
+	(block (id ?id) (status ok)))
 	=>
 	(printout t "#confirm phase f2l" crlf)
 	(retract ?f)
@@ -344,19 +346,19 @@
 (defrule init-phase-macro
 =>
 ;;move the target face to the up position
-(assert (init-macro 1 align_up 2 F'F'))
-(assert (init-macro 1 align_up 4 F'))
-(assert (init-macro 1 align_up 8 F))
-(assert (init-macro 2 align_up 2 F'F'))
-(assert (init-macro 2 align_up 4 F'UF))
-(assert (init-macro 2 align_up 8 FU'F'))
+(assert (init-macro 1 1 align_up 2 F'F'))
+(assert (init-macro 2 1 align_up 4 F'))
+(assert (init-macro 3 1 align_up 8 F))
+(assert (init-macro 4 2 align_up 2 F'F'))
+(assert (init-macro 5 2 align_up 4 F'UF))
+(assert (init-macro 6 2 align_up 8 FU'F'))
 ;;if already in up positon, flip 
-(assert (init-macro align_flip 6 FRUR'))
+(assert (init-macro 7 align_flip 6 FRUR'))
 
 ;;if already aligned,move the target block to bottom
-(assert (init-macro align_down 4 F))
-(assert (init-macro align_down 6 FF))
-(assert (init-macro align_down 8 F'))
+(assert (init-macro 8 align_down 4 F))
+(assert (init-macro 9 align_down 6 FF))
+(assert (init-macro 10 align_down 8 F'))
 )
 
 (defrule init-phase-next-1
@@ -365,12 +367,12 @@
 	(facelet (id ?id) (color w))
 	(facelet (id ?id) (side ?s) (pos ?p&~2) (color ?c&~w))
 	(face ?s ?c)
-	(or (and (test (neq ?s F)) (rotate-macro ?s ?h))
-		(and (test (eq ?s F)) (init-macro align_down ?p ?h))
+	(or (and (test (neq ?s F)) (rotate-macro ?s ?h ?f))
+		(and (test (eq ?s F)) (init-macro ?f align_down ?p ?h))
 	)
 	=>
 	(printout t "t1:(" ?x " " ?y " " ?z ");")
-	(printout t "s:1;f:1;p:0;h:" ?h crlf)
+	(printout t "s:1;f:" ?f ";p:0;h:" ?h crlf)
 )
 
 (defrule init-phase-next-2 "edge is on layer3 but fliped"
@@ -380,12 +382,12 @@
 	(facelet (id ?id) (side ?s2) (color ?c&~w))
 	(face ?s1 ?c)
 	
-	(or (and (test (neq ?s1 F)) (rotate-macro ?s1 ?h))
-		(and (test (eq ?s1 F)) (init-macro align_flip 6 ?h))
+	(or (and (test (neq ?s1 F)) (rotate-macro ?s1 ?h ?f))
+		(and (test (eq ?s1 F)) (init-macro ?f align_flip 6 ?h))
 	)
 	=>
 	(printout t "t1:(" ?x " " ?y " " ?z ");")
-	(printout t "s:1;f:2;p:1;h:" ?h crlf)
+	(printout t "s:1;f:" ?f ";p:1;h:" ?h crlf)
 )
 
 (defrule init-phase-next-3 "the edge is flipped, move to layer 3"
@@ -396,13 +398,13 @@
 	(facelet (id ?id) (type V1) (pos ?p1) (side ?s2))
 	(block (pos 1) (status ?t))
 	(not (face ?s1 ?c))
-	(or (and (test (neq ?s2 F)) (rotate-macro ?s2 ?h))
-		(and (test (eq ?s2 F)) (test (eq ?t ok)) (init-macro 2 align_up ?p1 ?h))
-		(and (test (eq ?s2 F)) (test (neq ?t ok)) (init-macro 1 align_up ?p1 ?h))
+	(or (and (test (neq ?s2 F)) (rotate-macro ?s2 ?h ?f))
+		(and (test (eq ?s2 F)) (test (eq ?t ok)) (init-macro ?f 2 align_up ?p1 ?h))
+		(and (test (eq ?s2 F)) (test (neq ?t ok)) (init-macro ?f 1 align_up ?p1 ?h))
 	)
 	=>
 	(printout t "t1:(" ?x " " ?y " " ?z ");")
-	(printout t "s:1;f:3;p:2;h:" ?h crlf)
+	(printout t "s:1;f:" ?f ";p:2;h:" ?h crlf)
 )
 
 (defrule init-phase-next-4 "the edge on layer 3, adust face"
@@ -413,12 +415,12 @@
 	(facelet (id ?id) (color ?c2&~w))
 	(face ?s2 ?c2)
 	(test (neq ?s1 ?s2))
-	(or (and (test (neq ?s2 F)) (rotate-macro ?s2 ?h))
-		(and (test (eq ?s2 F)) (up-rotate-macro ?s1 F ?h))
+	(or (and (test (neq ?s2 F)) (rotate-macro ?s2 ?h ?f))
+		(and (test (eq ?s2 F)) (up-rotate-macro ?s1 F ?h ?f))
 	)
 	=>
 	(printout t "t1:(" ?x " " ?y " " ?z ");")
-	(printout t "s:1;f:4;p:1;h:" ?h crlf)
+	(printout t "s:1;f:" ?f ";p:1;h:" ?h crlf)
 ) 
 
 
@@ -502,7 +504,7 @@
 	(block (id ?id6&:(= (block-id - ?c1 ?c2) ?id6)) (cord ?x2 ?y2 ?z2) (layer 3))
     (facelet (id ?id5) (side U) (pos ?p5) (color ?c5))
 	(facelet (id ?id6) (side U) (pos ?p6) (color ?c6))
-	(rotate-macro ?s1 ?h1)
+	(rotate-macro ?s1 ?h1 ?x)
 	(f2l-macro 1 ?f ?pv_f ?pv_r ?pv_w ?h2)
 	=>
 	(bind ?hv1 (f2l-hpos-value ?p5 ?c5 ?c1 ?c2))
@@ -539,7 +541,7 @@
 	
     (block (id ?id5&:(= (block-id w ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
     (facelet (id ?id5) (side U) (pos ?p5) (color ?c5))
-	(rotate-macro ?s1 ?h1)
+	(rotate-macro ?s1 ?h1 ?x)
 	(f2l-macro 2 ?f ?pv_f ?pv_r ?pv_w ?h2)
 	=>
 	(bind ?hv1 (f2l-hpos-value ?p5 ?c5 ?c1 ?c2))
@@ -571,7 +573,7 @@
 	
     (block (id ?id5&:(= (block-id w ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
     (facelet (id ?id5) (side U) (pos ?p5) (color ?c5))
-	(rotate-macro ?s1 ?h1)
+	(rotate-macro ?s1 ?h1 ?x)
 	(f2l-macro 3 ?f ?pv_f ?pv_r ?pv_w ?h2)
 	=>
 	(bind ?hv1 (f2l-hpos-value ?p5 ?c5 ?c1 ?c2))
@@ -598,7 +600,7 @@
 	(block (id ?id1) (pos ?p1) (layer 1) (cord ?x1 ?y1 ?z1) (type corner) (status ok))
 	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (cord ?x2 ?y2 ?z2) (status flipped))
 	(facelet (id ?id1) (type V1) (side ?s1))
-	(rotate-macro ?s1 ?h1)
+	(rotate-macro ?s1 ?h1 ?x)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -611,7 +613,7 @@
 	(block (id ?id1) (pos ?p1) (layer 1) (cord ?x1 ?y1 ?z1) (type corner) (status flipped))
 	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (cord ?x2 ?y2 ?z2) (status ok))
 	(facelet (id ?id1) (type V1) (side ?s1) (color w))
-	(rotate-macro ?s1 ?h1)
+	(rotate-macro ?s1 ?h1 ?x)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -624,7 +626,7 @@
 	(block (id ?id1) (pos ?p1) (layer 1) (cord ?x1 ?y1 ?z1) (type corner) (status flipped))
 	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (cord ?x2 ?y2 ?z2) (status ok))
 	(facelet (id ?id1) (type V1) (side ?s1) (color ~w))
-	(rotate-macro ?s1 ?h1)
+	(rotate-macro ?s1 ?h1 ?x)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -637,7 +639,7 @@
 	(block (id ?id1) (pos ?p1) (layer 1) (cord ?x1 ?y1 ?z1) (type corner) (status flipped))
 	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (cord ?x2 ?y2 ?z2) (status flipped))
 	(facelet (id ?id1) (type V1) (side ?s1) (color w))
-	(rotate-macro ?s1 ?h)
+	(rotate-macro ?s1 ?h ?x)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -650,7 +652,7 @@
 	(block (id ?id1) (pos ?p1) (layer 1) (cord ?x1 ?y1 ?z1) (type corner) (status flipped))
 	(block (id ?id2) (pos ?p2&:(= ?p2 (+ 3 ?p1))) (cord ?x2 ?y2 ?z2) (status flipped))
 	(facelet (id ?id1) (type V1) (side ?s1) (color ~w))
-	(rotate-macro ?s1 ?h)
+	(rotate-macro ?s1 ?h ?x)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -668,9 +670,9 @@
 	
     (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
 	(facelet (id ?id5) (type V1) (side ?s3) (color ?c3))	
-	(rotate-macro ?s1 ?h1)
-	(up-rotate-macro ?s3 F ?h2)
-	(up-rotate-macro ?s3 R ?h3)
+	(rotate-macro ?s1 ?h1 ?x)
+	(up-rotate-macro ?s3 F ?h2 ?y)
+	(up-rotate-macro ?s3 R ?h3 ?z)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -694,9 +696,9 @@
 	
     (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
 	(facelet (id ?id5) (type V1) (side ?s3) (color ?c3))	
-	(rotate-macro ?s1 ?h1)
-	(up-rotate-macro ?s3 F ?h2)
-	(up-rotate-macro ?s3 R ?h3)
+	(rotate-macro ?s1 ?h1 ?x)
+	(up-rotate-macro ?s3 F ?h2 ?y)
+	(up-rotate-macro ?s3 R ?h3 ?z)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -720,9 +722,9 @@
 	
     (block (id ?id5&:(= (block-id - ?c1 ?c2) ?id5)) (cord ?x2 ?y2 ?z2) (layer 3))
 	(facelet (id ?id5) (type V1) (side ?s3) (color ?c3))	
-	(rotate-macro ?s1 ?h1)
-	(up-rotate-macro ?s3 F ?h2)
-	(up-rotate-macro ?s3 R ?h3)
+	(rotate-macro ?s1 ?h1 ?x)
+	(up-rotate-macro ?s3 F ?h2 ?y)
+	(up-rotate-macro ?s3 R ?h3 ?z)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -742,7 +744,7 @@
 	(block (id ?id1) (pos ?p1) (layer 1) (cord ?x1 ?y1 ?z1) (type corner) (status wrong))
 	(facelet (id ?id1) (color w))
 	(facelet (id ?id1) (side ?s1) (type V1))	
-	(rotate-macro ?s1 ?h)	
+	(rotate-macro ?s1 ?h ?x)	
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(if (neq ?s1 F) then (printout t "f:42;p:3;h:" ?h crlf) else 
@@ -759,9 +761,9 @@
 	
 	(block (id ?id2&:(= ?id2 (block-id - ?c1 ?c2))) (cord ?x2 ?y2 ?z2) (layer 3))
 	(facelet (id ?id2) (side ?s3) (type V1) (color ?c3))	
-	(rotate-macro ?s1 ?h1)
-	(up-rotate-macro ?s3 F ?h2)
-	(up-rotate-macro ?s3 R ?h3)
+	(rotate-macro ?s1 ?h1 ?x)
+	(up-rotate-macro ?s3 F ?h2 ?y)
+	(up-rotate-macro ?s3 R ?h3 ?z)
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")
@@ -792,8 +794,8 @@
 	(facelet (id ?id3) (type V1) (side ?s3))
 	(not (and (block (id ?id4&:(< ?id4 ?id3)) (layer 3) (type edge))
 			  (facelet (id ?id4) (color y))))			  
-	(rotate-macro ?s1 ?h1)
-	(up-rotate-macro ?s3 R ?h2)		  
+	(rotate-macro ?s1 ?h1 ?x)
+	(up-rotate-macro ?s3 R ?h2 ?y)		  
 	=>
 	(printout t "s:2;t1:(" ?x1 " " ?y1 " " ?z1 ");")	
 	(printout t "t2:(" ?x2 " " ?y2 " " ?z2 ");")

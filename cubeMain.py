@@ -8,10 +8,11 @@ min_scn_h = 768
  
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--auto", help="automatically resolve to this level")	
+    parser.add_argument("--auto", type = int,help="automatically resolve to this level")   
+    parser.add_argument("--gen", type = int,help="just to genaerate F2CP samples.")    
     args = parser.parse_args()
     if args.auto == None:
-        args.auto = 2    
+        args.auto = 2  
     #初始化pygame屏幕
     pygame.init()
     ctypes.windll.user32.SetProcessDPIAware()
@@ -34,10 +35,27 @@ if __name__ == "__main__":
     pygame.draw.line(screen,(128,128,128),pt4,pt3,2)
     pygame.draw.line(screen,(128,128,128),pt3,pt1,2)
     
-    pygame.draw.line(screen,(128,128,128),(x_scale*800,0),(x_scale*800,scn_h-2),2)
-    pygame.draw.line(screen,(128,128,128),(x_scale*800,y_scale*600),(scn_w-2,y_scale*600),2)
+    pygame.draw.line(screen,(128,128,128),(x_scale*800,0),(x_scale*800,y_scale*680),2)
+    pygame.draw.line(screen,(128,128,128),(x_scale*800,y_scale*680),(scn_w-2,y_scale*680),2)
 
-    cubeController = CubeController(15,25,int(args.auto))
+    cubeController = CubeController(15,25,args.auto)
+    cubeController.level(args.auto)
+    if args.gen == 1:
+        fig_num = {1:14,2:41,3:57,4:21}
+        figures = []
+        generated = 0;i=0
+        print("I will try ", fig_num[args.auto]*5, " times. Pls wait.\n")
+        while i < fig_num[args.auto]*5 and generated < fig_num[args.auto]:
+            cubeController.init(0)
+            cubeController.hint(0)
+            i += 1
+            print(u"Try ", i, " times...\n")
+            if cubeController.figure !=0:
+                if cubeController.figure not in figures:
+                    cubeController.save(1,cubeController.figure)
+                    figures.append(cubeController.figure)
+                    generated += 1
+                    print(u"Success ", generated, " times!\n")
     
     cubeController.gameLoop()
     pygame.quit()

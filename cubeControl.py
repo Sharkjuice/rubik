@@ -64,6 +64,7 @@ class CubeController:
         self.gameExit = False
         self.message = u"操作历史"
         self.advise = u"下一步提示"
+        self.figure = 0
         self.stage = 0
         self.dk_count = 0
         self.dk_time = 0
@@ -89,22 +90,22 @@ class CubeController:
         self.my_tutorial.nextOrPrevious(-1)
         
     #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
-    def saveCube(self,flag):
-        self.my_snapshot.saveCube(self.my_cube_3d.cube,flag)            
+    def save(self,flag=1,figure=0):
+        msg = self.my_snapshot.saveCube(self.my_cube_3d.cube,flag,figure)            
 
         if flag == 1:
-            self.message = u"保存为第" + str(self.my_snapshot.getTotal()) + "份魔方"    
+            self.message = msg    
             self.snapshot_or_tutorial = 1
 
-    def loadCube(self,dumy):
+    def load(self,dumy):
         self.his_actions = []
         cube = copy.deepcopy(self.my_snapshot.sn_cube_3d.cube)
         self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, 
-			distance,0,-30)
+            distance,0,-30)
         self.displayCube()
         
  
-    def resetCube(self,dumy):
+    def reset(self,dumy):
         my_cube = cubeModel.Cube()
         self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, 
             distance,0,-30)
@@ -115,7 +116,7 @@ class CubeController:
         
 
 #随机生成一个初始乱的魔方
-    def initCube(self,dumy):
+    def init(self,dummy):
         ra_map = ["F", "R", "U", "F'", "R'", "U'","f", "r","u","f'", "r'","u'",
           "B", "L", "D", "B'", "L'", "D'"]
         self.stage = 0
@@ -125,7 +126,6 @@ class CubeController:
             layer = a_map[ra_map[r]]["layer"]
             clockwize = a_map[ra_map[r]]["clockwize"]
             self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
-
         #rotate to F2L stage
         auto_actions = []
         while self.stage < self.auto_level:
@@ -135,12 +135,12 @@ class CubeController:
                 clockwize = a_map[a]["clockwize"]
                 self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
             self.advise = ""
-            self.hint(dumy)
+            self.hint(0)
             auto_actions = self.parseAdvice()
-                
-        self.his_actions = []
-        self.advise = ""
-        self.displayCube()        
+        if dummy == 1:        
+            self.his_actions = []
+            self.advise = ""
+            self.displayCube()        
         
     def displayCube(self):
         self.my_cube_3d.buildFaces()        
@@ -150,11 +150,11 @@ class CubeController:
         self.my_cube_3d.displayLayer("FRONT",2, 360, -110)
     
 
-    def helpCube(self,dumy):
+    def help(self,dumy):
         self.snapshot_or_tutorial = 0            
         self.my_tutorial.nextOrPrevious(0)
 
-    def snapCube(self,dumy): 
+    def snapshot(self,dumy): 
         screen,ft_sz,x_scale,y_scale= getDisplayParams()
         pygame.draw.rect(screen,background,(x_scale*810,
             y_scale*5,x_scale*538,y_scale*595))    
@@ -162,7 +162,7 @@ class CubeController:
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_cube_3d.cube)
    
-    def compareCube(self,dumy):
+    def compare(self,dumy):
         if self.comparing:#已经处于比对状态，先取消
             self.cancel(dumy)
         self.comparing = True        
@@ -216,10 +216,10 @@ class CubeController:
         self.message = "".join(self.his_actions)
         return True
     
-    def cubeQuit(self,dumy):
+    def quit(self,dumy):
         self.gameExit = True
 
-    def stepOver(self,dumy):
+    def step(self,dumy):
         self.advise = ""
         self.hint(dumy)
         self.auto_actions = self.parseAdvice()
@@ -263,11 +263,13 @@ class CubeController:
                 pass2.append(a)
                 tmp = [a]
                 ci += 1
-                
         return pass2
-
-    def hint(self,dumy):
-        self.saveCube(0)
+    def delete(self,dumy):
+        msg = self.my_snapshot.deleteSnapshot()
+        if msg != None:
+            self.message = msg
+    def hint(self,show):
+        self.save(0)
         res = subprocess.Popen("clipsutil.exe",bufsize = 1,shell = True,stdout=subprocess.PIPE)
         
         outlines = res.stdout.readlines()
@@ -296,21 +298,24 @@ class CubeController:
         if best == []:
             best = [ adv for adv in adv_p if adv["p"] == 3 ]
         if best != []:
+            #print("best advise:",best)
             self.advise = best[0]["h"]
             self.stage = best[0]["s"]
+            self.figure = best[0].get("f",0)
             t1 = best[0].get("t1", None)
             t2 = best[0].get("t2", None)
-            for my_b in self.my_cube_3d.blocks:
+            if show == 1:
+                for my_b in self.my_cube_3d.blocks:
+                    if t1 != None:
+                        if (my_b.block.current.x == int(t1[0]) and
+                            my_b.block.current.y == int(t1[1]) and my_b.block.current.z == int(t1[2])):
+                                my_b.mark = "1"
+                    if t2 != None:
+                        if (my_b.block.current.x == int(t2[0]) and my_b.block.current.y == int(t2[1]) and
+                           my_b.block.current.z == int(t2[2])):
+                                my_b.mark = "2"
                 if t1 != None:
-                    if (my_b.block.current.x == int(t1[0]) and
-                        my_b.block.current.y == int(t1[1]) and my_b.block.current.z == int(t1[2])):
-                            my_b.mark = "1"
-                if t2 != None:
-                    if (my_b.block.current.x == int(t2[0]) and my_b.block.current.y == int(t2[1]) and
-                       my_b.block.current.z == int(t2[2])):
-                            my_b.mark = "2"
-            if t1 != None:
-                self.my_cube_3d.displayCube()
+                    self.my_cube_3d.displayCube()
             
     def cancelComparing(self): 
         self.comparing = False        
@@ -347,7 +352,7 @@ class CubeController:
         
     def detectAction(self,block,face,start,end):
         _, _, x_scale,_ = getDisplayParams()
-        motion_sz = 50*x_scale		
+        motion_sz = 50*x_scale      
         rel_y = end[1] - start[1]
         rel_x = end[0] - start[0]
         dir = "-"
@@ -412,7 +417,14 @@ class CubeController:
                 return 0
             else:
                 self.brush_copy = 0
-                self.advise = u"颜色设置完成。"                
+                self.advise = u"颜色设置完成。"
+    def level(self,value):
+        self.my_snapshot.setLevel(value)
+        self.auto_level = value        
+        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        pygame.draw.rect(screen,background,(x_scale*810,
+            y_scale*5,x_scale*538,y_scale*595))    
+        self.snapshot_or_tutorial = 1
 
     def gameLoop(self):
         global mouse_status
@@ -459,49 +471,46 @@ class CubeController:
                 
                                     
 
-            #显示控制按钮
-            b_map = [["F","F'","f","f'","B","B'"],["R","R'","r","r'","L","L'",],
-                     ["U","U'","u","u'","D","D'"],["x","x'","y","y'","z","z'"]]
-            b_x = x_scale*810
-            b_y = y_scale*610
-            b_h = y_scale*30
+            #显示标准旋转按钮
+            b_map = [["F","F'","f"],["f'","B","B'"],["R","R'","r"],["r'","L","L'"],
+                     ["U","U'","u"],["u'","D","D'"],["x","x'","y"],["y'","z","z'"],
+                     ["M","M'","l"],["d","d'","l'"]]
+
+            b_x = x_scale*650; b_y = y_scale*290; b_h = y_scale*30
+
+            button(screen,"X",ft_sz,x_scale*1300,y_scale*10,x_scale*40,b_h,green,bright_green,self.quit,"X")
+
             for bs in b_map:
                 for b in bs:
                     button(screen, b, ft_sz, b_x, b_y, x_scale*40,b_h,green,bright_green,self.singleRotate,b)
                     b_x += x_scale*50
-                b_y += y_scale*40
-                b_x = x_scale*810
-            button(screen,"X",ft_sz,x_scale*1300,y_scale*10,x_scale*40,b_h,green,bright_green,self.cubeQuit,"X")
-            button(screen,"d",ft_sz,x_scale*1110,y_scale*610,x_scale*40,b_h,green,bright_green,self.singleRotate,'d')
-            button(screen,"d'",ft_sz,x_scale*1160,y_scale*610,x_scale*40,b_h,green,bright_green,self.singleRotate,"d'")
-            button(screen,u"帮助",ft_sz,x_scale*1210,y_scale*610,x_scale*60,b_h,green,bright_green,self.helpCube,"X")  
-            button(screen,u"保存",ft_sz,x_scale*1280,y_scale*610,x_scale*60,b_h,green,bright_green,self.saveCube,1)  
-            button(screen,"M",ft_sz,x_scale*1110,y_scale*650,x_scale*40,b_h,green,bright_green,self.singleRotate,"M") 
-            button(screen,"M'",ft_sz,x_scale*1160,y_scale*650,x_scale*40,b_h,green,bright_green,self.singleRotate,"M'") 
-            button(screen,u"快照",ft_sz,x_scale*1210,y_scale*650,x_scale*60,b_h,green,bright_green,self.snapCube,"X" )
-            button(screen,u"加载",ft_sz,x_scale*1280,y_scale*650,x_scale*60,b_h,green,bright_green,self.loadCube,"X")  
-            button(screen,"l",ft_sz,x_scale*1110,y_scale*690,x_scale*20,b_h,green,bright_green,self.singleRotate,"l")
-            button(screen,u"自动",ft_sz,x_scale*1140,y_scale*690,x_scale*60,b_h,green,bright_green,self.stepOver,"X") 
-            button(screen,u"对比",ft_sz,x_scale*1210,y_scale*690,x_scale*60,b_h,green,bright_green,self.compareCube,"X") 
-            button(screen,u"撤销",ft_sz,x_scale*1280,y_scale*690,x_scale*60,b_h,green,bright_green,self.cancel,"X")
-            button(screen,"l'",ft_sz,x_scale*1110,y_scale*730,x_scale*20,b_h,green,bright_green,self.singleRotate,"l'")
-            button(screen,u"打乱",ft_sz,x_scale*1140,y_scale*730,x_scale*60,b_h,green,bright_green,self.initCube,"X")
-            button(screen,u"开始",ft_sz,x_scale*1210,y_scale*730,x_scale*60,b_h,green,bright_green,self.resetCube,"X")
-            button(screen,"提示",ft_sz,x_scale*1280,y_scale*730,x_scale*60,b_h,green,bright_green,self.hint,"X")
+                b_y += y_scale*40; b_x = x_scale*650
+                
+            #显示控制按钮
+            b_map = [[(u"自定",self.level,0),("十字",self.level,1),("F2",self.level,2),
+                    ("oll",self.level,3),(u"pll",self.level,4),(u"帮助",self.help,0),
+                    (u"删除",self.delete,0), (u"提示",self.hint,1)],
+                     [(u"保存",self.save,1),(u"快照",self.snapshot,0),(u"加载",self.load,0),
+                     (u"自动",self.step,0),(u"对比",self.compare,0),(u"撤销",self.cancel,0),
+                     (u"打乱",self.init,1),(u"开始",self.reset,0)],
+                     ]
+
+            b_x = x_scale*790; b_y = y_scale*690; b_h = y_scale*30
+            for bs in b_map:
+                for b,f,p in bs:
+                    button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,green,bright_green,f,p)
+                    b_x += x_scale*70
+                b_y += y_scale*40; b_x = x_scale*790
+                     
             #显示设置颜色块
-            button(screen,"",ft_sz,x_scale*230,y_scale*10,x_scale*40,x_scale*40,
-                colors["r"],bright_green,self.selectColor,"r")
-            button(screen,"",ft_sz,x_scale*280,y_scale*10,x_scale*40,x_scale*40,
-                colors["b"],bright_green,self.selectColor,"b")
-            button(screen,"",ft_sz,x_scale*330,y_scale*10,x_scale*40,x_scale*40,
-                colors["g"],bright_green,self.selectColor,"g")
-            button(screen,"",ft_sz,x_scale*380,y_scale*10,x_scale*40,x_scale*40,
-                colors["o"],bright_green,self.selectColor,"o")
-            button(screen,"",ft_sz,x_scale*430,y_scale*10,x_scale*40,x_scale*40,
-                colors["y"],bright_green,self.selectColor,"y")
-            button(screen,"",ft_sz,x_scale*480,y_scale*10,x_scale*40,x_scale*40,
-                colors["w"],bright_green,self.selectColor,"w")
-            button(screen,u"完成",ft_sz,x_scale*530,y_scale*10,x_scale*50,x_scale*40,
+            b_map = ["r","b","g","o","y","w"]
+            b_x = x_scale*230; b_y = y_scale*10; b_h = y_scale*30
+            for b in b_map:
+                    button(screen, "", ft_sz, b_x, b_y, x_scale*40,b_h,
+                        colors[b],bright_green,self.selectColor,b)
+                    b_x += x_scale*50
+                
+            button(screen,u"完成",ft_sz, b_x, b_y, x_scale*60, b_h,
                 (224,224,224),bright_green,self.endBrush,"x")
                 
 

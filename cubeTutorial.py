@@ -240,7 +240,7 @@ class CubeTutorial:
         
         ln_size = y_scale*28
         if self.refresh == 1:
-            pygame.draw.rect(screen,background,(x_scale*810,y_scale*45,x_scale*538,y_scale*550))
+            pygame.draw.rect(screen,background,(x_scale*810,y_scale*45,x_scale*538,y_scale*635))
             self.refresh = 0
             line = 0
             for text in texts:

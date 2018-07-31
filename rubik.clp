@@ -331,6 +331,7 @@
 	)
 	=>
 	(printout t "#confirm phase end" crlf)
+	(printout t "s:5;p:0;h:End" crlf)
 	(assert (phase 5))
 	(retract ?f)
 )
@@ -348,10 +349,10 @@
 ;;move the target face to the up position
 (assert (init-macro 1 1 align_up 2 F'F'))
 (assert (init-macro 2 1 align_up 4 F'))
-(assert (init-macro 3 1 align_up 8 F))
-(assert (init-macro 4 2 align_up 2 F'F'))
+;;(assert (init-macro 3 1 align_up 8 F))
+;;(assert (init-macro 4 2 align_up 2 F'F'));;this is not possible
 (assert (init-macro 5 2 align_up 4 F'UF))
-(assert (init-macro 6 2 align_up 8 FU'F'))
+;;(assert (init-macro 6 2 align_up 8 FU'F'))
 ;;if already in up positon, flip 
 (assert (init-macro 7 align_flip 6 FRUR'))
 

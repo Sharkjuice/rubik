@@ -91,12 +91,26 @@ class CubeController:
         
     #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
     def save(self,flag=1,figure=0):
-        msg = self.my_snapshot.saveCube(self.my_cube_3d.cube,flag,figure)            
-
+        fig = figure
+        if figure == 0:
+            if self.auto_level > 0:
+                self.hint(0)
+                if self.stage == self.auto_level:
+                    fig = self.figure
+                else:
+                    fig = -1
+        if fig != -1:
+            self.save2(flag,fig)
+        else:
+            self.message = u"超出范围，不能保存在本题库!"
+		
+    def save2(self,flag=1,figure=0):
+        msg = self.my_snapshot.saveCube(self.my_cube_3d.cube,flag, figure)            
+		
         if flag == 1:
             self.message = msg    
-            self.snapshot_or_tutorial = 1
-
+            self.snapshot_or_tutorial = 1			
+			
     def load(self,dumy):
         self.his_actions = []
         cube = copy.deepcopy(self.my_snapshot.sn_cube_3d.cube)
@@ -137,6 +151,8 @@ class CubeController:
             self.advise = ""
             self.hint(0)
             auto_actions = self.parseAdvice()
+            if auto_actions == "":
+                break
         if dummy == 1:        
             self.his_actions = []
             self.advise = ""
@@ -227,8 +243,8 @@ class CubeController:
         self.auto_actions = self.parseAdvice()
 
     def parseAdvice(self):
-        if self.advise == "":
-            return ""
+        if self.advise == "" or self.advise == "End":
+            return ""			
         macro = self.advise
         l = len(macro)
         if l == 0 : return
@@ -274,7 +290,7 @@ class CubeController:
         if msg != None:
             self.message = msg
     def hint(self,show):
-        self.save(0)
+        self.save2(0)
         res = subprocess.Popen("clipsutil.exe",bufsize = 1,shell = True,stdout=subprocess.PIPE)
         
         outlines = res.stdout.readlines()
@@ -304,7 +320,7 @@ class CubeController:
             best = [ adv for adv in adv_p if adv["p"] == 3 ]
         if best != []:
             #print("best advise:",best)
-            self.advise = best[0]["h"]
+            self.advise = best[0].get("h","No Advise")
             self.stage = best[0]["s"]
             self.figure = best[0].get("f",0)
             t1 = best[0].get("t1", None)

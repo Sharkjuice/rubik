@@ -55,8 +55,8 @@ class CubeSnapshot:
     def saveCube(self,cube,flag,figure=0):
         if figure != 0:#此图案已经存在，就不保存了。
             if figure in [item[1] for item in self.snapshots]:
-               return u"已经有存在相同的，不能保存"
-        if flag == 0:
+               return u"已经有相同的魔方存在，不能保存"
+        if flag == 0:#临时存放，为了调用规则引擎
             fo = open(".\\mycube.clp", "w", 1)
         else:
             self.next_index += 1

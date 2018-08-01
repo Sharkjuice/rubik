@@ -2,7 +2,7 @@
 import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial
 from cubeGlobal import mouse_status,cube_o,getDisplayParams,\
-    background,black,green,bright_green,colors_r,colors_n,colors
+    background,black,green,gray,bright_green,colors_r,colors_n,colors
 from cubeCommon import button,printText
 
 #显示魔方区域的高度和宽度
@@ -11,6 +11,16 @@ win_width = 800
 #3D显示参数
 fov = 700
 distance = 8
+
+m_map = [["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
+			"RU'R'"],
+		 ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
+			"RU'R'"],					
+	     ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
+			"RU'R'"],					
+	     ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
+			"RU'R'"]
+		]
 
 
 #action map用户在几面上的按钮，对应的数据模型
@@ -70,6 +80,9 @@ class CubeController:
         self.dk_time = 0
         self.brush_color = "-"
         self.brush_copy  = 0 #0: not starting copy 1: in copy status
+        #宏按钮分页
+        self.total_page = len(m_map) - 1
+        self.current_page = 0
 
         #转动哪一面
         self.rotate_face = ""
@@ -206,7 +219,6 @@ class CubeController:
             self.my_cube_3d.displayLayer("UP",2, -156, 295)
             self.my_cube_3d.displayLayer("FRONT",2, 360, -110)
             self.my_snapshot.displayCube()
-                    
 
     def singleRotate(self,action):
         reverse = False
@@ -233,7 +245,10 @@ class CubeController:
                     self.his_actions.append(action)
         self.message = "".join(self.his_actions)
         return True
-    
+
+    def macroRotate(self,macro):
+        pass
+		
     def quit(self,dumy):
         self.gameExit = True
 
@@ -448,6 +463,12 @@ class CubeController:
             self.snapshot_or_tutorial = 1
         self.my_snapshot.setLevel(value)
         self.my_snapshot.selectSnapshot()
+    def nextPage(self,flag):
+        if self.current_page < self.total_page:
+            self.current_page += 1
+    def prevPage(self,flag):
+        if self.current_page > 0:
+            self.current_page -= 1
 
     def gameLoop(self):
         global mouse_status
@@ -492,7 +513,28 @@ class CubeController:
                                         if self.brush_copy == 1:
                                             self.brushColor(hit_b,hit_f)
                 
-                                    
+            #显示宏按钮
+
+            b_x = x_scale*10; b_y = y_scale*200; b_h = y_scale*30
+
+            b_y += y_scale*40
+            for b in m_map[self.current_page]:
+                button(screen, b, ft_sz, b_x, b_y, x_scale*85,b_h,
+				green,bright_green,self.macroRotate,b)
+                b_y += y_scale*40;
+            if self.current_page == 0:
+                button(screen,"<<",ft_sz,b_x, b_y, x_scale*35,b_h,
+	    			gray,bright_green, self.prevPage,"X")
+            else:
+                button(screen,"<<",ft_sz,b_x, b_y, x_scale*35,b_h,
+			    	green,bright_green, self.prevPage,"X")
+            if self.current_page == self.total_page:	
+                button(screen,">>",ft_sz,b_x + x_scale*50, b_y, x_scale*35,b_h,
+				    gray,bright_green,self.nextPage,"X")
+            else:            
+                button(screen,">>",ft_sz,b_x + x_scale*50, b_y, x_scale*35,b_h,
+				    green,bright_green,self.nextPage,"X")
+				
 
             #显示标准旋转按钮
             b_map = [["F","F'","f"],["f'","B","B'"],["R","R'","r"],["r'","L","L'"],

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-  
 import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial
-from cubeGlobal import mouse_status,cube_o,getDisplayParams,\
+from cubeGlobal import mouse_status,m_map,cube_o,getDisplayParams,\
     background,black,green,gray,bright_green,colors_r,colors_n,colors
 from cubeCommon import button,printText
 
@@ -11,17 +11,6 @@ win_width = 800
 #3D显示参数
 fov = 700
 distance = 8
-
-m_map = [["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
-			"RU'R'"],
-		 ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
-			"RU'R'"],					
-	     ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
-			"RU'R'"],					
-	     ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'",
-			"RU'R'"]
-		]
-
 
 #action map用户在几面上的按钮，对应的数据模型
 a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
@@ -247,7 +236,8 @@ class CubeController:
         return True
 
     def macroRotate(self,macro):
-        pass
+        self.advise = macro
+        self.auto_actions = self.parseAdvice()	
 		
     def quit(self,dumy):
         self.gameExit = True
@@ -519,20 +509,20 @@ class CubeController:
 
             b_y += y_scale*40
             for b in m_map[self.current_page]:
-                button(screen, b, ft_sz, b_x, b_y, x_scale*85,b_h,
+                button(screen, b, ft_sz, b_x, b_y, x_scale*120,b_h,
 				green,bright_green,self.macroRotate,b)
                 b_y += y_scale*40;
             if self.current_page == 0:
-                button(screen,"<<",ft_sz,b_x, b_y, x_scale*35,b_h,
+                button(screen,"<<",ft_sz,b_x, b_y, x_scale*50,b_h,
 	    			gray,bright_green, self.prevPage,"X")
             else:
-                button(screen,"<<",ft_sz,b_x, b_y, x_scale*35,b_h,
+                button(screen,"<<",ft_sz,b_x, b_y, x_scale*50,b_h,
 			    	green,bright_green, self.prevPage,"X")
             if self.current_page == self.total_page:	
-                button(screen,">>",ft_sz,b_x + x_scale*50, b_y, x_scale*35,b_h,
+                button(screen,">>",ft_sz,b_x + x_scale*70, b_y, x_scale*50,b_h,
 				    gray,bright_green,self.nextPage,"X")
             else:            
-                button(screen,">>",ft_sz,b_x + x_scale*50, b_y, x_scale*35,b_h,
+                button(screen,">>",ft_sz,b_x + x_scale*70, b_y, x_scale*50,b_h,
 				    green,bright_green,self.nextPage,"X")
 				
 

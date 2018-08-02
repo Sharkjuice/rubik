@@ -97,16 +97,19 @@ def setDisplayParams(scn,ft,x,y):
     screen = scn
     ft_sz = int(ft*x_scale)
     
-m_map = [["FRUR'","F'UF","RUR'","RU'R'","R'U'R","RUR'U'",
+m_map = [["FRUR'","F'UF","FU'F'","RUR'","RU'R'","R'U'R",
 			"R'UR"],
-		 ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","U'R'UR",
+		 ["RU2R'","RUR'U","R'U'RU'","R'U2R","R'FRF'","RUR'U'",
 			"RU'R'U"],	
-	     ["RU'R'U'","rUR'U'","r'U'RU'","rU2R'","r'U2R","UR'Ur",
-			"rU2R'"],			
-	     ["(UR'U'R)2","RUR'F'","(R'U'RU)2","(RUR'U')2",
-			"(U'RUR')2","(URU'R')2","R'U'RU'"],					
-	     ["rUr'","rU'r'","r'U'r","r'Ur'","FU'F'","F'UF",
-			"R2uR'U"],
+	     ["RU'R'U'","R'U'RU'","U'R'UR","U'RU'R'","rUR'U'","r'U'RU'",
+			"rU2R'",
+			],			
+	     ["r'U2R","UR'Ur","rUr'","rU'r'","r'U'r","r'Ur'","r'FRF'"],
+	     ["(UR'U'R)2","(URU'R')2","(R'U'RU)2","(RUR'U')2",
+			"(U'RUR')2","RUR'F'","RU'R'D"],					
 	     ["FRUR'U'F'","fRUR'U'f'","B'U'R'URB","FURU'R'F'",
-			"R2U'R'U'","R2u'RU'","UR'uR2"],
+			"R2U'R'U'","R2UR'U'","R2u'RU'"],
+	     ["UR'uR2","R2uR'U","U'Ru'R2","FRU'R'",
+			"RUR'F'","M2U","RU"]
+			
 		]

@@ -62,9 +62,9 @@ class CubeController:
 
         self.gameExit = False
         self.message = u"操作历史"
-        self.advise = u"下一步提示"
-        self.figure = 0
-        self.stage = 0
+        self.advice = u"下一步提示"
+        #self.figure = 0
+        #self.stage = 0
         self.dk_count = 0
         self.dk_time = 0
         self.brush_color = "-"
@@ -105,14 +105,14 @@ class CubeController:
             self.save2(flag,fig)
         else:
             self.message = u"超出范围，不能保存在本题库!"
-		
+        
     def save2(self,flag=1,figure=0):
         msg = self.my_snapshot.saveCube(self.my_cube_3d.cube,flag, figure)            
-		
+        
         if flag == 1:
             self.message = msg    
-            self.snapshot_or_tutorial = 1			
-			
+            self.snapshot_or_tutorial = 1           
+            
     def load(self,dumy):
         self.his_actions = []
         cube = copy.deepcopy(self.my_snapshot.sn_cube_3d.cube)
@@ -150,14 +150,13 @@ class CubeController:
                 layer = a_map[a]["layer"]
                 clockwize = a_map[a]["clockwize"]
                 self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
-            self.advise = ""
-            self.hint(0)
-            auto_actions = self.parseAdvice()
+            advice = self.hint2()
+            auto_actions = self.parseAdvice(advice.get("h",0))
             if auto_actions == "":
                 break
         if dummy == 1:        
             self.his_actions = []
-            self.advise = ""
+            self.advice = ""
             self.displayCube()        
         
     def displayCube(self):
@@ -178,7 +177,7 @@ class CubeController:
             pygame.draw.rect(screen,background,(x_scale*810,
                 y_scale*5,x_scale*538,y_scale*595))    
             self.snapshot_or_tutorial = 1
-	
+    
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_cube_3d.cube)
    
@@ -236,21 +235,19 @@ class CubeController:
         return True
 
     def macroRotate(self,macro):
-        self.advise = macro
-        self.auto_actions = self.parseAdvice()	
-		
+        #self.advice = macro
+        self.auto_actions = self.parseAdvice(macro) 
+        
     def quit(self,dumy):
         self.gameExit = True
 
     def step(self,dumy):
-        self.advise = ""
-        self.hint(dumy)
-        self.auto_actions = self.parseAdvice()
+        self.advice = self.hint2().get("h","")
+        self.auto_actions = self.parseAdvice(self.advice)
 
-    def parseAdvice(self):
-        if self.advise == "" or self.advise == "End":
-            return ""			
-        macro = self.advise
+    def parseAdvice(self,macro):
+        if macro == "" or macro == "End":
+            return ""           
         l = len(macro)
         if l == 0 : return
         ci = l-1
@@ -295,6 +292,22 @@ class CubeController:
         if msg != None:
             self.message = msg
     def hint(self,show):
+        advice = self.hint2()
+        t1 = advice.get("t1", None)
+        t2 = advice.get("t2", None)
+        for my_b in self.my_cube_3d.blocks:
+            if t1 != None:
+                if (my_b.block.current.x == int(t1[0]) and
+                    my_b.block.current.y == int(t1[1]) and my_b.block.current.z == int(t1[2])):
+                        my_b.mark = "1"
+            if t2 != None:
+                if (my_b.block.current.x == int(t2[0]) and my_b.block.current.y == int(t2[1]) and
+                   my_b.block.current.z == int(t2[2])):
+                        my_b.mark = "2"
+        if t1 != None:
+            self.my_cube_3d.displayCube()
+
+    def hint2(self):
         self.save2(0)
         res = subprocess.Popen("clipsutil.exe",bufsize = 1,shell = True,stdout=subprocess.PIPE)
         
@@ -323,26 +336,18 @@ class CubeController:
             best = [ adv for adv in adv_p if adv["p"] == 2 ]
         if best == []:
             best = [ adv for adv in adv_p if adv["p"] == 3 ]
+        if best == []:
+            return {}
         if best != []:
-            #print("best advise:",best)
-            self.advise = best[0].get("h","No Advise")
+            #print("best advice:",best)
+            self.advice = best[0].get("h","No Advise")
             self.stage = best[0]["s"]
             self.figure = best[0].get("f",0)
             t1 = best[0].get("t1", None)
             t2 = best[0].get("t2", None)
-            if show == 1:
-                for my_b in self.my_cube_3d.blocks:
-                    if t1 != None:
-                        if (my_b.block.current.x == int(t1[0]) and
-                            my_b.block.current.y == int(t1[1]) and my_b.block.current.z == int(t1[2])):
-                                my_b.mark = "1"
-                    if t2 != None:
-                        if (my_b.block.current.x == int(t2[0]) and my_b.block.current.y == int(t2[1]) and
-                           my_b.block.current.z == int(t2[2])):
-                                my_b.mark = "2"
-                if t1 != None:
-                    self.my_cube_3d.displayCube()
-            
+            return best[0]
+
+
     def cancelComparing(self): 
         self.comparing = False        
         mark = 1
@@ -439,11 +444,11 @@ class CubeController:
     def endBrush(self,dumy):
         if self.brush_copy == 1:
             if not self.my_cube_3d.cube.validateCube():
-                self.advise = u"颜色设置没有完成，请继续完成设置！"
+                self.advice = u"颜色设置没有完成，请继续完成设置！"
                 return 0
             else:
                 self.brush_copy = 0
-                self.advise = u"颜色设置完成。"
+                self.advice = u"颜色设置完成。"
     def level(self,value):
         self.auto_level = value        
         if self.snapshot_or_tutorial == 0:
@@ -510,21 +515,21 @@ class CubeController:
             b_y += y_scale*40
             for b in m_map[self.current_page]:
                 button(screen, b, ft_sz, b_x, b_y, x_scale*120,b_h,
-				green,bright_green,self.macroRotate,b)
+                green,bright_green,self.macroRotate,b)
                 b_y += y_scale*40;
             if self.current_page == 0:
                 button(screen,"<<",ft_sz,b_x, b_y, x_scale*50,b_h,
-	    			gray,bright_green, self.prevPage,"X")
+                    gray,bright_green, self.prevPage,"X")
             else:
                 button(screen,"<<",ft_sz,b_x, b_y, x_scale*50,b_h,
-			    	green,bright_green, self.prevPage,"X")
-            if self.current_page == self.total_page:	
+                    green,bright_green, self.prevPage,"X")
+            if self.current_page == self.total_page:    
                 button(screen,">>",ft_sz,b_x + x_scale*70, b_y, x_scale*50,b_h,
-				    gray,bright_green,self.nextPage,"X")
+                    gray,bright_green,self.nextPage,"X")
             else:            
                 button(screen,">>",ft_sz,b_x + x_scale*70, b_y, x_scale*50,b_h,
-				    green,bright_green,self.nextPage,"X")
-				
+                    green,bright_green,self.nextPage,"X")
+                
 
             #显示标准旋转按钮
             b_map = [["F","F'","f"],["f'","B","B'"],["R","R'","r"],["r'","L","L'"],
@@ -599,7 +604,7 @@ class CubeController:
             printText(screen, self.message, "fangsong", ft_sz, x_scale*230, y_scale*690, background)
                     
             pygame.draw.rect(screen,(128,128,128),(x_scale*220,y_scale*730,x_scale*560,y_scale*30))            
-            printText(screen, self.advise, "fangsong", ft_sz, x_scale*230, y_scale*730, background)
+            printText(screen, self.advice, "fangsong", ft_sz, x_scale*230, y_scale*730, background)
             
             if self.snapshot_or_tutorial == 1:
                 self.my_snapshot.displayHeader()

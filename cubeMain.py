@@ -47,13 +47,13 @@ if __name__ == "__main__":
         print("I will try ", fig_num[args.auto]*5, " times. Pls wait.")
         while i < fig_num[args.auto]*5 and generated < fig_num[args.auto]:
             cubeController.init(0)
-            cubeController.hint(0)
+            fig = cubeController.hint2().get("f",0)
             i += 1
             print(u"Try ", i, " times...")
-            if cubeController.figure !=0:
+            if fig !=0:
                 if cubeController.figure not in figures:
-                    cubeController.save2(1,cubeController.figure)
-                    figures.append(cubeController.figure)
+                    cubeController.save2(1,fig)
+                    figures.append(fig)
                     generated += 1
                     print(u"Success ", generated, " times!")
     

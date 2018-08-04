@@ -465,6 +465,10 @@ class CubeController:
         if self.current_page > 0:
             self.current_page -= 1
 
+    def mirror(self,flag):
+        self.my_cube_3d.mirrorCube()
+        self.displayCube()
+			
     def gameLoop(self):
         global mouse_status
         hit_b = ""
@@ -536,21 +540,24 @@ class CubeController:
                      ["U","U'","u"],["u'","D","D'"],["x","x'","y"],["y'","z","z'"],
                      ["M","M'","l"],["d","d'","l'"]]
 
-            b_x = x_scale*650; b_y = y_scale*290; b_h = y_scale*30
-
+            b_x = x_scale*650; b_y = y_scale*250; b_h = y_scale*30
+            #退出按钮，最右上角
             button(screen,"X",ft_sz,x_scale*1300,y_scale*10,x_scale*40,b_h,green,bright_green,self.quit,"X")
-
             for bs in b_map:
                 for b in bs:
                     button(screen, b, ft_sz, b_x, b_y, x_scale*40,b_h,green,bright_green,self.singleRotate,b)
                     b_x += x_scale*50
                 b_y += y_scale*40; b_x = x_scale*650
+            #镜面按钮，在控制按钮下方
+            button(screen,u"|->",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.snapshot,"X")
+            b_x += x_scale*80
+            button(screen,u"<-|",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.load,"X")
                 
             #显示控制按钮
             b_map = [[(u"自定",self.level,0),("十字",self.level,1),("F2L",self.level,2),
-                    ("OLL",self.level,3),(u"PLL",self.level,4),(u"帮助",self.help,0),
+                    ("OLL",self.level,3),(u"PLL",self.level,4),(u"7步",self.help,0),
                     (u"删除",self.delete,0), (u"提示",self.hint,1)],
-                     [(u"保存",self.save,1),(u"快照",self.snapshot,0),(u"加载",self.load,0),
+                     [(u"保存",self.save,1),(u"镜像",self.mirror,0),(u"保留",None,0),
                      (u"自动",self.step,0),(u"对比",self.compare,0),(u"撤销",self.cancel,0),
                      (u"打乱",self.init,1),(u"开始",self.reset,0)],
                      ]

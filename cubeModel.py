@@ -69,6 +69,12 @@ class Cube:
         tmp = block.colors[1]
         block.colors[1] = block.colors[0]
         block.colors[0] = tmp
+
+    #沿YZ平面镜像
+    def mirrorCube(self):
+        """ Reflects around YZ plane. """
+        for b in self.blocks:
+            b.current.x = -b.current.x  
         
     def rotateLayer(self,face,layer,clockwize):
         r_map = {"FRONT":self.rotateX,"RIGHT":self.rotateZ,"UP":self.rotateY}

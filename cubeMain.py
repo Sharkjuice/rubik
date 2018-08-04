@@ -30,14 +30,18 @@ if __name__ == "__main__":
     pt3 = (0, scn_h-2)#bottom left point
     pt4 = (scn_w-2, scn_h-2)
     
-    pygame.draw.line(screen,(128,128,128),pt1,pt2,2)
-    pygame.draw.line(screen,(128,128,128),pt2,pt4,2)
-    pygame.draw.line(screen,(128,128,128),pt4,pt3,2)
-    pygame.draw.line(screen,(128,128,128),pt3,pt1,2)
-    
+    #最外面的框
+    pygame.draw.rect(screen,(128,128,128),(0,0,scn_w-1,scn_h-1),2)
+    #pygame.draw.line(screen,(128,128,128),pt2,pt4,2)
+    #pygame.draw.line(screen,(128,128,128),pt4,pt3,2)
+    #pygame.draw.line(screen,(128,128,128),pt3,pt1,2)
+    #竖分割线
     pygame.draw.line(screen,(128,128,128),(x_scale*800,0),(x_scale*800,y_scale*680),2)
-    pygame.draw.line(screen,(128,128,128),(x_scale*800,y_scale*680),(scn_w-2,y_scale*680),2)
-
+    #底部横线
+    pygame.draw.line(screen,(128,128,128),(x_scale*210,y_scale*680),(scn_w-2,y_scale*680),2)
+    #底部竖线
+    pygame.draw.line(screen,(128,128,128),(x_scale*210,y_scale*680),(x_scale*210,scn_h*680),2)
+	
     cubeController = CubeController(19,25,args.auto)
     cubeController.level(args.auto)
     if args.gen == 1:

@@ -97,6 +97,8 @@ class Cube:
         elif layer == 5:
             self.rotateLayer(face,1,clockwize)
             self.rotateLayer(face,2,clockwize)
+        elif layer == 6:
+            self.mirrorCube()
             
     def validateCube(self):
         colors = {"w":0,"y":0,"r":0,"b":0,"g":0,"o":0,"-":1}

@@ -28,11 +28,13 @@ a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
          "r'":{"face":"RIGHT","clockwize":1,"layer":3,"reverse":"r"},
          "u'":{"face":"UP","clockwize":-1,"layer":3,"reverse":"u"},
          "B":{"face":"FRONT","clockwize":1,"layer":2,"reverse":"B'"},
+         "b":{"face":"FRONT","clockwize":1,"layer":5,"reverse":"b'"},
          "L":{"face":"RIGHT","clockwize":1,"layer":2,"reverse":"L'"},
          "l":{"face":"RIGHT","clockwize":1,"layer":5,"reverse":"l'"},
          "l'":{"face":"RIGHT","clockwize":-1,"layer":5,"reverse":"l"},
          "D":{"face":"UP","clockwize":-1,"layer":2,"reverse":"D'"},
          "B'":{"face":"FRONT","clockwize":-1,"layer":2,"reverse":"B"},
+         "b'":{"face":"FRONT","clockwize":-1,"layer":5,"reverse":"b"},
          "L'":{"face":"RIGHT","clockwize":-1,"layer":2,"reverse":"L"},
          "D'":{"face":"UP","clockwize":1,"layer":2,"reverse":"D"},         
          "d":{"face":"UP","clockwize":-1,"layer":5,"reverse":"d'"},         
@@ -42,7 +44,8 @@ a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
          "z":{"face":"FRONT","clockwize":-1,"layer":4,"reverse":"z'"},
          "z'":{"face":"FRONT","clockwize":1,"layer":4,"reverse":"z"},
          "x":{"face":"RIGHT","clockwize":-1,"layer":4,"reverse":"x'"},
-         "x'":{"face":"RIGHT","clockwize":1,"layer":4,"reverse":"x"}
+         "x'":{"face":"RIGHT","clockwize":1,"layer":4,"reverse":"x"},
+         "'|'":{"face":"FRONT","clockwize":1,"layer":6,"reverse":"'|'"}
 }
 
 class CubeController:
@@ -133,14 +136,16 @@ class CubeController:
 
 #随机生成一个初始乱的魔方
     def init(self,dummy):
-        ra_map = ["F", "R", "U", "F'", "R'", "U'","f", "r","u","f'", "r'","u'",
-          "B", "L", "D", "B'", "L'", "D'"]
+        r_list = ["F", "R", "U", "F'", "R'", "U'","f", 
+				  "r","u","f'", "r'","u'","B", "L", "D", 
+				  "B'", "L'", "D'","b","b'"]
         self.stage = 0
+        total = len(r_list)
         for i in range(self.init_count):
-            r = int(random.random()*18)
-            face = a_map[ra_map[r]]["face"]
-            layer = a_map[ra_map[r]]["layer"]
-            clockwize = a_map[ra_map[r]]["clockwize"]
+            r = int(random.random()*total)
+            face = a_map[r_list[r]]["face"]
+            layer = a_map[r_list[r]]["layer"]
+            clockwize = a_map[r_list[r]]["clockwize"]
             self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
         #rotate to F2L stage
         auto_actions = []
@@ -465,10 +470,6 @@ class CubeController:
         if self.current_page > 0:
             self.current_page -= 1
 
-    def mirror(self,flag):
-        self.my_cube_3d.mirrorCube()
-        self.displayCube()
-			
     def gameLoop(self):
         global mouse_status
         hit_b = ""
@@ -514,9 +515,8 @@ class CubeController:
                 
             #显示宏按钮
 
-            b_x = x_scale*10; b_y = y_scale*200; b_h = y_scale*30
+            b_x = x_scale*10; b_y = y_scale*240; b_h = y_scale*30
 
-            b_y += y_scale*40
             for b in m_map[self.current_page]:
                 button(screen, b, ft_sz, b_x, b_y, x_scale*120,b_h,
                 green,bright_green,self.macroRotate,b)
@@ -535,29 +535,30 @@ class CubeController:
                     green,bright_green,self.nextPage,"X")
                 
 
-            #显示标准旋转按钮
+            #标准旋转按钮列表
             b_map = [["F","F'","f"],["f'","B","B'"],["R","R'","r"],["r'","L","L'"],
                      ["U","U'","u"],["u'","D","D'"],["x","x'","y"],["y'","z","z'"],
-                     ["M","M'","l"],["d","d'","l'"]]
+                     ["M","M'","l"],["d","d'","l'"],["b","b'","'|'"]]
 
-            b_x = x_scale*650; b_y = y_scale*250; b_h = y_scale*30
+            b_x = x_scale*650; b_y = y_scale*240; b_h = y_scale*30
             #退出按钮，最右上角
             button(screen,"X",ft_sz,x_scale*1300,y_scale*10,x_scale*40,b_h,green,bright_green,self.quit,"X")
+            #显示标准旋转按钮
             for bs in b_map:
                 for b in bs:
                     button(screen, b, ft_sz, b_x, b_y, x_scale*40,b_h,green,bright_green,self.singleRotate,b)
                     b_x += x_scale*50
                 b_y += y_scale*40; b_x = x_scale*650
             #镜面按钮，在控制按钮下方
-            button(screen,u"|->",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.snapshot,"X")
-            b_x += x_scale*80
-            button(screen,u"<-|",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.load,"X")
+            #button(screen,u"|->",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.snapshot,"X")
+            #b_x += x_scale*80
+            #button(screen,u"<-|",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.load,"X")
                 
             #显示控制按钮
             b_map = [[(u"自定",self.level,0),("十字",self.level,1),("F2L",self.level,2),
                     ("OLL",self.level,3),(u"PLL",self.level,4),(u"7步",self.help,0),
                     (u"删除",self.delete,0), (u"提示",self.hint,1)],
-                     [(u"保存",self.save,1),(u"镜像",self.mirror,0),(u"保留",None,0),
+                     [(u"保存",self.save,1),(u"<-|",self.load,0),(u"|->",self.snapshot,0),
                      (u"自动",self.step,0),(u"对比",self.compare,0),(u"撤销",self.cancel,0),
                      (u"打乱",self.init,1),(u"开始",self.reset,0)],
                      ]

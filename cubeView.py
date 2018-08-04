@@ -146,10 +146,6 @@ class Cube3D:
             self.rotateLayer(face,1,clockwize,angle)
             self.rotateLayer(face,2,clockwize,angle)
             
-    def mirrorCube(self):
-        self.cube.mirrorCube()
-
-            
     def displayLayer(self,face,layer,x,y):
         face_index = l_map[face]["FACE"]
         x_offset = self.x_scale*x

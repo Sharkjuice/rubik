@@ -184,8 +184,8 @@ class CubeSnapshot:
             button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,green,bright_green,self.nextPage,1)
         s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2题库",3:u"oll题库",4:u"pll题库"}
 		
-        pygame.draw.rect(screen,(128,128,128),(x_scale*1070,y_scale*650,x_scale*280,y_scale*30))            
-        printText(screen,u"当前是" + s_map[self.level], "fangsong", ft_sz, x_scale*1075, y_scale*653, black)
+        pygame.draw.rect(screen,(128,128,128),(x_scale*1070,y_scale*640,x_scale*270,y_scale*30))            
+        printText(screen,u"当前是" + s_map[self.level], "fangsong", ft_sz, x_scale*1075, y_scale*643, black)
         #self.selectSnapshot(self.current)	
 		
     def takeSnapshot(self,cube):

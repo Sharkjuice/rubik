@@ -4,6 +4,7 @@ import cubeModel,cubeView,cubeSnapshot,cubeTutorial
 from cubeGlobal import mouse_status,m_map,cube_o,getDisplayParams,\
     background,black,green,gray,bright_green,colors_r,colors_n,colors
 from cubeCommon import button,printText
+from macroParse import parseAdvice
 
 #显示魔方区域的高度和宽度
 win_height = 768
@@ -56,7 +57,7 @@ class CubeController:
         self.his_colors = []
         self.his_count = his_count
         self.auto_level = auto_level
-        
+        self.method = "F2CP"
         self.snapshot_or_tutorial = 0; #0 表示显示tutorial， 1表示显示snapshot
 
         #控制动画显示某一层的转动
@@ -137,8 +138,8 @@ class CubeController:
 #随机生成一个初始乱的魔方
     def init(self,dummy):
         r_list = ["F", "R", "U", "F'", "R'", "U'","f", 
-				  "r","u","f'", "r'","u'","B", "L", "D", 
-				  "B'", "L'", "D'","b","b'"]
+                  "r","u","f'", "r'","u'","B", "L", "D", 
+                  "B'", "L'", "D'","b","b'"]
         self.stage = 0
         total = len(r_list)
         for i in range(self.init_count):
@@ -156,7 +157,7 @@ class CubeController:
                 clockwize = a_map[a]["clockwize"]
                 self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
             advice = self.hint2()
-            auto_actions = self.parseAdvice(advice.get("h",0))
+            auto_actions = parseAdvice(advice.get("h",""))
             if auto_actions == "":
                 break
         if dummy == 1:        
@@ -175,6 +176,8 @@ class CubeController:
     def help(self,dumy):
         self.snapshot_or_tutorial = 0            
         self.my_tutorial.nextOrPrevious(0)
+        self.method = "7-STEP"
+        self.auto_level = 1 
 
     def snapshot(self,dumy): 
         if self.snapshot_or_tutorial == 0:
@@ -240,55 +243,15 @@ class CubeController:
         return True
 
     def macroRotate(self,macro):
-        #self.advice = macro
-        self.auto_actions = self.parseAdvice(macro) 
+        self.auto_actions = parseAdvice(macro) 
         
     def quit(self,dumy):
         self.gameExit = True
 
     def step(self,dumy):
         self.advice = self.hint2().get("h","")
-        self.auto_actions = self.parseAdvice(self.advice)
+        self.auto_actions = parseAdvice(self.advice)
 
-    def parseAdvice(self,macro):
-        if macro == "" or macro == "End":
-            return ""           
-        l = len(macro)
-        if l == 0 : return
-        ci = l-1
-        pass1 = []
-        while ci >= 0:
-            a = macro[ci]
-            if a == "'":
-                ci -= 1
-                pass1.insert(0,macro[ci] + a)
-                ci -= 1            
-            else:
-                ci -= 1            
-                pass1.insert(0,a)
-                
-        si = 0
-        l = len(pass1)
-        pass2 = []
-        tmp = []
-        ci = 0
-        while ci < l:
-            a = pass1[ci]
-            if a == "(" :
-                ci += 1
-                si = ci
-            elif a == ")":
-                #pass2.extend(pass1[si:ci])
-                tmp = pass1[si:ci]
-                ci += 1
-            elif a == "2":
-                pass2.extend(tmp)
-                ci += 1
-            else:
-                pass2.append(a)
-                tmp = [a]
-                ci += 1
-        return pass2
     def delete(self,dumy):
         if self.snapshot_or_tutorial == 0:
             msg = u"当前是帮助窗口，不能删除."
@@ -298,6 +261,7 @@ class CubeController:
             self.message = msg
     def hint(self,show):
         advice = self.hint2()
+        print(advice)
         t1 = advice.get("t1", None)
         t2 = advice.get("t2", None)
         for my_b in self.my_cube_3d.blocks:
@@ -314,11 +278,15 @@ class CubeController:
 
     def hint2(self):
         self.save2(0)
-        res = subprocess.Popen("clipsutil.exe",bufsize = 1,shell = True,stdout=subprocess.PIPE)
-        
+        if self.method == "F2CP":
+            res = subprocess.Popen("clipsutil.exe rubik-flcp.clp",bufsize = 1,shell = True,stdout=subprocess.PIPE)
+        else:
+            res = subprocess.Popen("clipsutil.exe rubik-simple.clp",bufsize = 1,shell = True,stdout=subprocess.PIPE)
         outlines = res.stdout.readlines()
+        print(outlines)
         adv_p = []
         for outline in outlines:
+            #print("hint2 ", outline)
             outline_str = outline.decode().strip()
             if outline_str != "" and outline_str[0] != "#":
                 adv_l = outline_str.split(";")
@@ -334,23 +302,21 @@ class CubeController:
                     val = adv_v[item1[0]](item1[1])
                     adv_m[item1[0]] = val
                 adv_p.append(adv_m)
-        best = [ adv for adv in adv_p if adv["p"] == 0 ]
-        if best == []:
-            best = [ adv for adv in adv_p if adv["p"] == 1 ]
-        if best == []:
-            best = [ adv for adv in adv_p if adv["p"] == 2 ]
-        if best == []:
-            best = [ adv for adv in adv_p if adv["p"] == 3 ]
+        i = 0
+        best = []
+        while best == [] and i < 4:
+            best = [ adv for adv in adv_p if adv["p"] == i ]
+            i += 1
         if best == []:
             return {}
-        if best != []:
-            #print("best advice:",best)
-            self.advice = best[0].get("h","No Advise")
-            self.stage = best[0]["s"]
-            self.figure = best[0].get("f",0)
-            t1 = best[0].get("t1", None)
-            t2 = best[0].get("t2", None)
-            return best[0]
+        #print("best advice:",best)
+        self.advice = best[0].get("h","No Advise")
+        self.stage = best[0]["s"]
+        self.figure = best[0].get("f",0)
+        t1 = best[0].get("t1", None)
+        t2 = best[0].get("t2", None)
+        return best[0]
+        
 
 
     def cancelComparing(self): 
@@ -455,7 +421,8 @@ class CubeController:
                 self.brush_copy = 0
                 self.advice = u"颜色设置完成。"
     def level(self,value):
-        self.auto_level = value        
+        self.auto_level = value 
+        self.method = "F2CP"      
         if self.snapshot_or_tutorial == 0:
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
             pygame.draw.rect(screen,background,(x_scale*810,

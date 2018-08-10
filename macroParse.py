@@ -1,4 +1,3 @@
-import pdb
 def pass1(macro):
     l = len(macro)
     if l == 0 : return
@@ -57,10 +56,12 @@ def pass3(macro):
     return result
     
 def parseAdvice(macro):
+    if macro == "":
+        return ""
     macro1 = pass1(macro)
     macro2 = pass2(macro1)
     macro3 = pass2(macro2)
     macro4 = pass3(macro3)
     return macro4
 
-print(parseAdvice("xUU'yU'U(rUF)(RU2RU)2(FUr)"))
+#print(parseAdvice("xUU'yU'U(rUF)(RU2RU)2(FUr)"))

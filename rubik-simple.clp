@@ -1,5 +1,8 @@
 (defglobal ?*oll-pv* = 0)
 (defglobal ?*pll-pv* = 0)
+(defglobal ?*pll-side-pv* = 0)
+(defglobal ?*pll-corner-pv* = 0)
+
 
 (deftemplate block
    (slot id)
@@ -79,6 +82,16 @@
 	(case o then 32))
 )
 
+(deffunction side-color-value (?c)
+(switch ?c
+	(case r then 0) 
+	(case g then 1) 
+	(case b then 2) 
+	(case o then 3)
+	(case y then 0)
+	(case w then 0)
+))
+
 (deffunction block-id (?c1 ?c2 ?c3) 
 	(bind ?cv1 (color-value ?c1))
 	(bind ?cv2 (color-value ?c2))
@@ -122,6 +135,16 @@
 (deffunction facelet-value (?p) 
 	(integer (** 2 (- ?p 1)))
 )
+
+(deffunction side-value (?s)
+(switch ?s
+	(case F then 0)
+	(case R then 4)
+	(case B then 16)
+	(case L then 64)
+	(case U then 0)
+	(case D then 0)
+))
 
 (deffunction face-number (?s) 
 (switch ?s
@@ -187,7 +210,8 @@
 )
 
 (defrule init-faces
-	(block (id ?id)  (type ?t&center))
+    (phase 1)
+	(block (id ?id)  (type center))
 	(facelet (id ?id)  (side ?s) (color ?c))	
 	=>
    (assert (face ?s ?c))
@@ -264,12 +288,12 @@
 	(modify ?f1 (status ok)) 
 )
 
-(defrule init-face-data
-	(block (id ?id) (type ?t&center))
-	(facelet (id ?id) (side ?s) (color ?c))
-   =>
-	(assert (face ?s ?c))
-)
+;;(defrule init-face-data
+;;(block (id ?id) (type ?t&center))
+;;	(facelet (id ?id) (side ?s) (color ?c))
+;;   =>
+;;	(assert (face ?s ?c))
+;;)
 ;;Confirm if the bottom center is white,
 ;;if it is, enter phase 1
 (defrule confirm-init-phase
@@ -335,14 +359,10 @@
 	(assert (phase 5))
 	(retract ?f)
 )
+
 (defrule confirm-end-phase
 	?f <- (phase 5)
-	(forall
-	(block (id ?id1) (layer 3) (type ~center))
-	(facelet (id ?id1) (side U) (color y))
-	(facelet (id ?id1) (type V1) (side ?s1) (color ?c1))
-	(face ?s1 ?c1)
-	)
+	(not (block (id ?id) (layer 3) (status ~ok)))
 	=>
 	(printout t "#confirm phase end" crlf)
 	(printout t "s:6;p:0;h:End" crlf)
@@ -548,27 +568,72 @@
 ;;only one yellow block on up face
 (assert (oll-macro 8 3770 "FRUR'U'F'"))
 (assert (oll-macro 9 3798 "FRUR'U'F'"))
+(assert (oll-macro 15 1170 "FRUR'U'F'"))
+(assert (oll-macro 10 3506 "FRUR'U'F'"))
+(assert (oll-macro 11 1691 "FRUR'U'F'"))
+(assert (oll-macro 12 3282 "FRUR'U'F'"))
+(assert (oll-macro 13 1175 "FRUR'U'F'"))
+(assert (oll-macro 14 3226 "FRUR'U'F'"))
+
 ;;3 block line, paralle to F face
 (assert (oll-macro 16 2758 "FRUR'U'F'"))
 (assert (oll-macro 18 2730 "FRUR'U'F'"))
 (assert (oll-macro 25 2690 "FRUR'U'F'"))
+(assert (oll-macro 20 422 "FRUR'U'F'"))
+(assert (oll-macro 21 2466 "FRUR'U'F'"))
+(assert (oll-macro 22 707 "FRUR'U'F'"))
+(assert (oll-macro 23 651 "FRUR'U'F'"))
+(assert (oll-macro 24 387 "FRUR'U'F'"))
+(assert (oll-macro 26 130 "FRUR'U'F'"))
+(assert (oll-macro 28 646 "FRUR'U'F'"))
+(assert (oll-macro 29 2242 "FRUR'U'F'"))
+(assert (oll-macro 30 674 "FRUR'U'F'"))
+
 ;;3 block line, need to turn 90
 (assert (oll-macro 17 676 "FRUR'U'F'"));;3668
 (assert (oll-macro 19 455 "FRUR'U'F'"));;3640
+(assert (oll-macro 31 450 "FRUR'U'F'"));;1080
+(assert (oll-macro 43 602 "FRUR'U'F'"));;1099
+
 ;;3 block right angle
-(assert (oll-macro 46 343 "FRUR'U'F'"))
-(assert (oll-macro 49 2646 "FRUR'U'F'"))
+(assert (oll-macro 46 343 "FURU'R'F'"))
+(assert (oll-macro 49 2646 "FURU'R'F'"))
+(assert (oll-macro 56 282 "FURU'R'F'"))
+(assert (oll-macro 27 18 "FURU'R'F'"))
+(assert (oll-macro 36 51 "FURU'R'F'"))
+(assert (oll-macro 41 310 "FURU'R'F'"))
+(assert (oll-macro 53 275 "FURU'R'F'"))
+(assert (oll-macro 55 338 "FURU'R'F'"))
+
 ;;3 block right angle,need to turn 180
-(assert (oll-macro 50 315 "FRUR'U'F'"));;3780
+(assert (oll-macro 50 315 "FURU'R'F'"));;3780
+(assert (oll-macro 52 562 "FURU'R'F'"));;3208
+(assert (oll-macro 33 86 "FURU'R'F'"));;1409
+(assert (oll-macro 35 58 "FURU'R'F'"));;3712
+(assert (oll-macro 37 2130 "FURU'R'F'"));1185
+(assert (oll-macro 38 2102 "FURU'R'F'"));;3488
+(assert (oll-macro 42 2326 "FURU'R'F'"));;1444
+
 ;;3 block right angle,need to turn -90
-(assert (oll-macro 47 2394 "FRUR'U'F'"));;2772
-(assert (oll-macro 48 1351 "FRUR'U'F'"));;469
-(assert (oll-macro 51 567 "FRUR'U'F'"));;441
+(assert (oll-macro 47 2394 "FURU'R'F'"));;2772
+(assert (oll-macro 48 1351 "FURU'R'F'"));;469
+(assert (oll-macro 51 567 "FURU'R'F'"));;441
+(assert (oll-macro 54 2578 "FURU'R'F'"));;149
+(assert (oll-macro 34 23 "FURU'R'F'"));;184
+(assert (oll-macro 40 539 "FURU'R'F'"));;217
+(assert (oll-macro 44 1610 "FURU'R'F'"));;595
+(assert (oll-macro 45 2354 "FURU'R'F'"));;2452
+(assert (oll-macro 57 534 "(R'U'RU')(R'U2R)(RUR'U')(R'FRF')"));;177
+
+;;3 block right angle,need to turn 90
+(assert (oll-macro 32 2074 "FURU'R'F'"));;1283
+(assert (oll-macro 39 91 "FURU'R'F'"));1547
+
 ;;litter fish
 (assert (oll-macro 1 577 "R'U2RUR'UR"));;521
 (assert (oll-macro 2 2336 "R'U2RUR'UR"));;292
 ;;big pattern
-(assert (oll-macro 7 2112 "R'U2RUR'UR"));;516
+(assert (oll-macro 7 264 "R'U2RUR'UR"));;516
 (assert (oll-macro 5 2056 "R'U2RUR'UR"));;257
 (assert (oll-macro 6 40   "R'U2RUR'UR"));;320
 (assert (oll-macro 3 325 "R'U2RUR'UR"))
@@ -633,6 +698,39 @@
 	(bind ?*pll-pv* (+ ?*pll-pv* (facelet-value ?p)))
 )
 
+(defrule pll-side-value
+(declare (salience 120))
+	(phase 5)
+	(face ?s ?c)
+	=>
+	(bind ?sv (side-value ?s))
+	(bind ?cv (side-color-value ?c))
+	(bind ?*pll-side-pv* (+ ?*pll-side-pv* (* ?sv ?cv)))
+)
+
+(defrule pll-coner-value
+(declare (salience 120))
+	(phase 5)
+	(block (id ?id) (layer 3) (type corner))
+	(facelet (id ?id) (type V2) (side ?s) (color ?c))
+	=>
+	(bind ?*pll-corner-pv* (+ ?*pll-corner-pv* 
+		(* (side-value ?s) (side-color-value ?c))))
+)
+
+(defrule pll-coner-match
+	(declare (salience 120))
+	(phase 5)
+	=>
+	(if (= ?*pll-corner-pv* (mod (* ?*pll-side-pv* 4) 255)) then 
+		(printout t "s:5;f:500;p:0;h:U'" crlf) else 
+	(if (= ?*pll-corner-pv* (mod (* ?*pll-side-pv* 16) 255)) then 
+		(printout t "s:5;f:500;p:0;h:U2" crlf) else
+	(if (= ?*pll-corner-pv* (mod (* ?*pll-side-pv* 64) 255)) then 
+		(printout t "s:5;f:500;p:0;h:U" crlf)  
+	))) 
+)
+
 (deffunction pll-pattern-match (?pv)
 	(if (= ?*pll-pv* ?pv) then 
 		(create$ TRUE O) else 
@@ -651,6 +749,7 @@
 	=>
 	(printout t "s:5;f:0;p:1;h:U" crlf)  
 )
+
 
 (defrule pll-pattern
 	(phase 5)

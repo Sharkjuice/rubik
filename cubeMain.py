@@ -43,7 +43,6 @@ if __name__ == "__main__":
     pygame.draw.line(screen,(128,128,128),(x_scale*210,y_scale*680),(x_scale*210,scn_h*680),2)
 	
     cubeController = CubeController(19,25,args.auto)
-    cubeController.level(args.auto)
     if args.gen == 1:
         fig_num = {1:14,2:41,3:57,4:21}
         figures = []

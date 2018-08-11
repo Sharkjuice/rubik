@@ -187,7 +187,8 @@
 )
 
 (defrule init-faces
-	(block (id ?id)  (type ?t&center))
+    (phase 1)
+	(block (id ?id)  (type center))
 	(facelet (id ?id)  (side ?s) (color ?c))	
 	=>
    (assert (face ?s ?c))
@@ -264,12 +265,6 @@
 	(modify ?f1 (status ok)) 
 )
 
-(defrule init-face-data
-	(block (id ?id) (type ?t&center))
-	(facelet (id ?id) (side ?s) (color ?c))
-   =>
-	(assert (face ?s ?c))
-)
 ;;Confirm if the bottom center is white,
 ;;if it is, enter phase 1
 (defrule confirm-init-phase

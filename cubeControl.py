@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-  
 import pygame,sys,time,copy,random,subprocess
-import cubeModel,cubeView,cubeSnapshot,cubeTutorial
+import cubeModel,cubeView,cubeSnapshot,cubeTutorial,cubeLibrary
 from cubeGlobal import mouse_status,m_map,cube_o,getDisplayParams,\
     background,black,green,gray,bright_green,colors_r,colors_n,colors
 from cubeCommon import button,printText
 from macroParse import parseAdvice
+
 
 #显示魔方区域的高度和宽度
 win_height = 768
@@ -57,8 +58,8 @@ class CubeController:
         self.his_colors = []
         self.his_count = his_count
         self.auto_level = auto_level
-        self.method = "F2CP"
-        self.snapshot_or_tutorial = 0; #0 表示显示tutorial， 1表示显示snapshot
+        self.resolve_method = "F2CP"
+        self.right_panel = "help"; 
 
         #控制动画显示某一层的转动
         #是否在转动中， 用户启动转动，转动90度后自动停止
@@ -94,6 +95,7 @@ class CubeController:
         self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube,500, 500, 700, 12, 820,50)
         self.my_tutorial = cubeTutorial.CubeTutorial()       
         self.my_tutorial.nextOrPrevious(-1)
+        self.my_library = cubeLibrary.CubeLibrary(my_cube,500, 500, 700, 12, 820,50)
         
     #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
     def save(self,flag=1,figure=0):
@@ -111,18 +113,23 @@ class CubeController:
             self.message = u"超出范围，不能保存在本题库!"
         
     def save2(self,flag=1,figure=0):
-        msg = self.my_snapshot.saveCube(self.my_cube_3d.cube,flag, figure)            
+        msg = self.my_library.saveCube(self.my_cube_3d.cube,flag, figure)            
         
         if flag == 1:
             self.message = msg    
-            self.snapshot_or_tutorial = 1           
+            self.right_panel = "library"           
             
     def load(self,dumy):
         self.his_actions = []
-        cube = copy.deepcopy(self.my_snapshot.sn_cube_3d.cube)
-        self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, 
-            distance,0,-30)
-        self.displayCube()
+        cube = None
+        if self.right_panel == "snapshot":
+            cube = copy.deepcopy(self.my_snapshot.sn_cube_3d.cube)
+        elif self.right_panel == "library":
+            cube = copy.deepcopy(self.my_library.sn_cube_3d.cube)
+        if cube != None:
+            self.my_cube_3d = cubeView.Cube3D(cube,win_width, win_height, fov, 
+                distance,0,-30)
+            self.displayCube()
         
  
     def reset(self,dumy):
@@ -174,17 +181,19 @@ class CubeController:
     
 
     def help(self,dumy):
-        self.snapshot_or_tutorial = 0            
-        self.my_tutorial.nextOrPrevious(0)
-        self.method = "7-STEP"
-        self.auto_level = 1 
-
-    def snapshot(self,dumy): 
-        if self.snapshot_or_tutorial == 0:
+        if self.right_panel != "help":
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
             pygame.draw.rect(screen,background,(x_scale*810,
                 y_scale*5,x_scale*538,y_scale*595))    
-            self.snapshot_or_tutorial = 1
+            self.right_panel = "help"
+            self.my_tutorial.nextOrPrevious(0)
+
+    def snapshot(self,dumy): 
+        if self.right_panel != "snapshot":
+            self.right_panel = "snapshot"
+            screen,ft_sz,x_scale,y_scale= getDisplayParams()
+            pygame.draw.rect(screen,background,(x_scale*810,
+                y_scale*5,x_scale*538,y_scale*595))    
     
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_cube_3d.cube)
@@ -253,10 +262,10 @@ class CubeController:
         self.auto_actions = parseAdvice(self.advice)
 
     def delete(self,dumy):
-        if self.snapshot_or_tutorial == 0:
+        if self.right_panel != "library":
             msg = u"当前是帮助窗口，不能删除."
         else:
-            msg = self.my_snapshot.deleteSnapshot()
+            msg = self.my_library.deleteSnapshot()
         if msg != None:
             self.message = msg
     def hint(self,show):
@@ -278,7 +287,7 @@ class CubeController:
 
     def hint2(self):
         self.save2(0)
-        if self.method == "F2CP":
+        if self.resolve_method == "F2CP":
             res = subprocess.Popen("clipsutil.exe rubik-flcp.clp",bufsize = 1,shell = True,stdout=subprocess.PIPE)
         else:
             res = subprocess.Popen("clipsutil.exe rubik-simple.clp",bufsize = 1,shell = True,stdout=subprocess.PIPE)
@@ -286,7 +295,6 @@ class CubeController:
         print(outlines)
         adv_p = []
         for outline in outlines:
-            #print("hint2 ", outline)
             outline_str = outline.decode().strip()
             if outline_str != "" and outline_str[0] != "#":
                 adv_l = outline_str.split(";")
@@ -420,16 +428,17 @@ class CubeController:
             else:
                 self.brush_copy = 0
                 self.advice = u"颜色设置完成。"
-    def level(self,value):
-        self.auto_level = value 
-        self.method = "F2CP"      
-        if self.snapshot_or_tutorial == 0:
+    def library(self,level):
+        if self.right_panel != "library":
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
             pygame.draw.rect(screen,background,(x_scale*810,
                 y_scale*5,x_scale*538,y_scale*595))    
-            self.snapshot_or_tutorial = 1
-        self.my_snapshot.setLevel(value)
-        self.my_snapshot.selectSnapshot()
+            self.right_panel = "library"
+            self.my_library.selectSnapshot()
+    def method(self,method):
+        self.resolve_method = method
+        self.message = "当前提示和自动解题方法是" + method
+
     def nextPage(self,flag):
         if self.current_page < self.total_page:
             self.current_page += 1
@@ -516,19 +525,18 @@ class CubeController:
                     button(screen, b, ft_sz, b_x, b_y, x_scale*40,b_h,green,bright_green,self.singleRotate,b)
                     b_x += x_scale*50
                 b_y += y_scale*40; b_x = x_scale*650
-            #镜面按钮，在控制按钮下方
-            #button(screen,u"|->",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.snapshot,"X")
-            #b_x += x_scale*80
-            #button(screen,u"<-|",ft_sz,b_x,b_y,x_scale*60,b_h,green,bright_green,self.load,"X")
                 
             #显示控制按钮
-            b_map = [[(u"自定",self.level,0),("十字",self.level,1),("F2L",self.level,2),
-                    ("OLL",self.level,3),(u"PLL",self.level,4),(u"7步",self.help,0),
-                    (u"删除",self.delete,0), (u"提示",self.hint,1)],
-                     [(u"保存",self.save,1),(u"<-|",self.load,0),(u"|->",self.snapshot,0),
-                     (u"自动",self.step,0),(u"对比",self.compare,0),(u"撤销",self.cancel,0),
-                     (u"打乱",self.init,1),(u"开始",self.reset,0)],
-                     ]
+            b_map = [[(u"题库",self.library,0),
+                    ("7步",self.method,"Simple"),("F2CP",self.method,"F2CP"),
+                    (u"保存",self.save,1),(u"帮助",self.help,0),
+                    (u"删除",self.delete,0), (u"提示",self.hint,1),
+                    (u"开始",self.reset,0)],
+                     [(u"<-|",self.load,0),(u"|->",self.snapshot,0),
+                     (u"对比",self.compare,0),("打乱1",self.init,1),
+                     (u"打乱2",self.init,2),(u"打乱3",self.init,3),
+                     (u"自动",self.step,0),(u"撤销",self.cancel,0),
+                     ]]
 
             b_x = x_scale*790; b_y = y_scale*690; b_h = y_scale*30
             for bs in b_map:
@@ -581,9 +589,9 @@ class CubeController:
             pygame.draw.rect(screen,(128,128,128),(x_scale*220,y_scale*730,x_scale*560,y_scale*30))            
             printText(screen, self.advice, "fangsong", ft_sz, x_scale*230, y_scale*730, background)
             
-            if self.snapshot_or_tutorial == 1:
-                self.my_snapshot.displayHeader()
-            else:
+            if self.right_panel == "library":
+                self.my_library.displayHeader()
+            elif self.right_panel == "help":
                 self.my_tutorial.displayHeader()
            
             clock.tick(30)

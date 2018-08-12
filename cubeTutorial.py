@@ -291,8 +291,6 @@ class CubeTutorial:
 
     def displayTutorial(self):
         screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        pygame.draw.rect(screen,background,(x_scale*810,
-            y_scale*5,x_scale*538,y_scale*595))
 		
         step = steps[self.currentStep]["step"]
         title = steps[self.currentStep]["title"]

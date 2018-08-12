@@ -208,7 +208,7 @@ class CubeController:
         if self.right_panel != "help":
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
             pygame.draw.rect(screen,background,(x_scale*810,
-                y_scale*5,x_scale*538,y_scale*595))    
+                y_scale*5,x_scale*538,y_scale*675))    
             self.right_panel = "help"
             self.my_tutorial.nextOrPrevious(0)
 
@@ -217,7 +217,7 @@ class CubeController:
             self.right_panel = "snapshot"
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
             pygame.draw.rect(screen,background,(x_scale*810,
-                y_scale*5,x_scale*538,y_scale*595))    
+                y_scale*5,x_scale*538,y_scale*675))    
     
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_cube_3d.cube)
@@ -361,7 +361,10 @@ class CubeController:
             if  sn_b.mark != "-":
                 sn_b.mark = "-"
         self.my_cube_3d.displayCube()
-        sn_cube_3d.displayCube()
+        self.my_cube_3d.displayLayer("RIGHT",2, -120, -110)
+        self.my_cube_3d.displayLayer("UP",2, -156, 295)
+        self.my_cube_3d.displayLayer("FRONT",2, 360, -110)
+        self.my_snapshot.displayCube()
 
 
     def cancelBrush(self):

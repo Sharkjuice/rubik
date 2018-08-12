@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-  
 import pygame,copy,math,os
-from cubeGlobal import background,screen,green,black,bright_green,gray,colors,getDisplayParams
+from cubeGlobal import background,screen,green,black,\
+	bright_green,gray,colors,getDisplayParams
 from cubeCommon import button,printText
 import cubeView,cubeModel
 
@@ -192,7 +193,7 @@ class CubeLibrary:
         for b in b_map:
             button(screen, b[0], ft_sz, b_x, b_y, x_scale*60,b_h,green,bright_green,b[1],b[2])
             b_x += x_scale*70
-        pygame.draw.rect(screen,(128,128,128),(b_x, b_y,x_scale*180,b_h))            
+        pygame.draw.rect(screen,gray,(b_x, b_y,x_scale*180,b_h))            
         printText(screen, s_map[self.lib_level], "fangsong", ft_sz, b_x + 5, b_y + 3, black)
 		
     def takeSnapshot(self,cube):

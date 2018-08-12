@@ -49,8 +49,6 @@ class CubeLibrary:
             self.current = -1
             self.current_page = -1
             self.next_index = 0
-		
-			
 
     def saveCube(self,cube,flag,figure=0):
         if figure != 0:#此图案已经存在，就不保存了。

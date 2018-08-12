@@ -1,8 +1,9 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;The followings are common for both method;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defglobal ?*oll-pv* = 0)
 (defglobal ?*pll-pv* = 0)
-(defglobal ?*pll-side-pv* = 0)
-(defglobal ?*pll-corner-pv* = 0)
-
 
 (deftemplate block
    (slot id)
@@ -70,7 +71,6 @@
    (assert (cord_facelet z 0 O))
 )
 
-
 (deffunction color-value (?c)
 (switch ?c
 	(case - then 0)
@@ -107,6 +107,7 @@
 	(case 3 then corner) 
 	(case 0 then inner))
 )
+
 (deffunction block-pos(?x ?y ?z)
 	(+ (* (+ ?x 1) 9) (* (+ ?y 1) 3) (+ ?z 1))
 ) 
@@ -114,6 +115,7 @@
 (deffunction block-layer (?y)
 	(+ ?y 2)
 )
+
 (deffunction facelet-pos (?s ?x ?y ?z ?t)
 	(if (eq ?t center) then (return 9))
 	(if (eq ?s F) then 
@@ -132,6 +134,7 @@
 	(if (eq ?s U) then (return (facelet-pos F (* -1 ?y) ?x ?z ?t))) 
 	(if (eq ?s D) then (return (facelet-pos B (* -1 ?y) ?x ?z ?t))) 
 )
+
 (deffunction facelet-value (?p) 
 	(integer (** 2 (- ?p 1)))
 )
@@ -160,6 +163,7 @@
 	(if (eq ?s O) then O else 	
 	(if (or (eq ?s U) (eq ?s D)) then H else V1))
 )
+
 (deffunction distance (?p1 ?p2)
 	(bind ?d (- ?p1 ?p2))
 	(if (> ?d 0) then ?d else (+ ?d 8)) 
@@ -210,7 +214,6 @@
 )
 
 (defrule init-faces
-    (phase 1)
 	(block (id ?id)  (type center))
 	(facelet (id ?id)  (side ?s) (color ?c))	
 	=>
@@ -218,9 +221,11 @@
 )
 
 (defrule remove-extra-faces
-   ?f <- (facelet (side O))
+   ?f1 <- (facelet (side O))
+   ?f2 <- (face O ?x)
    =>
-   (retract ?f)
+   (retract ?f1)
+   (retract ?f2)
 )
 
 (defrule adjust-facelet
@@ -236,6 +241,7 @@
 	(modify ?f2 (type V1))
 	)   
 )
+
 (defrule adjust-center-status
 	?f1 <- (block (id ?id) (type center) (status wrong))
    =>
@@ -288,12 +294,6 @@
 	(modify ?f1 (status ok)) 
 )
 
-;;(defrule init-face-data
-;;(block (id ?id) (type ?t&center))
-;;	(facelet (id ?id) (side ?s) (color ?c))
-;;   =>
-;;	(assert (face ?s ?c))
-;;)
 ;;Confirm if the bottom center is white,
 ;;if it is, enter phase 1
 (defrule confirm-init-phase
@@ -306,7 +306,8 @@
 	(retract ?f)
 	(assert (phase 1))
 )
-;;Confirm if the bottom center and bottom edge is OK,
+
+;;Confirm if the bottom edge is OK,
 ;;if it is, enter phase 2
 (defrule confirm-f2l-phase
 	?f <- (phase 1)
@@ -317,20 +318,6 @@
 	(printout t "#confirm phase f2l" crlf)
 	(retract ?f)
 	(assert (phase 2))
-)
-
-(defrule confirm-layer1-phase
-	?f <- (phase 2)
-	(forall
-	(block (id ?id1) (type corner) (layer 1))
-	(facelet (id ?id1) (type H)  (color w))
-	(facelet (id ?id1) (type V1) (side ?s1)(color ?c1))
-	(face ?s1 ?c1)
-	)
-	=>
-	(printout t "#confirm phase layer1" crlf)
-	(assert (phase 3))
-	(retract ?f)
 )
 
 (defrule confirm-oll-phase
@@ -348,7 +335,6 @@
 	(retract ?f)
 )
 
-
 (defrule confirm-pll-phase
 	?f <- (phase 4)
 	(forall 
@@ -362,7 +348,12 @@
 
 (defrule confirm-end-phase
 	?f <- (phase 5)
-	(not (block (id ?id) (layer 3) (status ~ok)))
+	(forall
+	(block (id ?id1) (layer 3) (type ~center))
+	(facelet (id ?id1) (side U) (color y))
+	(facelet (id ?id1) (type V1) (side ?s1) (color ?c1))
+	(face ?s1 ?c1)
+	)
 	=>
 	(printout t "#confirm phase end" crlf)
 	(printout t "s:6;p:0;h:End" crlf)
@@ -378,6 +369,7 @@
 	=>
 	(printout t "s:0;p:1;h:" ?h crlf)
 )
+
 (defrule init-phase-macro
 =>
 ;;move the target face to the up position
@@ -453,6 +445,94 @@
 	(printout t "t1:(" ?x " " ?y " " ?z ");")
 	(printout t "s:1;f:" ?f ";p:1;h:" ?h crlf)
 ) 
+
+(defrule oll-face-value
+	(declare (salience 120))
+	(phase 4)
+	(block (id ?id) (layer 3))
+	(facelet (id ?id) (type V1|V2) (color y) (vpos ?p))
+	=>
+	(bind ?*oll-pv* (+ ?*oll-pv* (facelet-value ?p)))
+)
+
+(defrule oll-pattern
+	(phase 4)
+	(oll-macro ?f ?pv ?h)
+	=>
+	(if (= ?*oll-pv* ?pv) then 
+		(printout t "s:4;p:0;h:" ?h ";f:" ?f crlf) else 
+	(if (= ?*oll-pv* (mod (* ?pv 8) 4095)) then 
+		(printout t "s:4;p:1;h:U;f:" ?f crlf) else
+	(if (= ?*oll-pv* (mod (* ?pv 64) 4095)) then 
+		(printout t "s:4;p:1;h:U2;f:" ?f crlf) else
+	(if (= ?*oll-pv* (mod (* ?pv 512) 4095)) then 
+		(printout t "s:4;p:1;h:U';f:" ?f crlf)
+	))))
+)
+
+(defrule pll-face-value
+(declare (salience 120))
+	(phase 5)
+	(block (id ?id) (layer 3))
+	(facelet (id ?id) (type V1|V2) (side ?s) (color ?c) (vpos ?p))
+	(face ?s ?c)
+	=>
+	(bind ?*pll-pv* (+ ?*pll-pv* (facelet-value ?p)))
+)
+
+(deffunction pll-pattern-match (?pv)
+	(if (= ?*pll-pv* ?pv) then 
+		(create$ TRUE O) else 
+	(if (= ?*pll-pv* (mod (* ?pv 8) 4095)) then 
+		(create$ TRUE y) else
+	(if (= ?*pll-pv* (mod (* ?pv 64) 4095)) then
+		(create$ TRUE yy) else
+	(if (= ?*pll-pv* (mod (* ?pv 512) 4095)) then
+		(create$ TRUE y') else
+		(create$ FALSE N))
+	))) 
+)
+
+(defrule pll-pattern-default
+	(phase 5)
+	=>
+	(printout t "s:5;f:0;p:1;h:U" crlf)  
+)
+
+(defrule pll-pattern
+	(phase 5)
+	(pll-macro ?x ?f ?pv ?h)
+	=>
+	(bind ?m (pll-pattern-match ?pv))
+	(if (nth$ 1 ?m) then 
+		(if (eq O (nth$ 2 ?m)) then 
+			(printout t "s:5;f:" ?f ";p:0;h:" ?h crlf)  
+		else
+			(printout t "s:5;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf)  
+		)
+	)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;The following is only for simple method;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defglobal ?*pll-side-pv* = 0)
+(defglobal ?*pll-corner-pv* = 0)
+
+(defrule confirm-layer1-phase
+	?f <- (phase 2)
+	(forall
+	(block (id ?id1) (type corner) (layer 1))
+	(facelet (id ?id1) (type H)  (color w))
+	(facelet (id ?id1) (type V1) (side ?s1)(color ?c1))
+	(face ?s1 ?c1)
+	)
+	=>
+	(printout t "#confirm phase layer1" crlf)
+	(assert (phase 3))
+	(retract ?f)
+)
 
 
 (defrule init-f21-macro
@@ -547,7 +627,6 @@
 	(printout t "f:" ?f3 ";p:0;h:" ?h3 crlf)
 )
 
-
 (defrule sl2-pattern-3 "macro for layer 2, ok edge is on layer 2."
 	(phase 3)
 	(block (id ?id1) (layer 2) (type edge) (cord ?x1 ?y1 ?z1) (status ~ok))
@@ -623,7 +702,7 @@
 (assert (oll-macro 40 539 "FURU'R'F'"));;217
 (assert (oll-macro 44 1610 "FURU'R'F'"));;595
 (assert (oll-macro 45 2354 "FURU'R'F'"));;2452
-(assert (oll-macro 57 534 "(R'U'RU')(R'U2R)(RUR'U')(R'FRF')"));;177
+(assert (oll-macro 57 534 "FURU'R'F'"));;177
 
 ;;3 block right angle,need to turn 90
 (assert (oll-macro 32 2074 "FURU'R'F'"));;1283
@@ -638,30 +717,6 @@
 (assert (oll-macro 6 40   "R'U2RUR'UR"));;320
 (assert (oll-macro 3 325 "R'U2RUR'UR"))
 (assert (oll-macro 4 2376 "R'U2RUR'UR"));;2628
-)
-
-(defrule oll-face-value
-	(declare (salience 120))
-	(phase 4)
-	(block (id ?id) (layer 3))
-	(facelet (id ?id) (type V1|V2) (color y) (vpos ?p))
-	=>
-	(bind ?*oll-pv* (+ ?*oll-pv* (facelet-value ?p)))
-)
-
-(defrule oll-pattern
-	(phase 4)
-	(oll-macro ?f ?pv ?h)
-	=>
-	(if (= ?*oll-pv* ?pv) then 
-		(printout t "s:4;p:0;h:" ?h ";f:" ?f crlf) else 
-	(if (= ?*oll-pv* (mod (* ?pv 8) 4095)) then 
-		(printout t "s:4;p:1;h:U;f:" ?f crlf) else
-	(if (= ?*oll-pv* (mod (* ?pv 64) 4095)) then 
-		(printout t "s:4;p:1;h:U2;f:" ?f crlf) else
-	(if (= ?*oll-pv* (mod (* ?pv 512) 4095)) then 
-		(printout t "s:4;p:1;h:U';f:" ?f crlf)
-	))))
 )
 
 (defrule init-pll-macro 
@@ -686,16 +741,6 @@
 (assert (pll-macro 1 3 2925 "(RU'R)(URUR)(U'R'U'R')R'"))
 ;;pattern 6
 (assert (pll-macro 1 1 3053 "(RU'R)(URUR)(U'R'U'R')R'"))
-)
-
-(defrule pll-face-value
-(declare (salience 120))
-	(phase 5)
-	(block (id ?id) (layer 3))
-	(facelet (id ?id) (type V1|V2) (side ?s) (color ?c) (vpos ?p))
-	(face ?s ?c)
-	=>
-	(bind ?*pll-pv* (+ ?*pll-pv* (facelet-value ?p)))
 )
 
 (defrule pll-side-value
@@ -730,39 +775,4 @@
 		(printout t "s:5;f:500;p:0;h:U" crlf)  
 	))) 
 )
-
-(deffunction pll-pattern-match (?pv)
-	(if (= ?*pll-pv* ?pv) then 
-		(create$ TRUE O) else 
-	(if (= ?*pll-pv* (mod (* ?pv 8) 4095)) then 
-		(create$ TRUE y) else
-	(if (= ?*pll-pv* (mod (* ?pv 64) 4095)) then
-		(create$ TRUE yy) else
-	(if (= ?*pll-pv* (mod (* ?pv 512) 4095)) then
-		(create$ TRUE y') else
-		(create$ FALSE N))
-	))) 
-)
-
-(defrule pll-pattern-default
-	(phase 5)
-	=>
-	(printout t "s:5;f:0;p:1;h:U" crlf)  
-)
-
-
-(defrule pll-pattern
-	(phase 5)
-	(pll-macro ?x ?f ?pv ?h)
-	=>
-	(bind ?m (pll-pattern-match ?pv))
-	(if (nth$ 1 ?m) then 
-		(if (eq O (nth$ 2 ?m)) then 
-			(printout t "s:5;f:" ?f ";p:0;h:" ?h crlf)  
-		else
-			(printout t "s:5;f:" ?f ";p:0;h:" (nth$ 2 ?m) ?h crlf)  
-		)
-	)
-)
-
 

@@ -39,16 +39,17 @@ def pass2(macro):
 	
 def pass3(macro):
     tmp1 = [[ord(y) for y in x] for x in macro]
-    tmp2 = [sum(x) for x in tmp1]
-    tmp3 = tmp2[1:] + [0]
-    tmp4 = list(zip(tmp2,tmp3))
-    tmp5 = [x[0] - x[1] for x in tmp4]
+    tmp2 = [[(lambda z:(z == 39) * 100 + z)(y) for y in x] for x in tmp1]
+    tmp3 = [sum(x) for x in tmp2]
+    tmp4 = tmp3[1:] + [0]
+    tmp5 = list(zip(tmp3,tmp4))
+    tmp6 = [x[0] - x[1] for x in tmp5]
     
     si = 0
     l = len(macro)
     result = []
     while si < l:
-        if tmp5[si] == 39 or tmp5[si] == -39:
+        if tmp6[si] == 139 or tmp6[si] == -139:
             si +=1
         else:
             result.append(macro[si])
@@ -65,3 +66,4 @@ def parseAdvice(macro):
     return macro4
 
 #print(parseAdvice("xUU'yU'U(rUF)(RU2RU)2(FUr)"))
+#print(parseAdvice("y(RU'R)(URUR)(U'R'U'R')R"))

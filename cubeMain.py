@@ -49,7 +49,7 @@ if __name__ == "__main__":
         generated = 0;i=0
         print("I will try ", fig_num[args.auto]*5, " times. Pls wait.")
         while i < fig_num[args.auto]*5 and generated < fig_num[args.auto]:
-            cubeController.init(0)
+            cubeController.init2(args.auto)
             fig = cubeController.hint2().get("f",0)
             i += 1
             print(u"Try ", i, " times...")

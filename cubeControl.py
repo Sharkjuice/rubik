@@ -13,6 +13,12 @@ win_width = 800
 #3D显示参数
 fov = 700
 distance = 8
+#0: init;1:bottom center ok;2:bottom edge ok;3 bottom corner ok
+#4:layer 2 OK;#5:up color OK;#6:Game Over
+p_map = {
+"Simple":[0,1,2,3,4,5,6],
+"F2CP":[0,1,2,4,5,6]
+}
 
 #action map用户在几面上的按钮，对应的数据模型
 a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
@@ -59,7 +65,7 @@ class CubeController:
         self.his_count = his_count
         self.auto_level = auto_level
         self.resolve_method = "F2CP"
-        self.right_panel = "help"; 
+        self.right_panel = "library"
 
         #控制动画显示某一层的转动
         #是否在转动中， 用户启动转动，转动90度后自动停止
@@ -68,8 +74,7 @@ class CubeController:
         self.gameExit = False
         self.message = u"操作历史"
         self.advice = u"下一步提示"
-        #self.figure = 0
-        #self.stage = 0
+        self.current_level = 0
         self.dk_count = 0
         self.dk_time = 0
         self.brush_color = "-"
@@ -94,30 +99,23 @@ class CubeController:
         self.displayCube()
         self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube,500, 500, 700, 12, 820,50)
         self.my_tutorial = cubeTutorial.CubeTutorial()       
-        self.my_tutorial.nextOrPrevious(-1)
         self.my_library = cubeLibrary.CubeLibrary(my_cube,500, 500, 700, 12, 820,50)
-        
-    #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
-    def save(self,flag=1,figure=0):
-        fig = figure
-        if figure == 0:
-            if self.auto_level > 0:
-                self.hint(0)
-                if self.stage == self.auto_level:
-                    fig = self.figure
-                else:
-                    fig = -1
-        if fig != -1:
-            self.save2(flag,fig)
-        else:
-            self.message = u"超出范围，不能保存在本题库!"
+        self.my_library.selectSnapshot()
+
+	#flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
+    def save(self,flag=1):
+        if self.right_panel != "library":
+            screen,ft_sz,x_scale,y_scale= getDisplayParams()
+            pygame.draw.rect(screen,background,(x_scale*810,
+                y_scale*5,x_scale*538,y_scale*595))    
+            self.right_panel = "library"
+    
+        msg = self.save2()
+        self.message = msg    
         
     def save2(self,flag=1,figure=0):
         msg = self.my_library.saveCube(self.my_cube_3d.cube,flag, figure)            
-        
-        if flag == 1:
-            self.message = msg    
-            self.right_panel = "library"           
+        return msg        
             
     def load(self,dumy):
         self.his_actions = []
@@ -143,7 +141,15 @@ class CubeController:
         
 
 #随机生成一个初始乱的魔方
-    def init(self,dummy):
+    def init(self,init_level=0):
+        self.current_level = init_level
+        self.init2(init_level)
+        self.his_actions = []
+        self.advice = ""
+        self.displayCube()   
+
+#随机生成一个初始乱的魔方
+    def init2(self,init_level):
         r_list = ["F", "R", "U", "F'", "R'", "U'","f", 
                   "r","u","f'", "r'","u'","B", "L", "D", 
                   "B'", "L'", "D'","b","b'"]
@@ -157,7 +163,8 @@ class CubeController:
             self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
         #rotate to F2L stage
         auto_actions = []
-        while self.stage < self.auto_level:
+        init_stage = p_map[self.resolve_method][init_level]
+        while self.stage < init_stage:
             for a in auto_actions:
                 face = a_map[a]["face"]
                 layer = a_map[a]["layer"]
@@ -167,10 +174,27 @@ class CubeController:
             auto_actions = parseAdvice(advice.get("h",""))
             if auto_actions == "":
                 break
-        if dummy == 1:        
-            self.his_actions = []
-            self.advice = ""
-            self.displayCube()        
+#进阶到下一个阶段
+    def next(self,dummy):
+        self.current_level += 1
+        if self.current_level >= len(p_map[self.resolve_method]):
+            self.message = "魔方已经完全解决"
+            return
+        next_stage = p_map[self.resolve_method][self.current_level]
+        auto_actions = []		
+        while self.stage < next_stage:
+            for a in auto_actions:
+                face = a_map[a]["face"]
+                layer = a_map[a]["layer"]
+                clockwize = a_map[a]["clockwize"]
+                self.my_cube_3d.cube.rotateCube(face,layer,clockwize)
+            advice = self.hint2()
+            auto_actions = parseAdvice(advice.get("h",""))
+            if auto_actions == "":
+                break
+        self.his_actions = []
+        self.advice = ""
+        self.displayCube()   
         
     def displayCube(self):
         self.my_cube_3d.buildFaces()        
@@ -259,7 +283,8 @@ class CubeController:
 
     def step(self,dumy):
         self.advice = self.hint2().get("h","")
-        self.auto_actions = parseAdvice(self.advice)
+        if self.advice != "End":
+            self.auto_actions = parseAdvice(self.advice)
 
     def delete(self,dumy):
         if self.right_panel != "library":
@@ -292,9 +317,9 @@ class CubeController:
         else:
             res = subprocess.Popen("clipsutil.exe rubik-simple.clp",bufsize = 1,shell = True,stdout=subprocess.PIPE)
         outlines = res.stdout.readlines()
-        print(outlines)
         adv_p = []
         for outline in outlines:
+            #print(outline)
             outline_str = outline.decode().strip()
             if outline_str != "" and outline_str[0] != "#":
                 adv_l = outline_str.split(";")
@@ -312,20 +337,18 @@ class CubeController:
                 adv_p.append(adv_m)
         i = 0
         best = []
-        while best == [] and i < 4:
+        while best == [] and i < 5:
             best = [ adv for adv in adv_p if adv["p"] == i ]
             i += 1
         if best == []:
             return {}
-        #print("best advice:",best)
         self.advice = best[0].get("h","No Advise")
         self.stage = best[0]["s"]
         self.figure = best[0].get("f",0)
         t1 = best[0].get("t1", None)
         t2 = best[0].get("t2", None)
+        #print(best[0])
         return best[0]
-        
-
 
     def cancelComparing(self): 
         self.comparing = False        
@@ -353,7 +376,6 @@ class CubeController:
             
     def cancel(self,dumy):
         if self.brush_copy == 1:
-            #print(self.his_colors)
             self.cancelBrush() 
         elif self.comparing:#已经处于比对状态，先撤销次状态
             self.cancelComparing()
@@ -533,15 +555,18 @@ class CubeController:
                     (u"删除",self.delete,0), (u"提示",self.hint,1),
                     (u"开始",self.reset,0)],
                      [(u"<-|",self.load,0),(u"|->",self.snapshot,0),
-                     (u"对比",self.compare,0),("打乱1",self.init,1),
-                     (u"打乱2",self.init,2),(u"打乱3",self.init,3),
+                     (u"对比",self.compare,0),("打乱",self.init,1),
+                     (u"进阶",self.next,2),(u"保留",None,0),
                      (u"自动",self.step,0),(u"撤销",self.cancel,0),
                      ]]
 
             b_x = x_scale*790; b_y = y_scale*690; b_h = y_scale*30
             for bs in b_map:
                 for b,f,p in bs:
-                    button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,green,bright_green,f,p)
+                    if f != None:               
+                        button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,green,bright_green,f,p)
+                    else:
+                        button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,gray,bright_green,f,p)
                     b_x += x_scale*70
                 b_y += y_scale*40; b_x = x_scale*790
                      

@@ -1,6 +1,7 @@
 #-*-coding:utf-8-*-
 import pygame
-from cubeGlobal import black,mouse_status
+from cubeGlobal import black,background,gray,mouse_status,\
+	getDisplayParams
 #用一个全局变量表示鼠标状态，以判断鼠标点击（pressed，released）
 mouse_pressed = 0  
 def button(screen,msg,Textsize,x,y,w,h,ic,ac,action=None,param=None):
@@ -38,4 +39,14 @@ def text_objects(text, font):
     return textSurface, textSurface.get_rect()
 
 
+def printMsg(msg):	
+    screen,ft_sz,x_scale,y_scale= getDisplayParams()
+    if msg != "":
+        pygame.draw.rect(screen,gray,(x_scale*220,y_scale*690,x_scale*560,y_scale*30))            
+        printText(screen, msg, "fangsong", ft_sz, x_scale*230, y_scale*690, background)
 
+def printHint(hint):	
+    screen,ft_sz,x_scale,y_scale= getDisplayParams()
+    if hint != "":
+        pygame.draw.rect(screen,gray,(x_scale*220,y_scale*730,x_scale*560,y_scale*30))            
+        printText(screen, hint, "fangsong", ft_sz, x_scale*230, y_scale*730, background)

@@ -21,7 +21,7 @@ class CubePlayground:
         self.his_actions = []
         self.his_count = his_count
         self.auto_actions = []
-
+        self.his_colors = []
         #控制动画显示某一层的转动
         #是否在转动中， 用户启动转动，转动90度后自动停止
         self.brush_color = "-"
@@ -46,10 +46,12 @@ class CubePlayground:
        
         self.my_cube_3d = cubeView.Cube3D(my_cube,width, 
 			height, fov, distance,adj_x,adj_y)
+        self.my_cube_3d.buildFaces()
         self.displayCube()
 
     def displayCube(self):
-        self.my_cube_3d.buildFaces()        
+        #print("displayCube")
+        #self.my_cube_3d.buildFaces()        
         self.my_cube_3d.displayCube()
         self.my_cube_3d.displayLayer("RIGHT",2, -120, -110)
         self.my_cube_3d.displayLayer("UP",2, -156, 295)
@@ -95,7 +97,7 @@ class CubePlayground:
             self.my_cube_3d.displayCube()
         else:
             self.brush_copy = 0
-            msg = u"取消全部设置。"
+            msg = u"取消全部设置"
         printMsg(msg)
 		
     def cancel(self,dumy):
@@ -174,14 +176,11 @@ class CubePlayground:
         if self.brush_copy == 1:
             if not self.my_cube_3d.cube.validateCube():
                 msg = u"颜色设置没有完成，请继续完成设置！"
-                return 0
             else:
                 self.brush_copy = 0
-                msg = u"颜色设置完成。"
-        if msg != "":
-            pygame.draw.rect(screen,gray,(x_scale*220,y_scale*690,x_scale*560,y_scale*30))            
-            printText(screen, msg, "fangsong", ft_sz, x_scale*230, y_scale*690, background)
-
+                msg = u"颜色设置完成"
+        printMsg(msg)
+				
     def nextPage(self,flag):
         if self.current_page < self.total_page:
             self.current_page += 1
@@ -199,6 +198,7 @@ class CubePlayground:
 
         if self.rotate_angle == 90:
             self.cube().rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize)
+            self.rebuild()
             self.displayCube()
             printText(screen,"U", "arial", ft_sz, x_scale*390, y_scale*220, black)
             printText(screen,"F", "arial", ft_sz, x_scale*290, y_scale*390, black)
@@ -208,7 +208,6 @@ class CubePlayground:
             printText(screen,"D", "arial", ft_sz, x_scale*120, y_scale*600, black)
             self.rotating = False
             self.rotate_angle = 0
-
 
         if not self.rotating:
             if len(self.auto_actions) > 0:
@@ -251,16 +250,14 @@ class CubePlayground:
                 button(screen, b, ft_sz, b_x, b_y, x_scale*40,b_h,green,red,self.singleRotate,b)
                 b_x += x_scale*50
             b_y += y_scale*40; b_x = x_scale*650
-            
-            
                      
         #显示设置颜色块
         b_map = ["r","b","g","o","y","w"]
         b_x = x_scale*230; b_y = y_scale*10; b_h = y_scale*30
         for b in b_map:
-                button(screen, "", ft_sz, b_x, b_y, x_scale*40,b_h,
-                    colors[b],red,self.selectColor,b)
-                b_x += x_scale*50
+            button(screen, "", ft_sz, b_x, b_y, x_scale*40,b_h,
+                colors[b],red,self.selectColor,b)
+            b_x += x_scale*50
             
         button(screen,u"完成",ft_sz, b_x, b_y, x_scale*60, b_h,
             (224,224,224),red,self.endBrush,"x")
@@ -298,3 +295,7 @@ class CubePlayground:
 
     def blocks(self):
         return self.my_cube_3d.blocks
+
+    def rebuild(self):
+        return self.my_cube_3d.buildFaces()
+		

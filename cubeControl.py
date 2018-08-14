@@ -3,8 +3,8 @@ import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,\
         cubeLibrary,cubePlayground
 from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
-		getDisplayParams,background,black,green,gray,\
-		red,colors_r,colors_n,colors
+        getDisplayParams,background,black,green,gray,\
+        red,colors_r,colors_n,colors
 from cubeCommon import button,printText,printMsg,printHint
 from macroParse import parseAdvice
 
@@ -15,10 +15,9 @@ p_map = {
 "F2CP":[0,1,2,4,5,6]
 }
 
-class CubeController:
+class CubeControl:
     def __init__(self, init_count, his_count,auto_level=2):
         self.init_count = init_count
-        self.his_colors = []
         self.resolve_method = "F2CP"
         self.right_panel = "library"
 
@@ -66,6 +65,7 @@ class CubeController:
             cube = copy.deepcopy(self.my_library.cube())
         if cube != None:
             self.my_playground.my_cube_3d.cube = cube
+            self.my_playground.rebuild()            
             self.my_playground.displayCube()
         
  
@@ -156,9 +156,17 @@ class CubeController:
         if self.comparing:#已经处于比对状态，先取消
             self.cancel(dumy)
         self.comparing = True        
-        mark = 1
+        mark = 0
+        right = None
+        if self.right_panel == "snapshot":
+            right = self.my_snapshot
+        elif self.right_panel == "library":
+            right = self.my_library
+        else:
+            self.comparing = False
+            return
         for my_b in self.my_playground.blocks():        
-            for sn_b in self.my_snapshot.blocks():
+            for sn_b in right.blocks():
                 if my_b.block.origin == sn_b.block.origin:
                     if  my_b.block.current != sn_b.block.current:
                         str_mark = str(mark)
@@ -171,9 +179,9 @@ class CubeController:
                         sn_b.mark = str_mark
                         mark += 1
                         
-        if mark > 1:
+        if mark > 0:
             self.my_playground.displayCube()
-            self.my_snapshot.displayCube()
+            right.displayCube()
 
         
     def quit(self,dumy):
@@ -191,7 +199,7 @@ class CubeController:
         else:
             msg = self.my_library.deleteSnapshot()
         printMsg(msg)
-		
+        
     def hint(self,show):
         advice = self.hint2()
         t1 = advice.get("t1", None)
@@ -209,7 +217,7 @@ class CubeController:
             self.my_playground.displayCube()
         hint = advice.get("h","No Advise")
         printHint(hint)
-		
+        
     def hint2(self):
         self.save2(0)
         if self.resolve_method == "F2CP":
@@ -323,7 +331,7 @@ class CubeController:
                                 if self.dk_count == 2:
                                     self.dk_count = 0
                                     if (pygame.time.get_ticks() - self.dk_time) < 250:
-                                        if self.brush_copy == 1:
+                                        if self.my_playground.brush_copy == 1:
                                             self.my_playground.brushColor(hit_b,hit_f)
             
             b_h = y_scale*30

@@ -1,5 +1,5 @@
 import argparse,pygame,ctypes
-from cubeControl import  CubeController
+from cubeControl import  CubeControl
 from cubeGlobal import setDisplayParams,background 
 
 #屏幕的最小宽度和高度
@@ -32,9 +32,6 @@ if __name__ == "__main__":
     
     #最外面的框
     pygame.draw.rect(screen,(128,128,128),(0,0,scn_w-1,scn_h-1),2)
-    #pygame.draw.line(screen,(128,128,128),pt2,pt4,2)
-    #pygame.draw.line(screen,(128,128,128),pt4,pt3,2)
-    #pygame.draw.line(screen,(128,128,128),pt3,pt1,2)
     #竖分割线
     pygame.draw.line(screen,(128,128,128),(x_scale*800,0),(x_scale*800,y_scale*680),2)
     #底部横线
@@ -42,7 +39,7 @@ if __name__ == "__main__":
     #底部竖线
     pygame.draw.line(screen,(128,128,128),(x_scale*210,y_scale*680),(x_scale*210,scn_h*680),2)
 	
-    cubeController = CubeController(19,25,args.auto)
+    cubeControl = CubeControl(19,25,args.auto)
     if args.gen == 1:
         fig_num = {1:14,2:41,3:57,4:21}
         figures = []
@@ -60,6 +57,6 @@ if __name__ == "__main__":
                     generated += 1
                     print(u"Success ", generated, " times!")
     
-    cubeController.gameLoop()
+    cubeControl.gameLoop()
     pygame.quit()
   

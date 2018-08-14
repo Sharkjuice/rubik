@@ -2,19 +2,12 @@
 import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,\
         cubeLibrary,cubePlayground
-from cubeGlobal import mouse_status,m_map,cube_o,\
+from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
 		getDisplayParams,background,black,green,gray,\
-		bright_green,colors_r,colors_n,colors
+		red,colors_r,colors_n,colors
 from cubeCommon import button,printText,printMsg,printHint
 from macroParse import parseAdvice
 
-
-#显示魔方区域的高度和宽度
-win_height = 768
-win_width = 800
-#3D显示参数
-fov = 700
-distance = 8
 #0: init;1:bottom center ok;2:bottom edge ok;3 bottom corner ok
 #4:layer 2 OK;#5:up color OK;#6:Game Over
 p_map = {
@@ -22,48 +15,10 @@ p_map = {
 "F2CP":[0,1,2,4,5,6]
 }
 
-#action map用户在几面上的按钮，对应的数据模型
-a_map = {"F":{"face":"FRONT","clockwize":-1,"layer":0,"reverse":"F'"},
-         "R":{"face":"RIGHT","clockwize":-1,"layer":0,"reverse":"R'"},
-         "U":{"face":"UP","clockwize":1,"layer":0,"reverse":"U'"},
-         "F'":{"face":"FRONT","clockwize":1,"layer":0,"reverse":"F"},
-         "R'":{"face":"RIGHT","clockwize":1,"layer":0,"reverse":"R"},
-         "U'":{"face":"UP","clockwize":-1,"layer":0,"reverse":"U"},
-         "f":{"face":"FRONT","clockwize":-1,"layer":3,"reverse":"f'"},
-         "r":{"face":"RIGHT","clockwize":-1,"layer":3,"reverse":"r'"},
-         "M":{"face":"RIGHT","clockwize":-1,"layer":1,"reverse":"M'"},
-         "u":{"face":"UP","clockwize":1,"layer":3,"reverse":"u'"},
-         "f'":{"face":"FRONT","clockwize":1,"layer":3,"reverse":"f"},
-         "M'":{"face":"RIGHT","clockwize":1,"layer":1,"reverse":"M"},
-         "r'":{"face":"RIGHT","clockwize":1,"layer":3,"reverse":"r"},
-         "u'":{"face":"UP","clockwize":-1,"layer":3,"reverse":"u"},
-         "B":{"face":"FRONT","clockwize":1,"layer":2,"reverse":"B'"},
-         "b":{"face":"FRONT","clockwize":1,"layer":5,"reverse":"b'"},
-         "L":{"face":"RIGHT","clockwize":1,"layer":2,"reverse":"L'"},
-         "l":{"face":"RIGHT","clockwize":1,"layer":5,"reverse":"l'"},
-         "l'":{"face":"RIGHT","clockwize":-1,"layer":5,"reverse":"l"},
-         "D":{"face":"UP","clockwize":-1,"layer":2,"reverse":"D'"},
-         "B'":{"face":"FRONT","clockwize":-1,"layer":2,"reverse":"B"},
-         "b'":{"face":"FRONT","clockwize":-1,"layer":5,"reverse":"b"},
-         "L'":{"face":"RIGHT","clockwize":-1,"layer":2,"reverse":"L"},
-         "D'":{"face":"UP","clockwize":1,"layer":2,"reverse":"D"},         
-         "d":{"face":"UP","clockwize":-1,"layer":5,"reverse":"d'"},         
-         "d'":{"face":"UP","clockwize":1,"layer":5,"reverse":"d"},         
-         "y":{"face":"UP","clockwize":1,"layer":4,"reverse":"y'"},#整体绕U面中心轴顺转
-         "y'":{"face":"UP","clockwize":-1,"layer":4,"reverse":"y"},#逆转
-         "z":{"face":"FRONT","clockwize":-1,"layer":4,"reverse":"z'"},
-         "z'":{"face":"FRONT","clockwize":1,"layer":4,"reverse":"z"},
-         "x":{"face":"RIGHT","clockwize":-1,"layer":4,"reverse":"x'"},
-         "x'":{"face":"RIGHT","clockwize":1,"layer":4,"reverse":"x"},
-         "'|'":{"face":"FRONT","clockwize":1,"layer":6,"reverse":"'|'"}
-}
-
 class CubeController:
     def __init__(self, init_count, his_count,auto_level=2):
         self.init_count = init_count
-        self.auto_actions = []
         self.his_colors = []
-        self.auto_level = auto_level
         self.resolve_method = "F2CP"
         self.right_panel = "library"
 
@@ -78,11 +33,11 @@ class CubeController:
        
         #self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,0,-30)
         #self.displayCube()
-        self.my_playground = cubePlayground.CubePlayground(my_cube,win_width, win_height, fov, distance,0,-30)
+        self.my_playground = cubePlayground.CubePlayground(my_cube)
         self.my_playground.displayCube()
-        self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube,500, 500, 700, 12, 820,50)
+        self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube)
         self.my_tutorial = cubeTutorial.CubeTutorial()       
-        self.my_library = cubeLibrary.CubeLibrary(my_cube,500, 500, 700, 12, 820,50)
+        self.my_library = cubeLibrary.CubeLibrary(my_cube)
         self.my_library.selectSnapshot()
         printMsg(u"操作历史")
         printHint(u"下一步提示")
@@ -106,22 +61,19 @@ class CubeController:
         self.his_actions = []
         cube = None
         if self.right_panel == "snapshot":
-            cube = copy.deepcopy(self.my_snapshot.sn_cube_3d.cube)
+            cube = copy.deepcopy(self.my_snapshot.cube())
         elif self.right_panel == "library":
-            cube = copy.deepcopy(self.my_library.sn_cube_3d.cube)
+            cube = copy.deepcopy(self.my_library.cube())
         if cube != None:
-            self.my_playground = cubePlayground.CubePlayground(cube,win_width, win_height, fov, 
-                distance,0,-30)
+            self.my_playground.my_cube_3d.cube = cube
             self.my_playground.displayCube()
         
  
     def reset(self,dumy):
         my_cube = cubeModel.Cube()
-        self.my_playground = cubePlayground.CubePlayground(my_cube,win_width, win_height, fov, 
-            distance,0,-30)
+        self.my_playground = cubePlayground.CubePlayground(my_cube) 
         self.my_playground.displayCube()
-        self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube,500, 500, 700, 12, 
-            820,50)
+        self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube)
         
 
 #随机生成一个初始乱的魔方
@@ -205,9 +157,8 @@ class CubeController:
             self.cancel(dumy)
         self.comparing = True        
         mark = 1
-        sn_cube_3d = self.my_snapshot.sn_cube_3d
         for my_b in self.my_playground.blocks():        
-            for sn_b in sn_cube_3d.blocks:
+            for sn_b in self.my_snapshot.blocks():
                 if my_b.block.origin == sn_b.block.origin:
                     if  my_b.block.current != sn_b.block.current:
                         str_mark = str(mark)
@@ -231,7 +182,7 @@ class CubeController:
     def step(self,dumy):
         self.advice = self.hint2().get("h","")
         if self.advice != "End":
-            self.auto_actions = parseAdvice(self.advice)
+            self.my_playground.auto_actions = parseAdvice(self.advice)
 
     def delete(self,dumy):
         msg = ""
@@ -243,7 +194,6 @@ class CubeController:
 		
     def hint(self,show):
         advice = self.hint2()
-        print(advice)
         t1 = advice.get("t1", None)
         t2 = advice.get("t2", None)
         for my_b in self.my_playground.blocks():
@@ -257,7 +207,9 @@ class CubeController:
                         my_b.mark = "2"
         if t1 != None:
             self.my_playground.displayCube()
-
+        hint = advice.get("h","No Advise")
+        printHint(hint)
+		
     def hint2(self):
         self.save2(0)
         if self.resolve_method == "F2CP":
@@ -301,11 +253,10 @@ class CubeController:
     def cancelComparing(self): 
         self.comparing = False        
         mark = 1
-        sn_cube_3d = self.my_snapshot.sn_cube_3d        
         for my_b in self.my_playground.blocks():        
             if  my_b.mark != "-":
                 my_b.mark = "-"
-        for sn_b in sn_cube_3d.blocks:       
+        for sn_b in self.my_library.blocks():       
             if  sn_b.mark != "-":
                 sn_b.mark = "-"
         self.my_playground.displayCube()
@@ -378,7 +329,7 @@ class CubeController:
             b_h = y_scale*30
                 
           #退出按钮，最右上角
-            button(screen,"X",ft_sz,x_scale*1300,y_scale*10,x_scale*40,b_h,green,bright_green,self.quit,"X")
+            button(screen,"X",ft_sz,x_scale*1300,y_scale*10,x_scale*40,b_h,green,red,self.quit,"X")
           #显示控制按钮
             b_map = [[(u"题库",self.library,0),
                     ("7步",self.method,"Simple"),("F2CP",self.method,"F2CP"),
@@ -395,9 +346,9 @@ class CubeController:
             for bs in b_map:
                 for b,f,p in bs:
                     if f != None:               
-                        button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,green,bright_green,f,p)
+                        button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,green,red,f,p)
                     else:
-                        button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,gray,bright_green,f,p)
+                        button(screen, b, ft_sz, b_x, b_y, x_scale*60,b_h,gray,red,f,p)
                     b_x += x_scale*70
                 b_y += y_scale*40; b_x = x_scale*790
                      

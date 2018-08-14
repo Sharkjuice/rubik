@@ -1,13 +1,22 @@
 # -*- coding: utf-8 -*-  
 import pygame,copy,math,os
 from cubeGlobal import background,screen,green,black,\
-	bright_green,gray,colors,getDisplayParams
+	red,gray,colors,getDisplayParams
 from cubeCommon import button,printText
 import cubeView,cubeModel
 
+#显示魔方区域的高度和宽度
+height = 500
+width = 500
+#3D显示参数
+fov = 700
+distance = 12
+adj_x = 820
+adj_y = 50
 
 class CubeLibrary:
-    def __init__(self,cube,width, height, fov, distance,x_adj,y_adj):
+    def __init__(self,cube):
+        global height,width,fov,distance,adj_x,adj_y
         self.total =  0
         self.total_page = 0
         self.current = -1
@@ -15,13 +24,8 @@ class CubeLibrary:
         self.next_index = 0
         self.snapshots = []
         self.lib_level = 0	
-        self.x_adj = x_adj
-        self.y_adj = y_adj
-        self.width = width
-        self.height = height
-        self.fov = fov
-        self.distance = distance
-        self.sn_cube_3d = cubeView.Cube3D(cube,width, height, fov, distance, x_adj,y_adj)
+        self.my_cube_3d = cubeView.Cube3D(cube,width, 
+			height, fov, distance, adj_x, adj_y)
         self.snapshots_dir = ".\\snapshots_0\\"
         self.build()
 		
@@ -111,9 +115,8 @@ class CubeLibrary:
                     blocks.append(((int(b[2]),int(b[3]),int(b[4])),"".join([b[5],b[6],b[7]])))
             fo.close()
             cube = cubeModel.Cube(blocks)
-            self.sn_cube_3d = cubeView.Cube3D(cube,self.width, self.height, self.fov, 
-                self.distance,self.x_adj,self.y_adj)
-            self.sn_cube_3d.buildFaces()
+            self.my_cube_3d.cube = copy.deepcopy(cube)				
+            self.my_cube_3d.buildFaces()
             self.displayCube()
 			
     def setCurrent(self,c):
@@ -163,24 +166,24 @@ class CubeLibrary:
             if self.current_page == self.total_page:
                 stop1 = self.total
         if self.current_page == 1:
-            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,b_h,gray,bright_green,None,-1)
+            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,b_h,gray,red,None,-1)
         else:
-            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,b_h,green,bright_green,self.prevPage,-1)
+            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,b_h,green,red,self.prevPage,-1)
         b_x += x_scale*40
 
         for b in range(start,stop1):
             if (b + 1) == self.current:		
-                button(screen, str(b+1), ft_sz, b_x, b_y, x_scale*30,b_h,bright_green,bright_green,self.selectSnapshot,b+1)
+                button(screen, str(b+1), ft_sz, b_x, b_y, x_scale*30,b_h,red,red,self.selectSnapshot,b+1)
             else:
-                button(screen, str(b+1), ft_sz, b_x, b_y, x_scale*30,b_h,green,bright_green,self.selectSnapshot,b+1)
+                button(screen, str(b+1), ft_sz, b_x, b_y, x_scale*30,b_h,green,red,self.selectSnapshot,b+1)
             b_x += x_scale*40
         for b in range(stop1, stop2):
-            button(screen, "", ft_sz, b_x, b_y, x_scale*30,b_h,gray,bright_green,None,b+1)
+            button(screen, "", ft_sz, b_x, b_y, x_scale*30,b_h,gray,red,None,b+1)
             b_x += x_scale*40
         if self.current_page == self.total_page:
-            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,gray,bright_green,None,1)
+            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,gray,red,None,1)
         else:
-            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,green,bright_green,self.nextPage,1)
+            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,green,red,self.nextPage,1)
         s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2题库",3:u"oll题库",4:u"pll题库"}
 
         b_x = x_scale*810
@@ -191,26 +194,32 @@ class CubeLibrary:
 
         b_x = x_scale*810; b_y = y_scale*640; b_h = y_scale*30
         for b in b_map:
-            button(screen, b[0], ft_sz, b_x, b_y, x_scale*60,b_h,green,bright_green,b[1],b[2])
+            button(screen, b[0], ft_sz, b_x, b_y, x_scale*60,b_h,green,red,b[1],b[2])
             b_x += x_scale*70
         pygame.draw.rect(screen,gray,(b_x, b_y,x_scale*180,b_h))            
         printText(screen, s_map[self.lib_level], "fangsong", ft_sz, b_x + 5, b_y + 3, black)
 		
     def takeSnapshot(self,cube):
-        self.sn_cube_3d.cube = copy.deepcopy(cube)
-        self.sn_cube_3d.buildFaces()
+        self.my_cube_3d.cube = copy.deepcopy(cube)
+        self.my_cube_3d.buildFaces()
         self.displayCube()
         
     def displayCube(self):   
         #screen,ft_sz,x_scale,y_scale= getDisplayParams()
 		
-        self.sn_cube_3d.displayCube()
-        self.sn_cube_3d.displayLayer("RIGHT",2, 180,-70)
-        self.sn_cube_3d.displayLayer("UP",2, 160, 260)
-        self.sn_cube_3d.displayLayer("FRONT",2, 480, -70)
+        self.my_cube_3d.displayCube()
+        self.my_cube_3d.displayLayer("RIGHT",2, 180,-70)
+        self.my_cube_3d.displayLayer("UP",2, 160, 260)
+        self.my_cube_3d.displayLayer("FRONT",2, 480, -70)
 		
     def level(self,value):
         self.lib_level = value
         self.snapshots_dir = ".\\snapshots_" + str(value) + "\\"
         self.build()
         self.selectSnapshot()
+
+    def cube(self):
+        return self.my_cube_3d.cube 
+
+    def blocks(self):
+        return self.my_cube_3d.blocks

@@ -2,7 +2,8 @@
 import sys, math, pygame
 from operator import itemgetter
 import cubeModel
-from cubeGlobal import block_v, cube_o,faces,colors,background,getDisplayParams
+from cubeGlobal import block_v, cube_o,faces,colors,background,\
+	getDisplayParams
 from cubeCommon import printText
 
 #在侧边显示后、下、左三面的信息

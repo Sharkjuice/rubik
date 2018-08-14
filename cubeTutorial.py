@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-  
 import pygame
-from cubeGlobal import background,green,bright_green,colors,getDisplayParams
+from cubeGlobal import background,green,red,\
+	colors,getDisplayParams
 from cubeCommon import button,printText
 steps = [
 {"step":u"前提", "title":u"基本常识",
@@ -284,10 +285,10 @@ class CubeTutorial:
         screen,ft_sz,x_scale,y_scale= getDisplayParams()
         step = steps[self.currentStep]["step"]
         title = steps[self.currentStep]["title"]
-        button(screen,"<<",ft_sz,x_scale*810,y_scale*10,x_scale*40,y_scale*30,green,bright_green,self.nextOrPrevious,-1)
+        button(screen,"<<",ft_sz,x_scale*810,y_scale*10,x_scale*40,y_scale*30,green,red,self.nextOrPrevious,-1)
         button(screen,step,ft_sz,x_scale*880,y_scale*10,x_scale*100,y_scale*30,green,green)
         button(screen,title,ft_sz,x_scale*1000,y_scale*10,x_scale*200,y_scale*30,green,green)
-        button(screen,">>",ft_sz,x_scale*1230,y_scale*10,x_scale*40,y_scale*30,green,bright_green,self.nextOrPrevious,1)
+        button(screen,">>",ft_sz,x_scale*1230,y_scale*10,x_scale*40,y_scale*30,green,red,self.nextOrPrevious,1)
 
     def displayTutorial(self):
         screen,ft_sz,x_scale,y_scale= getDisplayParams()

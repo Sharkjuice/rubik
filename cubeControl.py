@@ -30,15 +30,13 @@ class CubeControl:
         #初始化数据模型
         my_cube = cubeModel.Cube()
        
-        #self.my_cube_3d = cubeView.Cube3D(my_cube,win_width, win_height, fov, distance,0,-30)
-        #self.displayCube()
         self.my_playground = cubePlayground.CubePlayground(my_cube)
         self.my_playground.displayCube()
         self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube)
         self.my_tutorial = cubeTutorial.CubeTutorial()       
         self.my_library = cubeLibrary.CubeLibrary(my_cube)
         self.my_library.selectSnapshot()
-        printMsg(u"操作历史")
+        printMsg(u"当前解题方法是" + self.resolve_method + u"法")
         printHint(u"下一步提示")
 
     #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
@@ -82,6 +80,7 @@ class CubeControl:
         self.init2(init_level)
         self.his_actions = []
         self.advice = ""
+        self.my_playground.rebuild()
         self.my_playground.displayCube()   
 
 #随机生成一个初始乱的魔方
@@ -290,6 +289,17 @@ class CubeControl:
         self.resolve_method = method
         msg = "当前提示和自动解题方法是" + method
         printMsg(msg)
+		
+    def quitz(self,dummy):
+        total = self.my_library.getTotal()	
+        if total == 0:
+            msg =  u"当前题库为空"
+        else:
+            r = int(random.random() * total)
+            self.my_library.selectSnapshot(r)
+            self.load(0)
+            msg = u"当前是第" + str(r) + u"题"	
+        printMsg(msg)
 
     def gameLoop(self):
         global mouse_status
@@ -346,7 +356,7 @@ class CubeControl:
                     (u"开始",self.reset,0)],
                      [(u"<-|",self.load,0),(u"|->",self.snapshot,0),
                      (u"对比",self.compare,0),("打乱",self.init,1),
-                     (u"进阶",self.next,2),(u"保留",None,0),
+                     (u"进阶",self.next,2),(u"出题",self.quitz,0),
                      (u"自动",self.step,0),(u"撤销",self.cancel,0),
                      ]]
 

@@ -223,3 +223,4 @@ class CubeLibrary:
 
     def blocks(self):
         return self.my_cube_3d.blocks
+	

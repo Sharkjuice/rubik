@@ -41,9 +41,7 @@ class CubeSnapshot:
         b_x = x_scale*1160
         b_y = y_scale*640
         b_h = y_scale*30
-        pygame.draw.rect(screen,gray,(b_x, b_y, x_scale*180,b_h))            
-        printText(screen, "快照窗口", "fangsong", ft_sz, b_x + 5, 
-		    b_y + 3, black)
+        printRight("快照窗口")
 
     def cube(self):
         return self.my_cube_3d.cube 

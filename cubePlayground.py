@@ -3,7 +3,7 @@ import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,cubeLibrary
 from cubeGlobal import mouse_status,m_map,a_map,cube_o,getDisplayParams,\
     background,black,green,gray,red,colors_r,colors_n,colors
-from cubeCommon import button,printText,printMsg
+from cubeCommon import button,printText,printLeft
 from macroParse import parseAdvice
 
 #显示魔方区域的高度和宽度
@@ -81,7 +81,7 @@ class CubePlayground:
                     self.his_actions.pop(0)
                     self.his_actions.append(action)
         msg = "".join(self.his_actions)
-        printMsg(msg)
+        printLeft(msg)
         return True
 
     def macroRotate(self,macro):

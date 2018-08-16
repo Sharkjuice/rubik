@@ -39,14 +39,21 @@ def text_objects(text, font):
     return textSurface, textSurface.get_rect()
 
 
-def printMsg(msg):	
+def printLeft(msg):	
     screen,ft_sz,x_scale,y_scale= getDisplayParams()
     if msg != "":
         pygame.draw.rect(screen,gray,(x_scale*220,y_scale*690,x_scale*560,y_scale*30))            
-        printText(screen, msg, "fangsong", ft_sz, x_scale*230, y_scale*690, background)
+        printText(screen, msg, "fangsong", ft_sz, x_scale*225, y_scale*690, background)
 
-def printHint(hint):	
+def printHint(msg):	
     screen,ft_sz,x_scale,y_scale= getDisplayParams()
-    if hint != "":
+    if msg != "":
         pygame.draw.rect(screen,gray,(x_scale*220,y_scale*730,x_scale*560,y_scale*30))            
-        printText(screen, hint, "fangsong", ft_sz, x_scale*230, y_scale*730, background)
+        printText(screen, msg, "fangsong", ft_sz, x_scale*225, y_scale*730, background)
+
+def printRight(msg):	
+    screen,ft_sz,x_scale,y_scale= getDisplayParams()
+    if msg != "":
+        pygame.draw.rect(screen,gray,(x_scale*1160,y_scale*640,x_scale*180,y_scale*30))            
+        printText(screen, msg, "fangsong", ft_sz, x_scale*1165, y_scale*640, black)
+		

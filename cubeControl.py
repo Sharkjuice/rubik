@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-  
-import pygame,sys,time,copy,random,subprocess
+import pygame,sys,time,copy,random,subprocess,math
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,\
         cubeLibrary,cubePlayground
 from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
         getDisplayParams,background,black,green,gray,\
         red,colors_r,colors_n,colors
-from cubeCommon import button,printText,printMsg,printHint
+from cubeCommon import button,printText,printLeft,\
+	printHint,printRight
 from macroParse import parseAdvice
 
 #0: init;1:bottom center ok;2:bottom edge ok;3 bottom corner ok
@@ -36,7 +37,7 @@ class CubeControl:
         self.my_tutorial = cubeTutorial.CubeTutorial()       
         self.my_library = cubeLibrary.CubeLibrary(my_cube)
         self.my_library.selectSnapshot()
-        printMsg(u"当前解题方法是" + self.resolve_method + u"法")
+        printLeft(u"当前解题方法是" + self.resolve_method + u"法")
         printHint(u"下一步提示")
 
     #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
@@ -48,11 +49,11 @@ class CubeControl:
             self.right_panel = "library"
     
         msg = self.save2()
-        self.message = msg    
+        printLeft(msg)
         
     def save2(self,flag=1,figure=0):
-        msg = self.my_library.saveCube(self.my_playground.cube(),flag, figure)            
-        return msg        
+        return self.my_library.saveCube(self.my_playground.cube(),
+			flag, figure)            
             
     def load(self,dumy):
         self.his_actions = []
@@ -131,7 +132,7 @@ class CubeControl:
         self.his_actions = []
         self.advice = ""
         self.my_playground.displayCube()   
-        printMsg(msg)
+        printLeft(msg)
 
     def help(self,dumy):
         if self.right_panel != "help":
@@ -197,7 +198,7 @@ class CubeControl:
             msg = u"当前是帮助窗口，不能删除."
         else:
             msg = self.my_library.deleteSnapshot()
-        printMsg(msg)
+        printLeft(msg)
         
     def hint(self,show):
         advice = self.hint2()
@@ -288,18 +289,21 @@ class CubeControl:
     def method(self,method):
         self.resolve_method = method
         msg = "当前提示和自动解题方法是" + method
-        printMsg(msg)
-		
+        printLeft(msg)
+        
     def quitz(self,dummy):
-        total = self.my_library.getTotal()	
-        if total == 0:
-            msg =  u"当前题库为空"
-        else:
-            r = int(random.random() * total)
-            self.my_library.selectSnapshot(r)
-            self.load(0)
-            msg = u"当前是第" + str(r) + u"题"	
-        printMsg(msg)
+        if self.right_panel != "library":
+            screen,ft_sz,x_scale,y_scale= getDisplayParams()
+            pygame.draw.rect(screen,background,(x_scale*810,
+                y_scale*5,x_scale*538,y_scale*595))    
+            self.right_panel = "library"
+        l = math.ceil(random.random() * 4)
+        self.my_library.setLevel(l)
+        total = self.my_library.getTotal()
+        r = int(random.random() * total)
+        self.my_library.selectSnapshot(r)
+        self.load(0)
+        printLeft(u"当前是第" + str(r) + u"题")
 
     def gameLoop(self):
         global mouse_status

@@ -2,7 +2,7 @@
 import pygame,copy,math,os
 from cubeGlobal import background,screen,green,black,\
 	red,gray,colors,getDisplayParams
-from cubeCommon import button,printText
+from cubeCommon import button,printLeft,printRight
 import cubeView,cubeModel
 
 #显示魔方区域的高度和宽度
@@ -13,6 +13,8 @@ fov = 700
 distance = 12
 adj_x = 820
 adj_y = 50
+
+s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2题库",3:u"oll题库",4:u"pll题库"}
 
 class CubeLibrary:
     def __init__(self,cube):
@@ -81,7 +83,6 @@ class CubeLibrary:
         fo.write("\n(assert (phase 0)))")
         fo.close()
         return u"保存为第" + str(self.total) + "份快照"
-			
 
     def deleteSnapshot(self):  
         if self.lib_level > 0:
@@ -184,7 +185,6 @@ class CubeLibrary:
             button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,gray,red,None,1)
         else:
             button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,green,red,self.nextPage,1)
-        s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2题库",3:u"oll题库",4:u"pll题库"}
 
         b_x = x_scale*810
         b_y = y_scale*640
@@ -196,8 +196,7 @@ class CubeLibrary:
         for b in b_map:
             button(screen, b[0], ft_sz, b_x, b_y, x_scale*60,b_h,green,red,b[1],b[2])
             b_x += x_scale*70
-        pygame.draw.rect(screen,gray,(b_x, b_y,x_scale*180,b_h))            
-        printText(screen, s_map[self.lib_level], "fangsong", ft_sz, b_x + 5, b_y + 3, black)
+        printRight(s_map[self.lib_level])
 		
     def takeSnapshot(self,cube):
         self.my_cube_3d.cube = copy.deepcopy(cube)
@@ -205,18 +204,20 @@ class CubeLibrary:
         self.displayCube()
         
     def displayCube(self):   
-        #screen,ft_sz,x_scale,y_scale= getDisplayParams()
-		
         self.my_cube_3d.displayCube()
         self.my_cube_3d.displayLayer("RIGHT",2, 180,-70)
         self.my_cube_3d.displayLayer("UP",2, 160, 260)
         self.my_cube_3d.displayLayer("FRONT",2, 480, -70)
-		
+
     def level(self,value):
+        self.setLevel(value)
+        self.selectSnapshot()
+		
+    def setLevel(self,value):
         self.lib_level = value
         self.snapshots_dir = ".\\snapshots_" + str(value) + "\\"
         self.build()
-        self.selectSnapshot()
+        printRight(s_map[self.lib_level])
 
     def cube(self):
         return self.my_cube_3d.cube 

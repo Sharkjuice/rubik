@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-  
 import pygame,copy
 import cubeView,cubeModel
-from cubeCommon import button,printText
+from cubeCommon import button,printText,printRight
 from cubeGlobal import background,screen,green,black,\
 	 gray,colors,getDisplayParams
 

@@ -14,7 +14,7 @@ distance = 12
 adj_x = 820
 adj_y = 50
 
-s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2题库",3:u"oll题库",4:u"pll题库"}
+s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2L题库",3:u"OLL题库",4:u"PLL题库"}
 
 class CubeLibrary:
     def __init__(self,cube):

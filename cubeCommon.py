@@ -54,6 +54,6 @@ def printHint(msg):
 def printRight(msg):	
     screen,ft_sz,x_scale,y_scale= getDisplayParams()
     if msg != "":
-        pygame.draw.rect(screen,gray,(x_scale*1160,y_scale*640,x_scale*180,y_scale*30))            
-        printText(screen, msg, "fangsong", ft_sz, x_scale*1165, y_scale*640, black)
+        pygame.draw.rect(screen,gray,(x_scale*1170,y_scale*640,x_scale*170,y_scale*30))            
+        printText(screen, msg, "fangsong", ft_sz, x_scale*1175, y_scale*640, black)
 		

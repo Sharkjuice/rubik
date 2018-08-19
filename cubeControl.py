@@ -16,6 +16,12 @@ p_map = {
 "F2CP":[0,1,2,4,5,6]
 }
 
+screen,ft_sz,x_scale,y_scale= getDisplayParams()
+right_x = x_scale*820
+right_y = y_scale*5
+right_w = x_scale*528
+right_h = y_scale*675
+
 class CubeControl:
     def __init__(self, init_count, his_count,auto_level=2):
         self.init_count = init_count
@@ -44,8 +50,8 @@ class CubeControl:
     def save(self,flag=1):
         if self.right_panel != "library":
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(x_scale*810,
-                y_scale*5,x_scale*538,y_scale*595))    
+            pygame.draw.rect(screen,background,(right_x,
+                right_y,right_w,right_h))    
             self.right_panel = "library"
     
         msg = self.save2()
@@ -137,8 +143,8 @@ class CubeControl:
     def help(self,dumy):
         if self.right_panel != "help":
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(x_scale*810,
-                y_scale*5,x_scale*538,y_scale*675))    
+            pygame.draw.rect(screen,background,(right_x,
+                right_y,right_w,right_h))    
             self.right_panel = "help"
             self.my_tutorial.nextOrPrevious(0)
 
@@ -146,7 +152,7 @@ class CubeControl:
         if self.right_panel != "snapshot":
             self.right_panel = "snapshot"
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(x_scale*810,
+            pygame.draw.rect(screen,background,(x_scale*820,
                 y_scale*5,x_scale*538,y_scale*675))    
     
         self.comparing = False
@@ -264,11 +270,16 @@ class CubeControl:
         for my_b in self.my_playground.blocks():        
             if  my_b.mark != "-":
                 my_b.mark = "-"
-        for sn_b in self.my_library.blocks():       
+        if self.right_panel == "snapshot":
+            right = self.my_snapshot
+        elif self.right_panel == "library":
+            right = self.my_library
+				
+        for sn_b in right.blocks():       
             if  sn_b.mark != "-":
                 sn_b.mark = "-"
         self.my_playground.displayCube()
-        self.my_snapshot.displayCube()
+        right.displayCube()
            
     def cancel(self,dumy):
         if self.my_playground.brush_copy == 1:
@@ -281,8 +292,8 @@ class CubeControl:
     def library(self,level):
         if self.right_panel != "library":
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(x_scale*810,
-                y_scale*5,x_scale*538,y_scale*595))    
+            pygame.draw.rect(screen,background,(right_x,
+                right_y,right_w,right_h))    
             self.right_panel = "library"
             self.my_library.selectSnapshot()
 
@@ -294,8 +305,8 @@ class CubeControl:
     def quitz(self,dummy):
         if self.right_panel != "library":
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(x_scale*810,
-                y_scale*5,x_scale*538,y_scale*595))    
+            pygame.draw.rect(screen,background,(right_x,
+                right_y,right_w,right_h))    
             self.right_panel = "library"
         l = math.ceil(random.random() * 4)
         self.my_library.setLevel(l)

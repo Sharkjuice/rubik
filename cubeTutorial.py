@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-  
 import pygame
 from cubeGlobal import background,green,red,\
-	colors,getDisplayParams
+	white,colors,getDisplayParams
 from cubeCommon import button,printText
 steps = [
 {"step":u"前提", "title":u"基本常识",
@@ -284,11 +284,18 @@ class CubeTutorial:
     def displayHeader(self):
         screen,ft_sz,x_scale,y_scale= getDisplayParams()
         step = steps[self.currentStep]["step"]
+        b_x = x_scale*820
+        b_y = y_scale*10
+        b_h = y_scale*30
+		
         title = steps[self.currentStep]["title"]
-        button(screen,"<<",ft_sz,x_scale*810,y_scale*10,x_scale*40,y_scale*30,green,red,self.nextOrPrevious,-1)
-        button(screen,step,ft_sz,x_scale*880,y_scale*10,x_scale*100,y_scale*30,green,green)
-        button(screen,title,ft_sz,x_scale*1000,y_scale*10,x_scale*200,y_scale*30,green,green)
-        button(screen,">>",ft_sz,x_scale*1230,y_scale*10,x_scale*40,y_scale*30,green,red,self.nextOrPrevious,1)
+        button(screen,"<<",ft_sz,b_x,b_y,x_scale*40,b_h,green,red,self.nextOrPrevious,-1)
+        b_x += x_scale*70
+        button(screen,step,ft_sz,b_x,b_y,x_scale*100,b_h,green,green)
+        b_x += x_scale*120
+        button(screen,title,ft_sz,b_x,b_y,x_scale*200,b_h,green,green)
+        b_x += x_scale*230
+        button(screen,">>",ft_sz,b_x,b_y,x_scale*40,b_h,green,red,self.nextOrPrevious,1)
 
     def displayTutorial(self):
         screen,ft_sz,x_scale,y_scale= getDisplayParams()
@@ -297,22 +304,26 @@ class CubeTutorial:
         title = steps[self.currentStep]["title"]
         texts = steps[self.currentStep]["text"]
         figures = steps[self.currentStep].get("figures",[])
+
+        b_x = x_scale*820
+        b_y = y_scale*45
+        b_h = y_scale*28
         
         ln_size = y_scale*28
         if self.refresh == 1:
-            pygame.draw.rect(screen,background,(x_scale*810,y_scale*45,x_scale*538,y_scale*635))
+            pygame.draw.rect(screen,background,(b_x,b_y,x_scale*528,y_scale*635))
             self.refresh = 0
             line = 0
             for text in texts:
-                printText(screen,text, "fangsong", ft_sz, x_scale*810, y_scale*45+ln_size*line, (240,240,240))
+                printText(screen,text, "fangsong", ft_sz, b_x, b_y + b_h*line, white)
                 line += 1
-            x = x_scale*880
-            y = y_scale*500
+            b_x += x_scale*80
+            b_y = y_scale*500
             offset = 0
             for fig in figures:
-                self.displayFigure(screen,x+offset, y,figList[fig[0]][fig[1]])
+                self.displayFigure(screen, b_x+offset, b_y,figList[fig[0]][fig[1]])
                 fig_label = u"图" + str(fig[0]+1)+ "-" + str(fig[1]+1)
-                printText(screen,fig_label, "fangsong", ft_sz,  x + offset - x_scale*20,  y + y_scale*65, (200,200,200))
+                printText(screen,fig_label, "fangsong", ft_sz,  b_x+offset - x_scale*20, b_y + y_scale*65, white)
                 offset += x_scale*120
     
               

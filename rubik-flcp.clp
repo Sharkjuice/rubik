@@ -984,8 +984,8 @@
 (assert (pll-macro 2 17 28  "(RUR')y'(R2u'RU')R'(UR'uR2)"))
 (assert (pll-macro 1 18 14  "(R2uR'U)R'(U'Ru'R2)(F'UF)"))
 (assert (pll-macro 2 19 112 "(R'd'F)(R2uR'U)R(U'Ru'R2)"))
-(assert (pll-macro 5 20 2275 "(R'U)(RU'R')(F'U'F)(RUR')(FR'F')(RU'R)"))
-(assert (pll-macro 5 21 910  "(RUR'U)(RUR'F')(RUR'U')(R'F)(R2U'R'U')(U'RU'R')"))
+(assert (pll-macro 5 20 2275 "R'(URU'R')(F'U')(FRUR'F)(R'F')(RU'R)"))
+(assert (pll-macro 5 21 910  "(RUR')U(RUR')(F'RUR'U'R'F)(R2U'R'U2)(RU'R')"))
 )
 
 (deffunction pll-pattern-out (?c1 ?c2 ?c3 ?d ?f ?pv ?h)

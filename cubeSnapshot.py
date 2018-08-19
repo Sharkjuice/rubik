@@ -11,7 +11,7 @@ width = 500
 #3D显示参数
 fov = 700
 distance = 12
-adj_x = 820
+adj_x = 830
 adj_y = 50
 	
 class CubeSnapshot:

@@ -2,7 +2,7 @@
 import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,cubeLibrary
 from cubeGlobal import mouse_status,m_map,a_map,cube_o,getDisplayParams,\
-    background,black,green,gray,red,colors_r,colors_n,colors
+    background,black,green,gray,white,red,colors_r,colors_n,colors
 from cubeCommon import button,printText,printLeft
 from macroParse import parseAdvice
 
@@ -45,17 +45,54 @@ class CubePlayground:
         my_cube = cubeModel.Cube()
        
         self.my_cube_3d = cubeView.Cube3D(my_cube,width, 
-			height, fov, distance,adj_x,adj_y)
+            height, fov, distance,adj_x,adj_y)
         self.my_cube_3d.buildFaces()
         self.displayCube()
 
     def displayCube(self):
-        #print("displayCube")
-        #self.my_cube_3d.buildFaces()        
+        screen,ft_sz,x_scale,y_scale= getDisplayParams()
         self.my_cube_3d.displayCube()
         self.my_cube_3d.displayLayer("RIGHT",2, -120, -110)
         self.my_cube_3d.displayLayer("UP",2, -156, 295)
         self.my_cube_3d.displayLayer("FRONT",2, 360, -110)
+        center = [(b.current.x,b.current.y,b.current.z,b.colors)
+            for b in self.my_cube_3d.cube.blocks if 
+            abs(b.current.x)+abs(b.current.y)+abs(b.current.z) == 1]
+        c = [[c for c in x[3] if c != "-"] for x in center if x[1] == 1][0][0]
+        if c == "b":
+            printText(screen,"U", "arial", ft_sz, x_scale*390, y_scale*220, white)
+        else:
+            printText(screen,"U", "arial", ft_sz, x_scale*390, y_scale*220, black)
+
+        c = [[c for c in x[3] if c != "-"] for x in center if x[1] == -1][0][0]
+        if c == "b":
+            printText(screen,"D", "arial", ft_sz, x_scale*120, y_scale*600, white)
+        else:
+            printText(screen,"D", "arial", ft_sz, x_scale*120, y_scale*600, black)
+
+        c = [[c for c in x[3] if c != "-"] for x in center if x[0] == -1][0][0]
+        if c == "b":
+            printText(screen,"F", "arial", ft_sz, x_scale*290, y_scale*390, white)
+        else:
+            printText(screen,"F", "arial", ft_sz, x_scale*290, y_scale*390, black)
+
+        c = [[c for c in x[3] if c != "-"] for x in center if x[0] == 1][0][0]
+        if c == "b":        
+            printText(screen,"B", "arial", ft_sz, x_scale*690, y_scale*90, white)
+        else:
+            printText(screen,"B", "arial", ft_sz, x_scale*690, y_scale*90, black)
+
+        c = [[c for c in x[3] if c != "-"] for x in center if x[2] == -1][0][0]
+        if c == "b":
+            printText(screen,"R", "arial", ft_sz, x_scale*500, y_scale*400, white)
+        else:
+            printText(screen,"R", "arial", ft_sz, x_scale*500, y_scale*400, black)
+
+        c = [[c for c in x[3] if c != "-"] for x in center if x[2] == 1][0][0]
+        if c == "b":
+            printText(screen,"L", "arial", ft_sz, x_scale*95, y_scale*93, white)
+        else:
+            printText(screen,"L", "arial", ft_sz, x_scale*95, y_scale*93, black)
     
     def singleRotate(self,action):
         reverse = False
@@ -89,7 +126,7 @@ class CubePlayground:
         
     def cancelBrush(self):
         screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        msg = ""	
+        msg = ""    
         if len(self.his_colors) > 0:
             b,i,c = self.his_colors.pop(-1)
             b.colors[i] = c
@@ -99,7 +136,7 @@ class CubePlayground:
             self.brush_copy = 0
             msg = u"取消全部设置"
         printMsg(msg)
-		
+        
     def cancel(self,dumy):
         if self.brush_copy == 1:
             self.cancelBrush() 
@@ -180,7 +217,7 @@ class CubePlayground:
                 self.brush_copy = 0
                 msg = u"颜色设置完成"
         printMsg(msg)
-				
+                
     def nextPage(self,flag):
         if self.current_page < self.total_page:
             self.current_page += 1
@@ -189,7 +226,6 @@ class CubePlayground:
             self.current_page -= 1
     
     def displayRotation(self):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
         if self.rotating:
             self.rotate_angle = self.rotate_angle + 6
             self.my_cube_3d.rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize,self.rotate_angle)
@@ -200,12 +236,6 @@ class CubePlayground:
             self.cube().rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize)
             self.rebuild()
             self.displayCube()
-            printText(screen,"U", "arial", ft_sz, x_scale*390, y_scale*220, black)
-            printText(screen,"F", "arial", ft_sz, x_scale*290, y_scale*390, black)
-            printText(screen,"R", "arial", ft_sz, x_scale*500, y_scale*400, black)
-            printText(screen,"B", "arial", ft_sz, x_scale*690, y_scale*90, black)
-            printText(screen,"L", "arial", ft_sz, x_scale*95, y_scale*93, black)
-            printText(screen,"D", "arial", ft_sz, x_scale*120, y_scale*600, black)
             self.rotating = False
             self.rotate_angle = 0
 
@@ -243,13 +273,13 @@ class CubePlayground:
                  ["U","U'","u"],["u'","D","D'"],["x","x'","y"],["y'","z","z'"],
                  ["M","M'","l"],["d","d'","l'"],["b","b'","'|'"]]
 
-        b_x = x_scale*650; b_y = y_scale*240; b_h = y_scale*30
+        b_x = x_scale*660; b_y = y_scale*240; b_h = y_scale*30
         #显示标准旋转按钮
         for bs in b_map:
             for b in bs:
                 button(screen, b, ft_sz, b_x, b_y, x_scale*40,b_h,green,red,self.singleRotate,b)
                 b_x += x_scale*50
-            b_y += y_scale*40; b_x = x_scale*650
+            b_y += y_scale*40; b_x = x_scale*660
                      
         #显示设置颜色块
         b_map = ["r","b","g","o","y","w"]
@@ -298,4 +328,4 @@ class CubePlayground:
 
     def rebuild(self):
         return self.my_cube_3d.buildFaces()
-		
+        

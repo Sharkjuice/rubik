@@ -33,7 +33,7 @@ if __name__ == "__main__":
     #最外面的框
     pygame.draw.rect(screen,(128,128,128),(0,0,scn_w-1,scn_h-1),2)
     #竖分割线
-    pygame.draw.line(screen,(128,128,128),(x_scale*800,0),(x_scale*800,y_scale*680),2)
+    pygame.draw.line(screen,(128,128,128),(x_scale*810,0),(x_scale*810,y_scale*680),2)
     #底部横线
     pygame.draw.line(screen,(128,128,128),(x_scale*210,y_scale*680),(scn_w-2,y_scale*680),2)
     #底部竖线

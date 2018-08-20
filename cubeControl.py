@@ -17,7 +17,7 @@ p_map = {
 }
 
 screen,ft_sz,x_scale,y_scale= getDisplayParams()
-right_x = x_scale*820
+right_x = x_scale*822
 right_y = y_scale*5
 right_w = x_scale*528
 right_h = y_scale*675
@@ -152,8 +152,8 @@ class CubeControl:
         if self.right_panel != "snapshot":
             self.right_panel = "snapshot"
             screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(x_scale*820,
-                y_scale*5,x_scale*538,y_scale*675))    
+            pygame.draw.rect(screen,background,(right_x,
+                right_y,right_w,right_h))    
     
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_playground.cube())

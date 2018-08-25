@@ -6,7 +6,7 @@ from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
         getDisplayParams,background,black,green,gray,\
         red,colors_r,colors_n,colors
 from cubeCommon import button,printText,printLeft,\
-	printHint,printRight
+    printHint,printRight
 from macroParse import parseAdvice
 
 #0: init;1:bottom center ok;2:bottom edge ok;3 bottom corner ok
@@ -16,11 +16,13 @@ p_map = {
 "F2CP":[0,1,2,4,5,6]
 }
 
-screen,ft_sz,x_scale,y_scale= getDisplayParams()
-right_x = x_scale*822
-right_y = y_scale*5
-right_w = x_scale*528
-right_h = y_scale*675
+def clearRight():
+    screen,ft_sz,x_scale,y_scale= getDisplayParams()
+    right_x = x_scale*822
+    right_y = y_scale*5
+    right_w = x_scale*528
+    right_h = y_scale*675
+    pygame.draw.rect(screen,background,rightPanelRect())    
 
 class CubeControl:
     def __init__(self, init_count, his_count,auto_level=2):
@@ -46,12 +48,18 @@ class CubeControl:
         printLeft(u"当前解题方法是" + self.resolve_method + u"法")
         printHint(u"下一步提示")
 
+    def clearRight(self):
+        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        right_x = x_scale*820
+        right_y = y_scale*5
+        right_w = x_scale*528
+        right_h = y_scale*675
+        pygame.draw.rect(screen,background,
+			(right_x,right_y,right_w,right_h))    
     #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
     def save(self,flag=1):
         if self.right_panel != "library":
-            screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(right_x,
-                right_y,right_w,right_h))    
+            self.clearRight() 
             self.right_panel = "library"
     
         msg = self.save2()
@@ -59,7 +67,7 @@ class CubeControl:
         
     def save2(self,flag=1,figure=0):
         return self.my_library.saveCube(self.my_playground.cube(),
-			flag, figure)            
+            flag, figure)            
             
     def load(self,dumy):
         self.his_actions = []
@@ -119,13 +127,14 @@ class CubeControl:
 #进阶到下一个阶段
     def next(self,dummy):
         msg = ""
+        current_stage = p_map[self.resolve_method][self.current_level]
         self.current_level += 1
         if self.current_level >= len(p_map[self.resolve_method]):
-            msg = "魔方已经完全解决"
+            printLeft("魔方已经完全解决")
             return
         next_stage = p_map[self.resolve_method][self.current_level]
         auto_actions = []       
-        while self.stage < next_stage:
+        while current_stage < next_stage:
             for a in auto_actions:
                 face = a_map[a]["face"]
                 layer = a_map[a]["layer"]
@@ -133,27 +142,24 @@ class CubeControl:
                 self.my_playground.cube().rotateCube(face,layer,clockwize)
             advice = self.hint2()
             auto_actions = parseAdvice(advice.get("h",""))
+            current_stage = advice.get("s",current_stage)
             if auto_actions == "":
                 break
         self.his_actions = []
         self.advice = ""
+        self.my_playground.rebuild()
         self.my_playground.displayCube()   
-        printLeft(msg)
 
     def help(self,dumy):
         if self.right_panel != "help":
-            screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(right_x,
-                right_y,right_w,right_h))    
+            self.clearRight() 
             self.right_panel = "help"
             self.my_tutorial.nextOrPrevious(0)
 
     def snapshot(self,dumy): 
         if self.right_panel != "snapshot":
             self.right_panel = "snapshot"
-            screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(right_x,
-                right_y,right_w,right_h))    
+            self.clearRight() 
     
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_playground.cube())
@@ -274,7 +280,7 @@ class CubeControl:
             right = self.my_snapshot
         elif self.right_panel == "library":
             right = self.my_library
-				
+                
         for sn_b in right.blocks():       
             if  sn_b.mark != "-":
                 sn_b.mark = "-"
@@ -291,9 +297,7 @@ class CubeControl:
         
     def library(self,level):
         if self.right_panel != "library":
-            screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(right_x,
-                right_y,right_w,right_h))    
+            self.clearRight() 
             self.right_panel = "library"
             self.my_library.selectSnapshot()
 
@@ -304,12 +308,11 @@ class CubeControl:
         
     def quitz(self,dummy):
         if self.right_panel != "library":
-            screen,ft_sz,x_scale,y_scale= getDisplayParams()
-            pygame.draw.rect(screen,background,(right_x,
-                right_y,right_w,right_h))    
             self.right_panel = "library"
+            self.clearRight()
         l = math.ceil(random.random() * 4)
         self.my_library.setLevel(l)
+        self.current_level = l
         total = self.my_library.getTotal()
         r = int(random.random() * total)
         self.my_library.selectSnapshot(r)

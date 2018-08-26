@@ -60,7 +60,8 @@ class CubeLibrary:
     def saveCube(self,cube,flag,figure=0):
         if figure != 0:#此图案已经存在，就不保存了。
             if figure in [item[1] for item in self.snapshots]:
-               return u"已经有相同的魔方存在，不能保存"
+                printLeft(u"已经有相同的魔方存在，不能保存")
+                return
         if flag == 0:#临时存放，为了调用规则引擎
             fo = open(".\\mycube.clp", "w", 1)
         else:
@@ -77,6 +78,7 @@ class CubeLibrary:
             fo = open(self.snapshots_dir + "mycube_" + str(self.next_index) + ".clp", "w", 1)
             self.takeSnapshot(cube)
             self.setCurrent(self.getTotal())
+            printLeft(u"保存为第" + str(self.total) + "份快照")
             
         fo.write("(defrule start-up =>\n")
         for block in cube.blocks:
@@ -85,11 +87,12 @@ class CubeLibrary:
             fo.write(block_str)
         fo.write("\n(assert (phase 0)))")
         fo.close()
-        return u"保存为第" + str(self.total) + "份快照"
+        return
 
     def deleteSnapshot(self):  
         if self.lib_level > 0:
-            return u"不能删除非自定义题库里的题目"    
+            printLeft(u"不能删除非自定义题库里的题目")
+            return     
         if self.total == 0 or self.current == 0:
             return
         os.remove(self.snapshots_dir +  self.snapshots[self.current-1][0])
@@ -122,6 +125,8 @@ class CubeLibrary:
             self.my_cube_3d.cube = copy.deepcopy(cube)              
             self.my_cube_3d.buildFaces()
             self.displayCube()
+            printLeft(u"选择了第" + str(self.current) + "份快照")
+
             
     def setCurrent(self,c):
         if self.total == 0:

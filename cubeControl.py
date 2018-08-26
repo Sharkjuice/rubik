@@ -31,7 +31,7 @@ class CubeControl:
         self.right_panel = "library"
 
         self.gameExit = False
-        self.current_level = 0
+        self.current_level = -1
         self.dk_count = 0
         self.dk_time = 0
 
@@ -62,11 +62,10 @@ class CubeControl:
             self.clearRight() 
             self.right_panel = "library"
     
-        msg = self.save2()
-        printLeft(msg)
+        self.save2()
         
     def save2(self,flag=1,figure=0):
-        return self.my_library.saveCube(self.my_playground.cube(),
+        self.my_library.saveCube(self.my_playground.cube(),
             flag, figure)            
             
     def load(self,dumy):
@@ -126,7 +125,8 @@ class CubeControl:
                 break
 #进阶到下一个阶段
     def next(self,dummy):
-        msg = ""
+        if self.current_level == -1:
+            self.current_level = self.my_library.lib_level
         current_stage = p_map[self.resolve_method][self.current_level]
         self.current_level += 1
         if self.current_level >= len(p_map[self.resolve_method]):
@@ -148,7 +148,8 @@ class CubeControl:
         self.his_actions = []
         self.advice = ""
         self.my_playground.rebuild()
-        self.my_playground.displayCube()   
+        self.my_playground.displayCube() 
+        self.current_level = -1		
 
     def help(self,dumy):
         if self.right_panel != "help":

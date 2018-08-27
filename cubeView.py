@@ -2,9 +2,9 @@
 import sys, math, pygame
 from operator import itemgetter
 import cubeModel
-from cubeGlobal import block_v, cube_o,faces,colors,background,\
-	getDisplayParams
+from cubeGlobal import block_v, cube_o,faces,colors,background
 from cubeCommon import printText
+from cubePanel import Panel
 
 #在侧边显示后、下、左三面的信息
 l_map = {"FRONT":{"FACE":1}, "UP":{"FACE":5},"RIGHT":{"FACE":2}}
@@ -80,19 +80,19 @@ class Block3D:
         
 class Cube3D:
     def __init__(self, cube,width, height, fov, distance,x_adj,y_adj):
-        screen,_,x_scale,y_scale= getDisplayParams()
+        self.screen,self.x_scale,self.y_scale = \
+		 Panel.screen,Panel.x_scale,Panel.y_scale
         self.cube = cube
         self.blocks = []
         self.alpha = -45
         self.gama = -30
         self.beta = 0
-        self.width = x_scale*width
-        self.height = y_scale*height
-        self.fov = (x_scale+y_scale)*fov/2
+        self.width = self.x_scale*width
+        self.height = self.y_scale*height
+        self.fov = (self.x_scale+self.y_scale)*fov/2
         self.distance = distance
-        self.x_adj = x_scale*x_adj
-        self.y_adj = y_scale*y_adj
-        self.screen,self.x_scale,self.y_scale = screen,x_scale,y_scale
+        self.x_adj = self.x_scale*x_adj
+        self.y_adj = self.y_scale*y_adj
 
     def buildFaces(self):
         self.blocks = []
@@ -205,14 +205,14 @@ class Cube3D:
                 pointlist = [(t[f[0]].x, t[f[0]].y), (t[f[1]].x, t[f[1]].y),
                          (t[f[2]].x, t[f[2]].y), (t[f[3]].x, t[f[3]].y)]
                 
-                pygame.draw.polygon(self.screen,c,pointlist)
-                pygame.draw.polygon(self.screen,(0,0,0),pointlist,2)
+                pygame.draw.polygon(Panel.screen,c,pointlist)
+                pygame.draw.polygon(Panel.screen,(0,0,0),pointlist,2)
 				
                 if  self.blocks[b_i].mark != "-":
                     if c == (0,0,255):#蓝色的块，要先是白色的字，不然看不清
-                        printText(self.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (255,255,255))
+                        printText(Panel.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (255,255,255))
                     else:
-                        printText(self.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (0,0,0))
+                        printText(Panel.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (0,0,0))
 					
     def hitBlock(self,x,y):
         for b in self.blocks:

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-  
 import pygame,copy
 import cubeView,cubeModel
-from cubeCommon import button,printText,printRight
+from cubeCommon import button,printText
 from cubeGlobal import background,screen,green,black,\
-	 gray,colors,getDisplayParams
+	 colors
+from cubePanel import Panel
 
 #显示魔方区域的高度和宽度
 height = 500
@@ -37,11 +38,7 @@ class CubeSnapshot:
         self.my_cube_3d.displayLayer("RIGHT",2, 180,-70)
         self.my_cube_3d.displayLayer("UP",2, 160, 260)
         self.my_cube_3d.displayLayer("FRONT",2, 480, -70)
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        b_x = x_scale*1160
-        b_y = y_scale*640
-        b_h = y_scale*30
-        printRight("快照窗口")
+        Panel.printRight("快照窗口")
 
     def cube(self):
         return self.my_cube_3d.cube 

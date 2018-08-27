@@ -137,20 +137,10 @@ black = (0,0,0)
 #按钮颜色
 green = (0,255,0)
 red = (240,0,0)
-#文本框背景颜色
-gray = (128,128,128)
 #在蓝色背景上的字体颜色
 white = (255,255,255)
 
 ft_sz = 25
 mouse_status=[0,0,0]
 
-def getDisplayParams():
-    return screen,ft_sz,x_scale,y_scale
-def setDisplayParams(scn,ft,x,y):
-    global screen,ft_sz,x_scale,y_scale
-    x_scale = x
-    y_scale = y
-    screen = scn
-    ft_sz = int(ft*x_scale)
     

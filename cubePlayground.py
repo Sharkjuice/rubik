@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-  
 import pygame,sys,time,copy,random,subprocess
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,cubeLibrary
-from cubeGlobal import mouse_status,m_map,a_map,cube_o,getDisplayParams,\
-    background,black,green,gray,white,red,colors_r,colors_n,colors
-from cubeCommon import button,printText,printLeft
+from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
+    background,black,green,white,red,colors_r,colors_n,colors
+from cubeCommon import button,printText
 from macroParse import parseAdvice
+from cubePanel import Panel
 
 #显示魔方区域的高度和宽度
 height = 768
@@ -50,7 +51,8 @@ class CubePlayground:
         self.displayCube()
 
     def displayCube(self):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        screen,ft_sz,x_scale,y_scale= Panel.screen, \
+		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
         self.my_cube_3d.displayCube()
         self.my_cube_3d.displayLayer("RIGHT",2, -120, -110)
         self.my_cube_3d.displayLayer("UP",2, -156, 295)
@@ -118,15 +120,13 @@ class CubePlayground:
                     self.his_actions.pop(0)
                     self.his_actions.append(action)
         msg = "".join(self.his_actions)
-        printLeft(msg)
+        Panel.printLeft(msg)
         return True
 
     def macroRotate(self,macro):
         self.auto_actions = parseAdvice(macro) 
         
     def cancelBrush(self):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        msg = ""    
         if len(self.his_colors) > 0:
             b,i,c = self.his_colors.pop(-1)
             b.colors[i] = c
@@ -134,8 +134,7 @@ class CubePlayground:
             self.my_cube_3d.displayCube()
         else:
             self.brush_copy = 0
-            msg = u"取消全部设置"
-        printMsg(msg)
+            Panel.printLeft(u"取消全部设置")
         
     def cancel(self,dumy):
         if self.brush_copy == 1:
@@ -146,8 +145,7 @@ class CubePlayground:
             self.singleRotate(None)    
         
     def detectAction(self,block,face,start,end):
-        _, _, x_scale,_ = getDisplayParams()
-        motion_sz = 50*x_scale      
+        motion_sz = 50*Panel.x_scale      
         rel_y = end[1] - start[1]
         rel_x = end[0] - start[0]
         dir = "-"
@@ -175,11 +173,10 @@ class CubePlayground:
         return cube_o[block][1][face].get(dir,"-")
         
     def selectColor(self,c):
-        msg = ""
         self.brush_color = c
         self.brush_copy = 1
-        msg = u"选择色块，双击魔方设置颜色。当前选中:" + colors_n[self.brush_color]
-        printMsg(msg)
+        Panel.printLeft(u"选择色块，双击魔方设置颜色。当前选中:" 
+                                   + colors_n[self.brush_color])
 
     def brushColor(self,b,f):
         if self.brush_color != "-":
@@ -208,15 +205,13 @@ class CubePlayground:
             self.my_cube_3d.displayCube()
 
     def endBrush(self,dumy):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        msg = ""
         if self.brush_copy == 1:
             if not self.my_cube_3d.cube.validateCube():
                 msg = u"颜色设置没有完成，请继续完成设置！"
             else:
                 self.brush_copy = 0
                 msg = u"颜色设置完成"
-        printMsg(msg)
+            Panel.printLeft(msg)
                 
     def nextPage(self,flag):
         if self.current_page < self.total_page:
@@ -245,7 +240,8 @@ class CubePlayground:
                 self.singleRotate(action)
     
     def displayButtons(self):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        screen,ft_sz,x_scale,y_scale= Panel.screen, \
+		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
 
         #显示宏按钮
         b_x = x_scale*10; b_y = y_scale*240; b_h = y_scale*30
@@ -256,13 +252,13 @@ class CubePlayground:
             b_y += y_scale*40;
         if self.current_page == 0:
             button(screen,"<<",ft_sz,b_x, b_y, x_scale*50,b_h,
-                gray,red, self.prevPage,"X")
+                Panel.gray,red, self.prevPage,"X")
         else:
             button(screen,"<<",ft_sz,b_x, b_y, x_scale*50,b_h,
                 green,red, self.prevPage,"X")
         if self.current_page == self.total_page:    
             button(screen,">>",ft_sz,b_x + x_scale*70, b_y, x_scale*50,b_h,
-                gray,red,self.nextPage,"X")
+                Panel.gray,red,self.nextPage,"X")
         else:            
             button(screen,">>",ft_sz,b_x + x_scale*70, b_y, x_scale*50,b_h,
                 green,red,self.nextPage,"X")

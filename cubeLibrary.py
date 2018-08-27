@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-  
 import pygame,copy,math,os
-from cubeGlobal import background,screen,green,black,\
-    red,gray,colors,getDisplayParams
-from cubeCommon import button,printLeft,printRight
+from cubeGlobal import background,green,black,\
+    red,colors
+from cubeCommon import button
+from cubePanel import Panel
 import cubeView,cubeModel
 
 #显示魔方区域的高度和宽度
@@ -17,7 +18,7 @@ adj_y = 50
 s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2L题库",3:u"OLL题库",4:u"PLL题库"}
 
 class CubeLibrary:
-    def __init__(self,cube):
+    def __init__(self,cube,init_level=0):
         global height,width,fov,distance,adj_x,adj_y
         self.total =  0
         self.total_page = 0
@@ -25,7 +26,7 @@ class CubeLibrary:
         self.current_page = -1
         self.next_index = 0
         self.snapshots = []
-        self.lib_level = 0  
+        self.lib_level = init_level 
         self.my_cube_3d = cubeView.Cube3D(cube,width, 
             height, fov, distance, adj_x, adj_y)
         self.snapshots_dir = ".\\snapshots_0\\"
@@ -91,7 +92,7 @@ class CubeLibrary:
 
     def deleteSnapshot(self):  
         if self.lib_level > 0:
-            printLeft(u"不能删除非自定义题库里的题目")
+            Panel.printLeft(u"不能删除非自定义题库里的题目")
             return     
         if self.total == 0 or self.current == 0:
             return
@@ -112,7 +113,7 @@ class CubeLibrary:
         if self.total == 0:
             return      
         if b != None:#default select current， which is default to 0
-            self.current = b
+            self.setCurrent(b)
         fo = open(self.snapshots_dir + self.snapshots[self.current-1][0], "r", 1)
         blocks = []
         if fo != None:
@@ -125,7 +126,7 @@ class CubeLibrary:
             self.my_cube_3d.cube = copy.deepcopy(cube)              
             self.my_cube_3d.buildFaces()
             self.displayCube()
-            printLeft(u"选择了第" + str(self.current) + "份快照")
+            Panel.printLeft(u"选择了第" + str(self.current) + "份快照")
 
             
     def setCurrent(self,c):
@@ -160,7 +161,8 @@ class CubeLibrary:
             self.current_page -= 1
             
     def displayHeader(self):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        screen,ft_sz,x_scale,y_scale= Panel.screen, \
+		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
         b_x = x_scale*820
         b_y = y_scale*10
         b_h = y_scale*30
@@ -175,24 +177,31 @@ class CubeLibrary:
             if self.current_page == self.total_page:
                 stop1 = self.total
         if self.current_page == 1:
-            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,b_h,gray,red,None,-1)
+            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,
+								b_h, Panel.gray, red,None,-1)
         else:
-            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,b_h,green,red,self.prevPage,-1)
+            button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,
+			                  b_h,green,red,self.prevPage,-1)
         b_x += x_scale*40
 
         for b in range(start,stop1):
             if (b + 1) == self.current:     
-                button(screen, str(b+1), ft_sz, b_x, b_y, x_scale*30,b_h,red,red,self.selectSnapshot,b+1)
+                button(screen, str(b+1), ft_sz, b_x, b_y, 
+					   x_scale*30,b_h,red,red,self.selectSnapshot,b+1)
             else:
-                button(screen, str(b+1), ft_sz, b_x, b_y, x_scale*30,b_h,green,red,self.selectSnapshot,b+1)
+                button(screen, str(b+1), ft_sz, b_x, b_y,
+				       x_scale*30,b_h,green,red,self.selectSnapshot,b+1)
             b_x += x_scale*40
         for b in range(stop1, stop2):
-            button(screen, "", ft_sz, b_x, b_y, x_scale*30,b_h,gray,red,None,b+1)
+            button(screen, "", ft_sz, b_x, b_y, x_scale*30,
+			       b_h,Panel.gray,red,None,b+1)
             b_x += x_scale*40
         if self.current_page == self.total_page:
-            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,gray,red,None,1)
+            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,
+			       b_h,Panel.gray,red,None,1)
         else:
-            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,b_h,green,red,self.nextPage,1)
+            button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,
+			       b_h,green,red,self.nextPage,1)
 
         #显示控制按钮
         b_map = [("自定",self.level,0),("十字",self.level,1),("F2L",self.level,2),
@@ -204,7 +213,7 @@ class CubeLibrary:
         for b in b_map:
             button(screen, b[0], ft_sz, b_x, b_y, x_scale*60,b_h,green,red,b[1],b[2])
             b_x += x_scale*70
-        printRight(s_map[self.lib_level])
+        Panel.printRight(s_map[self.lib_level])
         
     def takeSnapshot(self,cube):
         self.my_cube_3d.cube = copy.deepcopy(cube)
@@ -225,7 +234,7 @@ class CubeLibrary:
         self.lib_level = value
         self.snapshots_dir = ".\\snapshots_" + str(value) + "\\"
         self.build()
-        printRight(s_map[self.lib_level])
+        Panel.printRight(s_map[self.lib_level])
 
     def cube(self):
         return self.my_cube_3d.cube 

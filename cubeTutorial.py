@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-  
 import pygame
 from cubeGlobal import background,green,red,\
-	white,colors,getDisplayParams
+	white,colors
 from cubeCommon import button,printText
+from cubePanel import Panel
 steps = [
 {"step":u"前提", "title":u"基本常识",
 "text":[
@@ -282,7 +283,8 @@ class CubeTutorial:
             i += 1
 
     def displayHeader(self):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        screen,ft_sz,x_scale,y_scale= Panel.screen, \
+		     Panel.ft_sz, Panel.x_scale, Panel.y_scale
         step = steps[self.currentStep]["step"]
         b_x = x_scale*820
         b_y = y_scale*10
@@ -298,7 +300,8 @@ class CubeTutorial:
         button(screen,">>",ft_sz,b_x,b_y,x_scale*40,b_h,green,red,self.nextOrPrevious,1)
 
     def displayTutorial(self):
-        screen,ft_sz,x_scale,y_scale= getDisplayParams()
+        screen,ft_sz,x_scale,y_scale= Panel.screen, \
+		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
 		
         step = steps[self.currentStep]["step"]
         title = steps[self.currentStep]["title"]

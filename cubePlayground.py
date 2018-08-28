@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-  
-import pygame,sys,time,copy,random,subprocess
+import pygame,time
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,cubeLibrary
 from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
-    background,black,green,white,red,colors_r,colors_n,colors
+    black,green,white,red,colors_r,colors_n,colors
 from cubeCommon import button,printText
 from macroParse import parseAdvice
 from cubePanel import Panel
@@ -281,8 +281,8 @@ class CubePlayground:
         b_map = ["r","b","g","o","y","w"]
         b_x = x_scale*230; b_y = y_scale*10; b_h = y_scale*30
         for b in b_map:
-            button(screen, "", ft_sz, b_x, b_y, x_scale*40,b_h,
-                colors[b],red,self.selectColor,b)
+            button(screen, "", ft_sz, b_x, b_y, x_scale*40,b_h,                
+				              colors[b],red,self.selectColor,b)
             b_x += x_scale*50
             
         button(screen,u"完成",ft_sz, b_x, b_y, x_scale*60, b_h,

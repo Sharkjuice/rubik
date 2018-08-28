@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-  
-import pygame,copy
-import cubeView,cubeModel
+import copy
+import cubeView
 from cubeCommon import button,printText
-from cubeGlobal import background,screen,green,black,\
-	 colors
 from cubePanel import Panel
 
 #显示魔方区域的高度和宽度

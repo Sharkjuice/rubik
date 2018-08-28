@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*- 
-import sys, math, pygame
+import math, pygame
 from operator import itemgetter
-import cubeModel
-from cubeGlobal import block_v, cube_o,faces,colors,background
+from cubeGlobal import cube_o,faces,colors,background
 from cubeCommon import printText
 from cubePanel import Panel
+
+#0,1,2,3为正面的4个点， 4,5,6,7位背面的4个点
+block_v = [(x,y,z) for z in (-0.5,0.5) for y in 
+	(0.5,-0.5) for x in (-0.5,0.5)]
 
 #在侧边显示后、下、左三面的信息
 l_map = {"FRONT":{"FACE":1}, "UP":{"FACE":5},"RIGHT":{"FACE":2}}

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-  
-import pygame,sys,time,copy,random,subprocess,math
+import pygame,time,copy,random,subprocess,math
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,\
         cubeLibrary,cubePlayground
-from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
+from cubeGlobal import mouse_status,m_map,a_map,\
         background,black,green,red,colors_r,colors_n,colors
 from cubeCommon import button,printText
 from macroParse import parseAdvice
@@ -293,7 +293,7 @@ class CubeControl:
     def quitz(self,dummy):
         if self.right_panel != "library":
             self.right_panel = "library"
-            self.clearRight()
+            Panel.clearRight()
         l = math.ceil(random.random() * 4)
         self.my_library.setLevel(l)
         self.current_level = l

@@ -1,6 +1,20 @@
 # -*- coding: utf-8 -*-  
-import cubeGlobal
-import pdb
+from cubeGlobal import faces
+#x轴：水平向右；y轴：垂直向上；z轴：向屏幕里面，圆心在魔方中心块
+cube_i = [
+    ((-1, -1, -1), "rwg"), ((-1, 0, -1), "r-g"), ((-1, 1, -1), "ryg"), 
+    ((-1, -1,0), "rw-"), ((-1, 0, 0), "r--"), ((-1, 1, 0), "ry-"), 
+    ((-1, -1, 1), "rwo"), ((-1, 0, 1), "r-o"), ((-1, 1, 1), "ryo"),
+    
+    ((0, -1, -1), "-wg"), ((0, 0, -1), "--g"), ((0, 1, -1), "-yg"), 
+    ((0, -1, 0), "-w-"), ((0, 0, 0), "---"), ((0, 1, 0), "-y-"), 
+    ((0, -1, 1), "-wo"), ((0, 0, 1), "--o"), ((0, 1, 1), "-yo"),
+
+    ((1, -1, -1), "bwg"), ((1, 0, -1), "b-g"), ((1, 1, -1), "byg"), 
+    ((1, -1, 0), "bw-"), ((1, 0, 0), "b--"), ((1, 1, 0), "by-"), 
+    ((1, -1, 1), "bwo"), ((1, 0, 1), "b-o"), ((1, 1, 1), "byo")
+]
+
 class Point:
     def __init__(self, x, y, z):
         self.x,self.y,self.z = x,y,z
@@ -23,7 +37,7 @@ class Block:
         
      
 class Cube:
-    def __init__(self, cube = cubeGlobal.cube_i):
+    def __init__(self, cube = cube_i):
         self.blocks = []
         for aBlock in cube:
             block = Block(aBlock[0][0],aBlock[0][1],aBlock[0][2],aBlock[1])
@@ -80,7 +94,7 @@ class Cube:
         r_map = {"FRONT":self.rotateX,"RIGHT":self.rotateZ,"UP":self.rotateY}
         blocks = [item for item in self.blocks if  
                 (item.current.x, item.current.y, item.current.z)
-                in cubeGlobal.faces[face][layer]]
+                in faces[face][layer]]
         for b in blocks:
             r_map[face](b,clockwize)          
 

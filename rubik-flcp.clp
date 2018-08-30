@@ -323,12 +323,12 @@
 (defrule confirm-oll-phase
 	?f <- (phase 2)
 	(forall
-	(block (id ?id2) (type edge) (layer 2))
-	(facelet (id ?id2) (type V1) (side ?s2)(color ?c2))
-	(facelet (id ?id2) (type V2) (side ?s3)(color ?c3))
-	(face ?s2 ?c2)
-	(face ?s3 ?c3)
-	)
+	(block (id ?id1) (type edge) (layer 2))
+	(block (id ?id1) (status ok)))
+
+	(forall
+	(block (id ?id2) (type corner) (layer 1))
+	(block (id ?id2) (status ok)))
 	=>
 	(printout t "#confirm phase oll" crlf)
 	(assert (phase 4))

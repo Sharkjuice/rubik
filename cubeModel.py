@@ -34,7 +34,6 @@ class Block:
         self.current = Point(x,y,z) 
         self.origin = Point(x,y,z)
         self.colors = [c for c in colors]
-        
      
 class Cube:
     def __init__(self, file=None):

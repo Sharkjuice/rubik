@@ -43,10 +43,8 @@ class CubePlayground:
         self.rotate_clockwize = 1
 
         #初始化数据模型
-        my_cube = cubeModel.Cube()
-       
         self.my_cube_3d = cubeView.Cube3D(my_cube,width, 
-            height, fov, distance,adj_x,adj_y)
+                      height, fov, distance,adj_x,adj_y)
         self.my_cube_3d.buildFaces()
         self.displayCube()
 

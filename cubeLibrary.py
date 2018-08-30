@@ -61,7 +61,7 @@ class CubeLibrary:
     def saveCube(self,cube,flag,figure=0):
         if figure != 0:#此图案已经存在，就不保存了。
             if figure in [item[1] for item in self.snapshots]:
-                printLeft(u"已经有相同的魔方存在，不能保存")
+                Panel.printLeft(u"已经有相同的魔方存在，不能保存")
                 return
         if flag == 0:#临时存放，为了调用规则引擎
             fo = open(".\\mycube.clp", "w", 1)
@@ -79,7 +79,7 @@ class CubeLibrary:
             fo = open(self.snapshots_dir + "mycube_" + str(self.next_index) + ".clp", "w", 1)
             self.takeSnapshot(cube)
             self.setCurrent(self.getTotal())
-            printLeft(u"保存为第" + str(self.total) + "份快照")
+            Panel.printLeft(u"保存为第" + str(self.total) + "份快照")
             
         fo.write("(defrule start-up =>\n")
         for block in cube.blocks:
@@ -114,21 +114,12 @@ class CubeLibrary:
             return      
         if b != None:#default select current， which is default to 0
             self.setCurrent(b)
-        fo = open(self.snapshots_dir + self.snapshots[self.current-1][0], "r", 1)
-        blocks = []
-        if fo != None:
-            for line in fo.readlines():
-                b = line.strip("(\n)").split(" ")
-                if b[0] == "assert" and b[1] == "(blk":
-                    blocks.append(((int(b[2]),int(b[3]),int(b[4])),"".join([b[5],b[6],b[7]])))
-            fo.close()
-            cube = cubeModel.Cube(blocks)
-            self.my_cube_3d.cube = copy.deepcopy(cube)              
-            self.my_cube_3d.buildFaces()
-            self.displayCube()
-            Panel.printLeft(u"选择了第" + str(self.current) + "份快照")
+        file = self.snapshots_dir + self.snapshots[self.current-1][0]
+        self.my_cube_3d.cube = cubeModel.Cube(file)              
+        self.my_cube_3d.buildFaces()
+        self.displayCube()
+        Panel.printLeft(u"选择了第" + str(self.current) + "份快照")
 
-            
     def setCurrent(self,c):
         if self.total == 0:
             return      
@@ -162,7 +153,7 @@ class CubeLibrary:
             
     def displayHeader(self):
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
-		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
+             Panel.ft_sz,Panel.x_scale,Panel.y_scale
         b_x = x_scale*820
         b_y = y_scale*10
         b_h = y_scale*30
@@ -178,30 +169,30 @@ class CubeLibrary:
                 stop1 = self.total
         if self.current_page == 1:
             button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,
-								b_h, Panel.gray, red,None,-1)
+                                b_h, Panel.gray, red,None,-1)
         else:
             button(screen, "<<", ft_sz, b_x, b_y, x_scale*30,
-			                  b_h,green,red,self.prevPage,-1)
+                              b_h,green,red,self.prevPage,-1)
         b_x += x_scale*40
 
         for b in range(start,stop1):
             if (b + 1) == self.current:     
                 button(screen, str(b+1), ft_sz, b_x, b_y, 
-					   x_scale*30,b_h,red,red,self.selectSnapshot,b+1)
+                       x_scale*30,b_h,red,red,self.selectSnapshot,b+1)
             else:
                 button(screen, str(b+1), ft_sz, b_x, b_y,
-				       x_scale*30,b_h,green,red,self.selectSnapshot,b+1)
+                       x_scale*30,b_h,green,red,self.selectSnapshot,b+1)
             b_x += x_scale*40
         for b in range(stop1, stop2):
             button(screen, "", ft_sz, b_x, b_y, x_scale*30,
-			       b_h,Panel.gray,red,None,b+1)
+                   b_h,Panel.gray,red,None,b+1)
             b_x += x_scale*40
         if self.current_page == self.total_page:
             button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,
-			       b_h,Panel.gray,red,None,1)
+                   b_h,Panel.gray,red,None,1)
         else:
             button(screen, ">>", ft_sz, b_x, b_y, x_scale*30,
-			       b_h,green,red,self.nextPage,1)
+                   b_h,green,red,self.nextPage,1)
 
         #显示控制按钮
         b_map = [("自定",self.level,0),("十字",self.level,1),("F2L",self.level,2),

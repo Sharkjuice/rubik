@@ -86,7 +86,7 @@ class Panel():
 
     @classmethod
     def clearRight(cls):
-        right_x = cls.x_scale*822
+        right_x = cls.x_scale*820
         right_y = cls.y_scale*5
         right_w = cls.x_scale*528
         right_h = cls.y_scale*675

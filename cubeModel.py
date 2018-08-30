@@ -37,10 +37,21 @@ class Block:
         
      
 class Cube:
-    def __init__(self, cube = cube_i):
+    def __init__(self, file=None):
+        cube = []
         self.blocks = []
-        for aBlock in cube:
-            block = Block(aBlock[0][0],aBlock[0][1],aBlock[0][2],aBlock[1])
+        if file == None:
+            cube = cube_i
+        else:#从文件读
+            fo = open(file, "r", 1)
+            if fo != None:
+                for line in fo.readlines():
+                    b = line.strip("(\n)").split(" ")
+                    if b[0] == "assert" and b[1] == "(blk":
+                        cube.append(((int(b[2]),int(b[3]),int(b[4])),"".join([b[5],b[6],b[7]])))
+                fo.close()
+        for b in cube:
+            block = Block(b[0][0],b[0][1],b[0][2],b[1])
             self.blocks.append(block)
  
     #沿x轴反时针转
@@ -116,7 +127,7 @@ class Cube:
             
     def validateCube(self):
         colors = {"w":0,"y":0,"r":0,"b":0,"g":0,"o":0,"-":1}
-	         		
+                    
         #map(count_colors, self.blocks)
         for b in self.blocks:
             for c in b.colors:
@@ -129,7 +140,7 @@ class Cube:
         if v != 531441:
             return False
         else:
-            return True		
+            return True     
         
   
 

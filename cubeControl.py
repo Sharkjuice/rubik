@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-  
-import pygame,time,copy,random,subprocess,math
+import pygame,time,os,copy,random,subprocess,math
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,\
         cubeLibrary,cubePlayground
 from cubeGlobal import mouse_status,m_map,a_map,\
@@ -21,7 +21,7 @@ class CubeControl:
     def __init__(self, init_count, his_count,init_level=2):
         self.init_count = init_count
         self.resolve_method = "F2CP"
-        self.right_panel = "library"
+        self.right_panel = "help"
 
         self.gameExit = False
         self.current_level = init_level
@@ -29,8 +29,12 @@ class CubeControl:
         self.dk_time = 0
 
         self.comparing = False
-        #初始化数据模型
-        my_cube = cubeModel.Cube()
+        #初始化数据模型,判断mycube.clp文件在不在，
+		#如果在，就读这个文件初始化
+        if os.path.exists("./mycube.clp"):
+            my_cube = cubeModel.Cube("./mycube.clp")
+        else:
+            my_cube = cubeModel.Cube()
         self.my_playground = cubePlayground.CubePlayground(my_cube)
         self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube)
         self.my_tutorial = cubeTutorial.CubeTutorial()       
@@ -38,7 +42,8 @@ class CubeControl:
        
     def displayAll(self):
         self.my_playground.displayCube()
-        self.my_library.selectSnapshot()
+        #self.my_library.selectSnapshot()
+        self.my_tutorial.displayTutorial()	
         Panel.printLeft(u"当前解题方法是" + self.resolve_method + u"法")
         Panel.printHint(u"下一步提示")
 
@@ -146,7 +151,7 @@ class CubeControl:
     def snapshot(self,dumy): 
         if self.right_panel != "snapshot":
             self.right_panel = "snapshot"
-            self.clearRight() 
+            Panel.clearRight() 
     
         self.comparing = False
         self.my_snapshot.takeSnapshot(self.my_playground.cube())
@@ -298,7 +303,7 @@ class CubeControl:
         self.my_library.setLevel(l)
         self.current_level = l
         total = self.my_library.getTotal()
-        r = int(random.random() * total)
+        r = math.ceil(random.random() * total)
         self.my_library.selectSnapshot(r)
         self.load(0)
         Panel.printLeft(u"当前是第" + str(r) + u"题")

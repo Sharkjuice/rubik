@@ -220,7 +220,7 @@
    (assert (face ?s ?c))
 )
 
-(defrule remove-extra-faces
+(defrule remove-extra-faces    
    ?f1 <- (facelet (side O))
    ?f2 <- (face O ?x)
    =>
@@ -384,9 +384,9 @@
 (assert (init-macro 10 align_down 8 F'))
 )
 
-(defrule init-phase-next-1
+(defrule init-phase-next-1 "edge is on layer3 and ok"
 	(phase 1)
-	(block (id ?id) (cord ?x ?y ?z) (type edge))
+	(block (id ?id) (cord ?x ?y ?z) (layer 2|3) (type edge))
 	(facelet (id ?id) (color w))
 	(facelet (id ?id) (side ?s) (pos ?p&~2) (color ?c&~w))
 	(face ?s ?c)
@@ -417,7 +417,7 @@
 	(phase 1)
 	(block (id ?id) (cord ?x ?y ?z) (layer 1|2) (type edge))
 	(facelet (id ?id) (color w))
-	(facelet (id ?id) (side ?s1) (color ?c&~w))
+	(facelet (id ?id) (side ?s1&~O) (color ?c&~w))
 	(facelet (id ?id) (type V1) (pos ?p1) (side ?s2))
 	(block (pos 1) (status ?t))
 	(not (face ?s1 ?c))

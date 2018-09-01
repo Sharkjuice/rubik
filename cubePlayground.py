@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-  
-import pygame,time
+import pygame,time,copy
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,cubeLibrary
 from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
     black,green,white,red,colors_r,colors_n,colors
@@ -316,6 +316,10 @@ class CubePlayground:
     
     def cube(self):
         return self.my_cube_3d.cube 
+   
+    def load(self,cube):
+        self.his_actions = []
+        self.my_cube_3d.cube = copy.deepcopy(cube) 
 
     def blocks(self):
         return self.my_cube_3d.blocks

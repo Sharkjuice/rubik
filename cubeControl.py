@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-  
-import pygame,time,os,copy,random,subprocess,math
+import pygame,time,os,random,subprocess,math
 import cubeModel,cubeView,cubeSnapshot,cubeTutorial,\
         cubeLibrary,cubePlayground
 from cubeGlobal import mouse_status,m_map,a_map,\
@@ -42,7 +42,6 @@ class CubeControl:
        
     def displayAll(self):
         self.my_playground.displayCube()
-        #self.my_library.selectSnapshot()
         self.my_tutorial.displayTutorial()	
         Panel.printLeft(u"当前解题方法是" + self.resolve_method + u"法")
         Panel.printHint(u"下一步提示")
@@ -60,17 +59,15 @@ class CubeControl:
             flag, figure)            
             
     def load(self,dumy):
-        self.his_actions = []
         cube = None
         if self.right_panel == "snapshot":
-            cube = copy.deepcopy(self.my_snapshot.cube())
+            cube = self.my_snapshot.cube()
         elif self.right_panel == "library":
-            cube = copy.deepcopy(self.my_library.cube())
+            cube = self.my_library.cube()
         if cube != None:
-            self.my_playground.my_cube_3d.cube = cube
+            self.my_playground.load(cube)
             self.my_playground.rebuild()            
             self.my_playground.displayCube()
-        
  
     def reset(self,dumy):
         my_cube = cubeModel.Cube()

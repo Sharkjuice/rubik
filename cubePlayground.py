@@ -13,9 +13,13 @@ width = 800
 #3D显示参数
 fov = 700
 distance = 8
-adj_x = 0
-adj_y = -30
+adj_xy = (-10, -40)
 his_count = 20
+#x,y坐标，在各面中心打印字母
+s_map = [['U',(380,210),(1, 1)], ['R',(490,380),(2, 1)],
+         ['F',(280,380),(0,-1)], ['B',(685,85), (0, 1)],
+         ['L',(90,90),  (2,-1)], ['D',(115,605),(1,-1)]
+        ]
 
 class CubePlayground:
     def __init__(self, my_cube):
@@ -44,55 +48,27 @@ class CubePlayground:
 
         #初始化数据模型
         self.my_cube_3d = cubeView.Cube3D(my_cube,width, 
-                      height, fov, distance,adj_x,adj_y)
+                      height, fov, distance,adj_xy[0],adj_xy[1])
         self.my_cube_3d.buildFaces()
         self.displayCube()
 
     def displayCube(self):
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
-		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
+             Panel.ft_sz,Panel.x_scale,Panel.y_scale
         self.my_cube_3d.displayCube()
         self.my_cube_3d.displayLayer("RIGHT",2, -120, -110)
-        self.my_cube_3d.displayLayer("UP",2, -156, 295)
+        self.my_cube_3d.displayLayer("UP",2, -150, 305	)
         self.my_cube_3d.displayLayer("FRONT",2, 360, -110)
         center = [(b.current.x,b.current.y,b.current.z,b.colors)
             for b in self.my_cube_3d.cube.blocks if 
             abs(b.current.x)+abs(b.current.y)+abs(b.current.z) == 1]
-        c = [[c for c in x[3] if c != "-"] for x in center if x[1] == 1][0][0]
-        if c == "b":
-            printText(screen,"U", "arial", ft_sz, x_scale*390, y_scale*220, white)
-        else:
-            printText(screen,"U", "arial", ft_sz, x_scale*390, y_scale*220, black)
-
-        c = [[c for c in x[3] if c != "-"] for x in center if x[1] == -1][0][0]
-        if c == "b":
-            printText(screen,"D", "arial", ft_sz, x_scale*120, y_scale*600, white)
-        else:
-            printText(screen,"D", "arial", ft_sz, x_scale*120, y_scale*600, black)
-
-        c = [[c for c in x[3] if c != "-"] for x in center if x[0] == -1][0][0]
-        if c == "b":
-            printText(screen,"F", "arial", ft_sz, x_scale*290, y_scale*390, white)
-        else:
-            printText(screen,"F", "arial", ft_sz, x_scale*290, y_scale*390, black)
-
-        c = [[c for c in x[3] if c != "-"] for x in center if x[0] == 1][0][0]
-        if c == "b":        
-            printText(screen,"B", "arial", ft_sz, x_scale*690, y_scale*90, white)
-        else:
-            printText(screen,"B", "arial", ft_sz, x_scale*690, y_scale*90, black)
-
-        c = [[c for c in x[3] if c != "-"] for x in center if x[2] == -1][0][0]
-        if c == "b":
-            printText(screen,"R", "arial", ft_sz, x_scale*500, y_scale*400, white)
-        else:
-            printText(screen,"R", "arial", ft_sz, x_scale*500, y_scale*400, black)
-
-        c = [[c for c in x[3] if c != "-"] for x in center if x[2] == 1][0][0]
-        if c == "b":
-            printText(screen,"L", "arial", ft_sz, x_scale*95, y_scale*93, white)
-        else:
-            printText(screen,"L", "arial", ft_sz, x_scale*95, y_scale*93, black)
+        
+        for s in s_map:
+            c = [[c for c in x[3] if c != "-"] for x in center if x[s[2][0]] == s[2][1]][0][0]
+            if c == "b":
+                printText(screen,s[0], "arial", ft_sz, x_scale*s[1][0], y_scale*s[1][1], white)
+            else:
+                printText(screen,s[0], "arial", ft_sz, x_scale*s[1][0], y_scale*s[1][1], black)
     
     def singleRotate(self,action):
         reverse = False
@@ -239,7 +215,7 @@ class CubePlayground:
     
     def displayButtons(self):
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
-		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
+             Panel.ft_sz,Panel.x_scale,Panel.y_scale
 
         #显示宏按钮
         b_x = x_scale*10; b_y = y_scale*240; b_h = y_scale*30
@@ -280,7 +256,7 @@ class CubePlayground:
         b_x = x_scale*230; b_y = y_scale*10; b_h = y_scale*30
         for b in b_map:
             button(screen, "", ft_sz, b_x, b_y, x_scale*40,b_h,                
-				              colors[b],red,self.selectColor,b)
+                              colors[b],red,self.selectColor,b)
             b_x += x_scale*50
             
         button(screen,u"完成",ft_sz, b_x, b_y, x_scale*60, b_h,

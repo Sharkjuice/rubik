@@ -178,7 +178,7 @@ class Cube3D:
   
     #返回cube显示的区域，在动画过程中要清除这个区域，然后才重新绘制
     def clearCube(self):
-        pygame.draw.circle(self.screen,background,(int(self.x_scale*400), int(self.y_scale*350)),int((self.x_scale+self.y_scale)*125))
+        pygame.draw.circle(self.screen,background,(int(self.x_scale*390), int(self.y_scale*345)),int((self.x_scale+self.y_scale)*120))
 
         
     #在正中间显示魔方的主体，立体显示，通过视角控制，显示前面、右面、上面

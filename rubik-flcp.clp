@@ -911,7 +911,7 @@
 (assert (oll-macro 9 3798 "(FRUR'U'F')(fRUR'U'f')"))
 (assert (oll-macro 10 3506 "(fRUR'U'f')U'(FRUR'U'F')"))
 (assert (oll-macro 11 1691 "(fRUR'U'f')U(FRUR'U'F')"))
-;(assert (oll-macro 12 3282 "(RUR'U)(R'FRF')U2(R'FRF')"))
+(assert (oll-macro 12 3282 "(RUR'U)(R'FRF')U2(R'FRF')"))
 ;(assert (oll-macro 12 3282 "(b'R'U'R2U)R(U'R2URb)"))
 (assert (oll-macro 13 1175 "(rUR'URU2r')(r'U'RU'R'U2r)"))
 (assert (oll-macro 14 3226 "(M'U)(RUR'U')M(R'FRF')"))
@@ -972,7 +972,8 @@
 (assert (pll-macro 2 4 2925 "(M'UM')(M'UM')(M'UM')U2M2U'"))
 (assert (pll-macro 1 5 1938 "x'(R2D2)(R'U'R)D2(R'UR')x"))
 (assert (pll-macro 2 6 1938 "x'(RU'R)D2(R'UR)(D2R2)x"))
-(assert (pll-macro 4 7 1170 "x'(RU'R'D)(RUR'D')(RUR'D)(RU'R'D')x"));this is a symetric pattern
+(assert (pll-macro 1 7 1170 "x'(RU'R'D)(RUR'D')(RUR'D)(RU'R'D')x"));this is a symetric pattern
+(assert (pll-macro 2 22 1170 "U2"));this is a pseudo pattern
 (assert (pll-macro 5 8 2947 "(RUR'U')(R'F)(R2U'R'U')(RUR'F')"))
 (assert (pll-macro 5 9 3857 "(R'U'F')(RUR'U')(R'F)(R2U'R'U')(RUR'UR)"))
 (assert (pll-macro 5 10 3171 "(R'UR')(d'R'F')(R2U')(R'UR')(FRF)"))
@@ -1170,4 +1171,20 @@
 			(printout t "s:5;f:" ?f ";p:0;h:" ?h crlf)  
 		)
 	)
+)
+
+(defrule pll-pattern-8
+	(phase 5)
+	(pll-macro ?d ?f&7|22 ?pv ?h)
+	(block (id ?id1) (layer 3) (type corner))
+	(facelet (id ?id1) (pos ?p1) (side U))
+	(facelet (id ?id2) (pos ?p2&:(= 2 (distance ?p2 ?p1))) (side U))
+	(facelet (id ?id3) (pos ?p3&:(= 4 (distance ?p3 ?p1))) (side U))	
+	(facelet (id ?id1) (type V1) (color ?c1))
+	(facelet (id ?id2) (type V1) (side ?s2))
+	(facelet (id ?id3) (type V1) (side ?s3))
+	(face ?s2 ?c2)
+	(face ?s3 ?c3)
+	=>
+	(pll-pattern-out ?c1 ?c2 ?c3 ?d ?f ?pv ?h)
 )

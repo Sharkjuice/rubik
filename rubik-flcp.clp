@@ -990,8 +990,8 @@
 (assert (pll-macro 2 17 28  "(RdB')(R2u'RU')R'(UR'uR2)"))
 (assert (pll-macro 1 18 14  "(R2uR'U)R'(U'Ru'R2)(F'UF)"));1
 (assert (pll-macro 2 19 112 "(R'd'F)(R2uR'U)R(U'Ru'R2)"))
-(assert (pll-macro 5 20 2275 "R'(URU'R')(F'U')(FRUR'F)(R'F')(RU'R)"));
-(assert (pll-macro 5 21 910  "R(U'R'UR)(BU)(B'R'U'RB')(RB)(R'UR')"))
+(assert (pll-macro 5 20 2275 "R'(URU'R')(F'U'F)(RUR')(FR'F')(RU'R)"));
+(assert (pll-macro 5 21 910  "R(U'R'UR)(BUB')(R'U'R)(B'RB)(R'UR')"))
 ;(assert (pll-macro 5 21 910  "(RUR')U(RUR')(F'RUR'U'R'F)(R2U'R'U2)(RU'R')"))
 )
 

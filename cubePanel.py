@@ -62,7 +62,7 @@ class Panel():
             printText(
 				cls.screen, msg, "fangsong", 
 			    cls.ft_sz, cls.x_scale*225, 
-			    cls.y_scale*690, background)
+			    cls.y_scale*693, background)
 
     @classmethod
     def printHint(cls,msg): 
@@ -71,7 +71,7 @@ class Panel():
             pygame.draw.rect(cls.screen,cls.gray,(cls.x_scale*220,
 			       cls.y_scale*730,cls.x_scale*560,cls.y_scale*30))            
             printText(cls.screen, msg, "fangsong", cls.ft_sz, 
-				cls.x_scale*225, cls.y_scale*730, background)
+				cls.x_scale*225, cls.y_scale*733, background)
 
     @classmethod
     def printRight(cls,msg):    
@@ -82,7 +82,7 @@ class Panel():
 				(cls.x_scale*1170, cls.y_scale*640,
 				 cls.x_scale*170, cls.y_scale*30))            
             printText(cls.screen, msg, "fangsong", cls.ft_sz, 
-			        cls.x_scale*1175, cls.y_scale*640, black)
+			        cls.x_scale*1175, cls.y_scale*643, black)
 
     @classmethod
     def clearRight(cls):

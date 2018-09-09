@@ -317,8 +317,8 @@ class CubeControl:
                 if event.type == pygame.QUIT:                    
                     self.gameExit = True
                 if event.type == pygame.KEYDOWN:                    
-                    if event.key == pygame.K_DELETE:
-                        self.my_snapshot.deleteSnapshot(0)
+                    if event.key == pygame.K_ESCAPE:
+                        self.gameExit = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1 and (not self.my_playground.rotating):
                         mouse_down_x,mouse_down_y = event.pos

@@ -923,7 +923,8 @@
 (assert (oll-macro 20 422 "(rU'r')U'(rUr')(F'UF)"))
 (assert (oll-macro 21 2466 "(r'U'r)(R'U'RU)(r'Ur)"))
 ;(assert (oll-macro 22 707 "(R'FR)U(R'F'R)(FU'F')"))
-(assert (oll-macro 22 203 "(r'Ur)U(r'U'r)(BU'B')"));707*64/4095
+;707*64/4095=203
+(assert (oll-macro 22 203 "(r'Ur)U(r'U'r)(BU'B')"))
 (assert (oll-macro 23 651 "(rUr')(RUR'U')(rU'r')"))
 (assert (oll-macro 24 387 "(RUR'U')(R'FRF')"))
 (assert (oll-macro 25 2690 "FRUR'U'F'"))
@@ -952,10 +953,11 @@
 (assert (oll-macro 47 2772 "B'(R'U'RU)2B"))
 (assert (oll-macro 48 469 "(r'U')(U'RUR')2(Ur)"))
 (assert (oll-macro 49 2646 "F(RUR'U')2F'"))
-(assert (oll-macro 50 3780 "(r'U)(r2U'(r2U')(r2)(Ur')"))
+(assert (oll-macro 50 3780 "(r'U)(r2U')(r2U')(r2)(Ur')"))
 ;;(assert (oll-macro 50 3780 "(r'Ur)(rU'r')(r'U'r)(rUr')"))
-(assert (oll-macro 51 441 "(RB')(R2F)(R2B)(R2F'R)"))
-;;(assert (oll-macro 51 441 "(RB'R')(R'FR)(RBR')(R'F'R)"))
+;;(assert (oll-macro 51 441 "(RB')(R2F)(R2B)(R2F'R)"))
+;;441*64/4095=3654
+(assert (oll-macro 51 3654 "(rU')(r2U)(r2U)(r2)(U'r)"))
 (assert (oll-macro 52 3208 "(fRUR2U')R'(UR2U'R'f')"))
 (assert (oll-macro 53 275 "(RUR'U')(RU'R'F')U'(FRUR')"))
 (assert (oll-macro 54 149 "(R'U'RU')(R'U2R)(FRUR'U'F')"))

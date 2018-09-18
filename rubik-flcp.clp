@@ -945,7 +945,8 @@
 (assert (oll-macro 40 217 "(r'U'RU')(R'U2r)"))
 (assert (oll-macro 41 310 "(rUR'U)(RU2r')"))
 ;(assert (oll-macro 42 1444 "M'(RUR'U)(RU2R')(UM)"))
-(assert (oll-macro 42 1444 "(B'R'U'RUB)U'(FRUR'U'F')"))
+;1444*8/4095
+(assert (oll-macro 42 3362 "(B'R'U'RUB)U'(FRUR'U'F')"))
 ;(assert (oll-macro 43 1099 "U(FRUR'U'F')U(FRUR'U'F')"))
 (assert (oll-macro 43 1673 "(FRUR'U'F')U(FRUR'U'F')"))
 ;(assert (oll-macro 44 595 "(RUR'U')R'(FR2UR'U'F')"))

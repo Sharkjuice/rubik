@@ -16,9 +16,9 @@ class Panel():
         pygame.init()
         ctypes.windll.user32.SetProcessDPIAware()
         scn_w, scn_h = (ctypes.windll.user32.GetSystemMetrics(0),
-		               ctypes.windll.user32.GetSystemMetrics(1))
+                       ctypes.windll.user32.GetSystemMetrics(1))
         cls.screen = pygame.display.set_mode((scn_w, scn_h),
-		                                 pygame.FULLSCREEN)
+                                         pygame.FULLSCREEN)
         cls.screen.fill(background)
         pygame.display.set_caption("3D魔方教程")
         cls.x_scale = scn_w/min_scn_w
@@ -54,35 +54,34 @@ class Panel():
     @classmethod
     def printLeft(cls,msg): 
         #screen,ft_sz,x_scale,y_scale= getDisplayParams()
-        if msg != "":
-            pygame.draw.rect(
-				cls.screen,cls.gray,
-				(cls.x_scale*220,cls.y_scale*690,
-				 cls.x_scale*560,cls.y_scale*30))            
-            printText(
-				cls.screen, msg, "fangsong", 
-			    cls.ft_sz, cls.x_scale*225, 
-			    cls.y_scale*693, background)
+        pygame.draw.rect(
+            cls.screen,cls.gray,
+            (cls.x_scale*220,cls.y_scale*690,
+             cls.x_scale*560,cls.y_scale*30))            
+        printText(
+            cls.screen, msg, "fangsong", 
+            cls.ft_sz, cls.x_scale*225, 
+            cls.y_scale*693, background)
 
     @classmethod
     def printHint(cls,msg): 
         #screen,ft_sz,x_scale,y_scale= getDisplayParams()
         if msg != "":
             pygame.draw.rect(cls.screen,cls.gray,(cls.x_scale*220,
-			       cls.y_scale*730,cls.x_scale*560,cls.y_scale*30))            
+                   cls.y_scale*730,cls.x_scale*560,cls.y_scale*30))            
             printText(cls.screen, msg, "fangsong", cls.ft_sz, 
-				cls.x_scale*225, cls.y_scale*733, background)
+                cls.x_scale*225, cls.y_scale*733, background)
 
     @classmethod
     def printRight(cls,msg):    
         #screen,ft_sz,x_scale,y_scale= getDisplayParams()
         if msg != "":
             pygame.draw.rect(
-				cls.screen,cls.gray,
-				(cls.x_scale*1170, cls.y_scale*640,
-				 cls.x_scale*170, cls.y_scale*30))            
+                cls.screen,cls.gray,
+                (cls.x_scale*1170, cls.y_scale*640,
+                 cls.x_scale*170, cls.y_scale*30))            
             printText(cls.screen, msg, "fangsong", cls.ft_sz, 
-			        cls.x_scale*1175, cls.y_scale*643, black)
+                    cls.x_scale*1175, cls.y_scale*643, black)
 
     @classmethod
     def clearRight(cls):

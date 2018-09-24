@@ -127,8 +127,8 @@ m_map = [["FRUR'","F'UF","FU'F'","RUR'","RU'R'","R'U'R",
 	     ["r'U2R","UR'Ur","rUr'","rU'r'","r'U'r","r'Ur","r'FRF'"],
 	     ["(UR'U'R)2","(URU'R')2","(R'U'RU)2","(RUR'U')2",
 			"(U'RUR')2","RUR'F'","RU'R'D"],					
-	     ["FRUR'U'F'","fRUR'U'f'","B'U'R'URB","FURU'R'F'",
-			"R2U'R'U'","R2UR'U'","R2u'RU'"],
+	     ["FRUR'U'F'","fRUR'U'f'","FURU'R'F'","B'U'R'URB",
+			"B'R'U'RUB","R2U'R'U'","R2u'RU'"],
 	     ["UR'uR2","R2uR'U","U'Ru'R2","FRU'R'",
 			"RUR'F'","M2U","RU"]
 			

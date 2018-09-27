@@ -196,7 +196,7 @@ class CubePlayground:
     
     def displayRotation(self):
         if self.rotating:
-            self.rotate_angle = self.rotate_angle + 6
+            self.rotate_angle = self.rotate_angle + 10
             self.my_cube_3d.rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize,self.rotate_angle)
             self.my_cube_3d.clearCube()
             self.my_cube_3d.displayCube()

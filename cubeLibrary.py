@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-  
 import pygame,copy,math,os
-from cubeGlobal import background,green,black,\
-    red,colors
+from cubeGlobal import background,green,black,red,colors
 from cubeCommon import button
 from cubePanel import Panel
-import cubeView,cubeModel
+import cube3D,cubeModel,cubeLegend
 
 #显示魔方区域的高度和宽度
 height = 500
@@ -19,17 +18,17 @@ s_map = {0:u"自定义题库",1:u"十字底题库",2:u"F2L题库",3:u"OLL题库"
 
 class CubeLibrary:
     def __init__(self,cube,init_level=0):
-        global height,width,fov,distance,adj_x,adj_y
         self.total =  0
         self.total_page = 0
         self.current = -1
         self.current_page = -1
         self.next_index = 0
         self.snapshots = []
-        self.lib_level = init_level 
-        self.my_cube_3d = cubeView.Cube3D(cube,width, 
-            height, fov, distance, adj_x, adj_y)
+        self.lib_level = init_level
+        self.my_cube_3d = None
         self.snapshots_dir = ".\\snapshots_0\\"
+        self.legends = []
+        self.current_legend = -1
         self.build()
         
     def build(self):    
@@ -109,17 +108,51 @@ class CubeLibrary:
             self.setCurrent(self.current + 1)
         self.selectSnapshot(self.current)
         
-    def selectSnapshot(self,b=None):        
+    def showLibBelowLevel3(self,b=None):        
         if self.total == 0:
             return      
         if b != None:#default select current， which is default to 0
             self.setCurrent(b)
         file = self.snapshots_dir + self.snapshots[self.current-1][0]
-        self.my_cube_3d.cube = cubeModel.Cube(file)              
+        cube = cubeModel.Cube(file)              
+        self.my_cube_3d = cube3D.Cube3D(cube,width, 
+                   height, fov, distance, adj_x, adj_y)
         self.my_cube_3d.buildFaces()
+        self.my_cube_3d.lbdLayerPos([(180,-70),(480, -70),  
+                                                (160, 260)])    
         self.displayCube()
         Panel.printLeft(u"选择了第" + str(self.current) + "份快照")
 
+    def showLibAboveLevel3(self,b=None): 
+        Panel.clearRight()  
+        if self.total == 0:
+            return
+        if b != None:#default select current， which is default to 0
+            self.setCurrent(b)
+        start = (self.current-1)*15
+        end = start + 15
+        if end > len(self.snapshots):
+            end = len(self.snapshots)
+        self.legends = []
+        for i in range(start,end):
+            file_no =  + i
+            file = self.snapshots_dir + self.snapshots[i][0]
+            cube = cubeModel.Cube(file)   
+            m,r = divmod(i-start,3)           
+            cube_3d = cubeLegend.CubeLegend(cube,width, 
+                   height, fov, 20, 650+r*180, -100+m*115)
+            cube_3d.buildFaces()
+            cube_3d.lbdLayerPos([(180,-70),(480, -70),(160, 260)])   
+            cube_3d.displayCube()
+            self.legends.append(cube_3d)            
+
+    def showLib(self,b=None):
+        if self.lib_level < 3:
+            self.showLibBelowLevel3(b)
+        else:
+            self.showLibAboveLevel3(b)
+        
+        
     def setCurrent(self,c):
         if self.total == 0:
             return      
@@ -133,14 +166,19 @@ class CubeLibrary:
         
     
     def setTotal(self,t):        
-        self.total = t
-        m,r = divmod(t,10)
-        if (m + r) != 0:
-            if r == 0:
-                self.total_page = m
-            else:
-                self.total_page = m + 1
-                
+        if self.lib_level < 3:
+            m,r = divmod(t,10)
+            self.total = t
+            if (m + r) != 0:
+                if r == 0:
+                    self.total_page = m
+                else:
+                    self.total_page = m + 1
+        else:
+            self.total_page = 1
+            m,r = divmod(t,16)
+            self.total = m + 1
+        
     def getTotal(self):        
         return self.total 
         
@@ -178,10 +216,10 @@ class CubeLibrary:
         for b in range(start,stop1):
             if (b + 1) == self.current:     
                 button(screen, str(b+1), ft_sz, b_x, b_y, 
-                       x_scale*30,b_h,red,red,self.selectSnapshot,b+1)
+                       x_scale*30,b_h,red,red,self.showLib,b+1)
             else:
                 button(screen, str(b+1), ft_sz, b_x, b_y,
-                       x_scale*30,b_h,green,red,self.selectSnapshot,b+1)
+                       x_scale*30,b_h,green,red,self.showLib,b+1)
             b_x += x_scale*40
         for b in range(stop1, stop2):
             button(screen, "", ft_sz, b_x, b_y, x_scale*30,
@@ -205,26 +243,19 @@ class CubeLibrary:
             button(screen, b[0], ft_sz, b_x, b_y, x_scale*60,b_h,green,red,b[1],b[2])
             b_x += x_scale*70
         Panel.printRight(s_map[self.lib_level])
-        
-    def takeSnapshot(self,cube):
-        self.my_cube_3d.cube = copy.deepcopy(cube)
-        self.my_cube_3d.buildFaces()
-        self.displayCube()
-        
+       
     def displayCube(self):   
         self.my_cube_3d.displayCube()
-        self.my_cube_3d.displayLayer("RIGHT",2, 180,-70)
-        self.my_cube_3d.displayLayer("UP",2, 160, 260)
-        self.my_cube_3d.displayLayer("FRONT",2, 480, -70)
 
     def level(self,value):
         self.setLevel(value)
-        self.selectSnapshot()
+        self.showLib()
         
     def setLevel(self,value):
         self.lib_level = value
         self.snapshots_dir = ".\\snapshots_" + str(value) + "\\"
         self.build()
+        Panel.clearRight()
         Panel.printRight(s_map[self.lib_level])
 
     def cube(self):
@@ -232,4 +263,17 @@ class CubeLibrary:
 
     def blocks(self):
         return self.my_cube_3d.blocks
+        
+    def hitBlock(self,x,y):
+        count = len(self.legends)
+        for i in range(count):
+            l = self.legends[i]
+            if l.hitMe(x,y):
+                if self.current_legend != -1:
+                    self.my_cube_3d.redraw()
+                Panel.printLeft(u"选择了第%d份快照"%(i+1))
+                self.current_legend = i
+                self.my_cube_3d = l
+                break
+        
     

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-  
 import pygame,time,os,random,subprocess,math
-import cubeModel,cubeView,cubeSnapshot,cubeTutorial,\
+import cubeModel,cubeSnapshot,cubeTutorial,\
         cubeLibrary,cubePlayground
 from cubeGlobal import mouse_status,m_map,a_map,\
         background,black,green,red,colors_r,colors_n,colors
@@ -154,18 +154,14 @@ class CubeControl:
         self.my_snapshot.takeSnapshot(self.my_playground.cube())
    
     def compare(self,dumy):
+        if self.right_panel != "snapshot":
+            Panel.printLeft("没有快照可以比较!")
+            return
         if self.comparing:#已经处于比对状态，先取消
             self.cancel(dumy)
         self.comparing = True        
         mark = 0
-        right = None
-        if self.right_panel == "snapshot":
-            right = self.my_snapshot
-        elif self.right_panel == "library":
-            right = self.my_library
-        else:
-            self.comparing = False
-            return
+        right = self.my_snapshot
         for my_b in self.my_playground.blocks():        
             for sn_b in right.blocks():
                 if my_b.block.origin == sn_b.block.origin:
@@ -286,7 +282,7 @@ class CubeControl:
         if self.right_panel != "library":
             Panel.clearRight() 
             self.right_panel = "library"
-            self.my_library.selectSnapshot()
+            self.my_library.showLib()
 
     def method(self,method):
         self.resolve_method = method
@@ -326,6 +322,8 @@ class CubeControl:
                         mouse_status[1] = mouse_down_x
                         mouse_status[2] = mouse_down_y
                         hit_b,hit_f = self.my_playground.hitBlock(mouse_down_x,mouse_down_y)
+                        if hit_f == -1:
+                            self.my_library.hitBlock(mouse_down_x,mouse_down_y)
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and (not self.my_playground.rotating):
                         mouse_up_x,mouse_up_y = event.pos

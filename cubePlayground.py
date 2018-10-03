@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-  
 import pygame,time,copy
-import cubeModel,cubeView,cubeSnapshot,cubeTutorial,cubeLibrary
+import cubeModel,cubeAnimation
 from cubeGlobal import mouse_status,m_map,a_map,cube_o,\
     black,green,white,red,colors_r,colors_n,colors
 from cubeCommon import button,printText
@@ -47,18 +47,20 @@ class CubePlayground:
         self.rotate_clockwize = 1
 
         #初始化数据模型
-        self.my_cube_3d = cubeView.Cube3D(my_cube,width, 
+        self.my_cube_3d = cubeAnimation.CubeAnimation(my_cube,width, 
                       height, fov, distance,adj_xy[0],adj_xy[1])
         self.my_cube_3d.buildFaces()
+        self.my_cube_3d.lbdLayerPos([(-120, -110),(360, -110),
+											    (-150, 305)])
         self.displayCube()
 
     def displayCube(self):
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
              Panel.ft_sz,Panel.x_scale,Panel.y_scale
         self.my_cube_3d.displayCube()
-        self.my_cube_3d.displayLayer("RIGHT",2, -120, -110)
-        self.my_cube_3d.displayLayer("UP",2, -150, 305	)
-        self.my_cube_3d.displayLayer("FRONT",2, 360, -110)
+        self.my_cube_3d.displayLayer("RIGHT",2)
+        self.my_cube_3d.displayLayer("UP",2)
+        self.my_cube_3d.displayLayer("FRONT",2)
         center = [(b.current.x,b.current.y,b.current.z,b.colors)
             for b in self.my_cube_3d.cube.blocks if 
             abs(b.current.x)+abs(b.current.y)+abs(b.current.z) == 1]
@@ -263,33 +265,8 @@ class CubePlayground:
             (224,224,224),red,self.endBrush,"x")
                 
     def hitBlock(self,x,y):
-        for b in self.my_cube_3d.blocks:
-            b1 = b.block
-            b2 = cube_o.get((b1.current.x,b1.current.y,b1.current.z))
-            if b2 != None:
-                for f in b2[1]:
-                    if self.hitFace(b,f,x,y):
-                        return (b1.current.x,b1.current.y,b1.current.z),f
-        return (-2,-2,-2),-1
-
-    def hitFace(self,b,f,x,y):
-        p0 = b.vertices[b.faces[f][0]]
-        p1 = b.vertices[b.faces[f][1]]
-        p2 = b.vertices[b.faces[f][2]]
-        p3 = b.vertices[b.faces[f][3]]
-        edges = [(p0,p1),(p1,p2),(p2,p3),(p3,p0)]
-        cross = []
-        ray_point = 0
-        for e in edges:#线段方程： y = ax + b
-            a = (e[1].y-e[0].y)/(e[1].x-e[0].x+0.1)
-            b = (e[0].y*e[1].x - e[1].y*e[0].x)/(e[1].x-e[0].x+0.1)
-            cross_y = x*a + b
-            if cross_y > y:
-                if (x > e[0].x and x < e[1].x) or (x < e[0].x and x > e[1].x):
-                    ray_point += 1
-
-        return ray_point == 1        
-    
+        return self.my_cube_3d.hitBlock(x,y)
+  
     def cube(self):
         return self.my_cube_3d.cube 
    

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-  
 import copy
-import cubeView
+import cube3D
 from cubeCommon import button,printText
 from cubePanel import Panel
 
@@ -23,9 +23,10 @@ class CubeSnapshot:
         self.next_index = 0
         self.snapshots = []
         self.level = 0		
-        self.my_cube_3d = cubeView.Cube3D(cube,width,
+        self.my_cube_3d = cube3D.Cube3D(cube,width,
 		    height, fov, distance, adj_x, adj_y)
-		
+        self.my_cube_3d.lbdLayerPos([(180,-70),(480, -70),	
+											    (160, 260)])		
     def takeSnapshot(self,cube):
         self.my_cube_3d.cube = copy.deepcopy(cube)
         self.my_cube_3d.buildFaces()
@@ -33,9 +34,6 @@ class CubeSnapshot:
         
     def displayCube(self):   
         self.my_cube_3d.displayCube()
-        self.my_cube_3d.displayLayer("RIGHT",2, 180,-70)
-        self.my_cube_3d.displayLayer("UP",2, 160, 260)
-        self.my_cube_3d.displayLayer("FRONT",2, 480, -70)
         Panel.printRight("快照窗口")
 
     def cube(self):

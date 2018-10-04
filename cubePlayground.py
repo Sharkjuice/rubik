@@ -45,22 +45,28 @@ class CubePlayground:
         self.rotate_angle = 0
         #转动的方向，顺时针、逆时针
         self.rotate_clockwize = 1
+        #鼠标点击状态
+        self.click_block = (-2,-2,-2)
+        self.click_face = -1
 
         #初始化数据模型
         self.my_cube_3d = cubeAnimation.CubeAnimation(my_cube,width, 
                       height, fov, distance,adj_xy[0],adj_xy[1])
         self.my_cube_3d.buildFaces()
-        self.my_cube_3d.lbdLayerPos([(-120, -110),(360, -110),
-											    (-150, 305)])
-        self.displayCube()
+        self.my_cube_3d.setLBDPos([(-120, -110),(360, -110),
+                                                (-150, 305)])
+        self.my_cube_3d.displayCube()
+        self.my_cube_3d.displayLBD()
+        self.displayCenterText()
 
-    def displayCube(self):
+    def displayContent(self):
+        self.my_cube_3d.displayCube()
+        self.my_cube_3d.displayLBD()
+        self.displayCenterText()
+    
+    def displayCenterText(self):
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
              Panel.ft_sz,Panel.x_scale,Panel.y_scale
-        self.my_cube_3d.displayCube()
-        self.my_cube_3d.displayLayer("RIGHT",2)
-        self.my_cube_3d.displayLayer("UP",2)
-        self.my_cube_3d.displayLayer("FRONT",2)
         center = [(b.current.x,b.current.y,b.current.z,b.colors)
             for b in self.my_cube_3d.cube.blocks if 
             abs(b.current.x)+abs(b.current.y)+abs(b.current.z) == 1]
@@ -120,7 +126,7 @@ class CubePlayground:
         else:#撤销上次的转动
             self.singleRotate(None)    
         
-    def detectAction(self,block,face,start,end):
+    def detectAction(self,start,end):
         motion_sz = 50*Panel.x_scale      
         rel_y = end[1] - start[1]
         rel_x = end[0] - start[0]
@@ -146,7 +152,7 @@ class CubePlayground:
                 dir = "Ru"
             else:
                 dir = "Ld"
-        return cube_o[block][1][face].get(dir,"-")
+        return cube_o[self.click_block][1][self.click_face].get(dir,"-")
         
     def selectColor(self,c):
         self.brush_color = c
@@ -154,7 +160,9 @@ class CubePlayground:
         Panel.printLeft(u"选择色块，双击魔方设置颜色。当前选中:" 
                                    + colors_n[self.brush_color])
 
-    def brushColor(self,b,f):
+    def brushColor(self):
+        b = self.click_block
+        f = self.click_face
         if self.brush_color != "-":
             model_b = [item.block for item in self.my_cube_3d.blocks if item.block.current == b][0]                                   
             
@@ -164,7 +172,7 @@ class CubePlayground:
             if (b[0] == 1 and f == 1):
                 self.his_colors.append((model_b,0,model_b.colors[0]))
                 model_b.colors[0] = self.brush_color
-            if (b[1] == -1 and self.brush_face == 5 ):
+            if (b[1] == -1 and f == 5 ):
                 self.his_colors.append((model_b,1,model_b.colors[1]))
                 model_b.colors[1] = self.brush_color
             if (b[1] == 1 and f == 4):
@@ -206,7 +214,9 @@ class CubePlayground:
         if self.rotate_angle == 90:
             self.cube().rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize)
             self.rebuild()
-            self.displayCube()
+            self.my_cube_3d.displayCube()
+            self.my_cube_3d.displayLBD()
+            self.displayCenterText()            
             self.rotating = False
             self.rotate_angle = 0
 
@@ -215,7 +225,7 @@ class CubePlayground:
                 action = self.auto_actions.pop(0)
                 self.singleRotate(action)
     
-    def displayButtons(self):
+    def displayHeader(self):
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
              Panel.ft_sz,Panel.x_scale,Panel.y_scale
 
@@ -264,8 +274,26 @@ class CubePlayground:
         button(screen,u"完成",ft_sz, b_x, b_y, x_scale*60, b_h,
             (224,224,224),red,self.endBrush,"x")
                 
-    def hitBlock(self,x,y):
-        return self.my_cube_3d.hitBlock(x,y)
+    def singleClick(self,x,y):
+        self.click_block,self.click_face = self.my_cube_3d.hitBlock(x,y)
+        if self.click_face == -1:
+            return False
+        return True
+        
+    def doubleClick(self):
+        if self.brush_copy == 1:
+            self.brushColor()
+            return True
+        return False
+        
+    def drag(self,xy1,xy2):
+        if self.click_face != -1:
+            action = self.detectAction(xy1,xy2)
+            if action != "-":
+                self.singleRotate(action)
+                return True
+        return False
+        
   
     def cube(self):
         return self.my_cube_3d.cube 

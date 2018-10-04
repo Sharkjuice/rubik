@@ -3,7 +3,7 @@ import pygame,copy,math,os
 from cubeGlobal import background,green,black,red,colors
 from cubeCommon import button
 from cubePanel import Panel
-import cube3D,cubeModel,cubeLegend
+import cube3D,cubeModel,cubeLegendOLL,cubeLegendPLL
 
 #显示魔方区域的高度和宽度
 height = 500
@@ -118,12 +118,14 @@ class CubeLibrary:
         self.my_cube_3d = cube3D.Cube3D(cube,width, 
                    height, fov, distance, adj_x, adj_y)
         self.my_cube_3d.buildFaces()
-        self.my_cube_3d.lbdLayerPos([(180,-70),(480, -70),  
+        self.my_cube_3d.setLBDPos([(180,-70),(480, -70),  
                                                 (160, 260)])    
-        self.displayCube()
+        self.my_cube_3d.displayCube()
+        self.my_cube_3d.displayLBD()
+		
         Panel.printLeft(u"选择了第" + str(self.current) + "份快照")
 
-    def showLibAboveLevel3(self,b=None): 
+    def showLibLevel3(self,b=None): 
         Panel.clearRight()  
         if self.total == 0:
             return
@@ -139,19 +141,42 @@ class CubeLibrary:
             file = self.snapshots_dir + self.snapshots[i][0]
             cube = cubeModel.Cube(file)   
             m,r = divmod(i-start,3)           
-            cube_3d = cubeLegend.CubeLegend(cube,width, 
-                   height, fov, 20, 650+r*180, -100+m*115)
+            cube_3d = cubeLegendOLL.CubeLegendOLL(cube,width, 
+                   height, fov, 20, 650+r*180, -120+m*115)
             cube_3d.buildFaces()
-            cube_3d.lbdLayerPos([(180,-70),(480, -70),(160, 260)])   
             cube_3d.displayCube()
             self.legends.append(cube_3d)            
 
+    def showLibLevel4(self,b=None): 
+        Panel.clearRight()  
+        if self.total == 0:
+            return
+        if b != None:#default select current， which is default to 0
+            self.setCurrent(b)
+        start = (self.current-1)*12
+        end = start + 12
+        if end > len(self.snapshots):
+            end = len(self.snapshots)
+        self.legends = []
+        for i in range(start,end):
+            file_no =  + i
+            file = self.snapshots_dir + self.snapshots[i][0]
+            cube = cubeModel.Cube(file)   
+            m,r = divmod(i-start,3)           
+            cube_3d = cubeLegendPLL.CubeLegendPLL(cube,width, 
+                   height, fov, 20, 650+r*180, -120+m*150)
+            cube_3d.buildFaces()
+            cube_3d.displayCube()
+            self.legends.append(cube_3d)            
+
+            
     def showLib(self,b=None):
-        if self.lib_level < 3:
-            self.showLibBelowLevel3(b)
+        if self.lib_level == 3:
+            self.showLibLevel3(b)
+        elif self.lib_level == 4:
+            self.showLibLevel4(b)
         else:
-            self.showLibAboveLevel3(b)
-        
+            self.showLibBelowLevel3(b)
         
     def setCurrent(self,c):
         if self.total == 0:
@@ -244,12 +269,16 @@ class CubeLibrary:
             b_x += x_scale*70
         Panel.printRight(s_map[self.lib_level])
        
-    def displayCube(self):   
+    def displayContent(self):   
         self.my_cube_3d.displayCube()
+        if self.lib_level < 3:
+            self.my_cube_3d.displayLBD()
 
     def level(self,value):
-        self.setLevel(value)
-        self.showLib()
+        if value != self.lib_level:
+            self.current_legend = -1
+            self.setLevel(value)
+            self.showLib()
         
     def setLevel(self,value):
         self.lib_level = value
@@ -264,7 +293,7 @@ class CubeLibrary:
     def blocks(self):
         return self.my_cube_3d.blocks
         
-    def hitBlock(self,x,y):
+    def singleClick(self,x,y):
         count = len(self.legends)
         for i in range(count):
             l = self.legends[i]

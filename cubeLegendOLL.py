@@ -13,12 +13,12 @@ block_v = [(x,y,z) for z in (-0.5,0.5) for y in
 #在侧边显示后、下、左三面的信息
 l_map = {"FRONT":{"FACE":1}, "UP":{"FACE":5},"RIGHT":{"FACE":2}}
        
-class CubeLegend(Cube3D):
+class CubeLegendOLL(Cube3D):
     def __init__(self, cube,width, height, fov, distance,x_adj,y_adj):
-        super(CubeLegend,self).__init__(cube,width, height, fov, 
+        super(CubeLegendOLL,self).__init__(cube,width, height, fov, 
               distance,x_adj,y_adj) 
             
-    def displayLBDLayerOLL(self):
+    def displayLBDLayer(self):
         blocks = [item for item in self.blocks if 
             item.block.current.y == 1 and 
             (item.block.current.z == 1 or
@@ -48,7 +48,7 @@ class CubeLegend(Cube3D):
 
             
     #只显示魔方最上一层
-    def displayCubeOLL(self):
+    def displayCube(self):
         avg_z = []
         b_i = 0
         top = [b for b in self.blocks if b.block.origin.y == 1]
@@ -76,68 +76,8 @@ class CubeLegend(Cube3D):
                 
                 pygame.draw.polygon(Panel.screen,c,pointlist)
                 pygame.draw.polygon(Panel.screen,(0,0,0),pointlist,2)
-        self.displayTopLayer()
-
-    def displayLBDLayerOLL(self):
-        blocks = [item for item in self.blocks if 
-            item.block.current.y == 1 and 
-            (item.block.current.z == 1 or
-             item.block.current.x == 1)]
-        left_blocks = [item for item in blocks if 
-                       item.block.current.z == 1]
-        face_index = l_map["RIGHT"]["FACE"]
-        for b in left_blocks:
-            c = b.colors[face_index]
-            t = b.vertices
-            pointlist = [(t[4].x, t[4].y), (t[5].x, t[5].y),
-                     (t[5].x, t[5].y-5), (t[4].x, t[4].y-5)]                
-            pygame.draw.polygon(self.screen,c,pointlist)
-            pygame.draw.polygon(self.screen,(0,0,0),pointlist,2) 
-
-        back_blocks = [item for item in blocks if 
-                       item.block.current.x == 1]
-        face_index = l_map["FRONT"]["FACE"]
-        for b in back_blocks:
-            c = b.colors[face_index]
-            f = b.faces[face_index]
-            t = b.vertices
-            pointlist = [(t[5].x, t[5].y), (t[1].x, t[1].y),
-                     (t[1].x, t[1].y-5), (t[5].x, t[5].y-5)]                
-            pygame.draw.polygon(self.screen,c,pointlist)
-            pygame.draw.polygon(self.screen,(0,0,0),pointlist,2) 
-
-            
-    #只显示魔方最上一层
-    def displayCubeOLL(self):
-        avg_z = []
-        b_i = 0
-        top = [b for b in self.blocks if b.block.origin.y == 1]
-        for b in top:
-            f_i = 0
-            for f in b.faces:
-                z = (b.vertices[f[0]].z + b.vertices[f[1]].z +
-                 b.vertices[f[2]].z + b.vertices[f[3]].z) / 4.0
-                avg_z.append((b_i,f_i,z))
-                f_i = f_i + 1
-            b_i = b_i + 1
-
-        # Draw the faces using the Painter's algorithm:
-        # Distant faces are drawn before the closer ones.
-        for tmp in sorted(avg_z,key=itemgetter(2),reverse=True):
-            b_i = tmp[0]
-            f_i = tmp[1]
-            t = top[b_i].vertices
-            f = top[b_i].faces[f_i]
-            c = top[b_i].colors[f_i]
-
-            if c != "-":
-                pointlist = [(t[f[0]].x, t[f[0]].y), (t[f[1]].x, t[f[1]].y),
-                         (t[f[2]].x, t[f[2]].y), (t[f[3]].x, t[f[3]].y)]
-                
-                pygame.draw.polygon(Panel.screen,c,pointlist)
-                pygame.draw.polygon(Panel.screen,(0,0,0),pointlist,2)
-        self.displayTopLayer()
-        
+        self.displayLBDLayer()
+       
     def hitMe(self,x,y):
         ps = self.outline()
         es = [(ps[i],ps[i+1]) for i in range(6)]

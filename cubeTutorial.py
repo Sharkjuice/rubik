@@ -299,7 +299,7 @@ class CubeTutorial:
         b_x += x_scale*230
         button(screen,">>",ft_sz,b_x,b_y,x_scale*40,b_h,green,red,self.nextOrPrevious,1)
 
-    def displayTutorial(self):
+    def displayContent(self):
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
 		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
 		

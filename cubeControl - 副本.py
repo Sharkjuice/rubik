@@ -30,7 +30,7 @@ class CubeControl:
 
         self.comparing = False
         #初始化数据模型,判断mycube.clp文件在不在，
-        #如果在，就读这个文件初始化
+		#如果在，就读这个文件初始化
         if os.path.exists("./mycube.clp"):
             my_cube = cubeModel.Cube("./mycube.clp")
         else:
@@ -41,8 +41,8 @@ class CubeControl:
         self.my_library = cubeLibrary.CubeLibrary(my_cube,init_level)
        
     def displayAll(self):
-        self.my_playground.displayContent()
-        self.my_tutorial.displayContent()  
+        self.my_playground.displayCube()
+        self.my_tutorial.displayTutorial()	
         Panel.printLeft(u"当前解题方法是" + self.resolve_method + u"法")
         Panel.printHint(u"下一步提示")
 
@@ -137,7 +137,7 @@ class CubeControl:
         self.advice = ""
         self.my_playground.rebuild()
         self.my_playground.displayCube() 
-        self.current_level = -1     
+        self.current_level = -1		
 
     def help(self,dumy):
         if self.right_panel != "help":
@@ -301,36 +301,13 @@ class CubeControl:
         self.load(0)
         Panel.printLeft(u"当前是第" + str(r) + u"题")
 
-    #mouse single click
-    def singleClick(self,x,y):
-        if self.my_playground.singleClick(x,y):
-            return True
-        if self.my_library.singleClick(x,y):
-            return True
-        return False
-    
-    #mouse double click
-    def doubleClick(self):
-        print("fdsafdsafdsa")
-        if self.my_playground.doubleClick():
-            return True
-        if self.my_library.doubleClick():
-            return True
-        return False
-    
-    #mouse drag
-    def drag(self,xy1,xy2):
-        if self.my_playground.drag(xy1,xy2):
-            return True
-        return False
-    
     def gameLoop(self):
         global mouse_status
         hit_b = ""
         hit_f = -1      
         clock = pygame.time.Clock()
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
-             Panel.ft_sz,Panel.x_scale,Panel.y_scale
+		     Panel.ft_sz,Panel.x_scale,Panel.y_scale
         while not self.gameExit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:                    
@@ -344,24 +321,32 @@ class CubeControl:
                         mouse_status[0] = 0
                         mouse_status[1] = mouse_down_x
                         mouse_status[2] = mouse_down_y
-                        self.singleClick(mouse_down_x,mouse_down_y)
+                        hit_b,hit_f = self.my_playground.hitBlock(mouse_down_x,mouse_down_y)
+                        if hit_f == -1:
+                            self.my_library.hitBlock(mouse_down_x,mouse_down_y)
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and (not self.my_playground.rotating):
                         mouse_up_x,mouse_up_y = event.pos
                         mouse_status[0] = 1
                         mouse_status[1] = mouse_up_x
                         mouse_status[2] = mouse_up_y
-                        if self.drag((mouse_down_x,mouse_down_y),
-                                     (mouse_up_x,mouse_up_y)):
-                            self.dk_count = 0
-                        else:
-                            self.dk_count += 1
-                            if self.dk_count == 1:
-                                self.dk_time = pygame.time.get_ticks()
-                            if self.dk_count == 2:
+                        if hit_f != -1:
+                            action = self.my_playground.detectAction(hit_b,hit_f,
+                                            (mouse_down_x,mouse_down_y),
+                                            (mouse_up_x,mouse_up_y))
+                            if action != "-":
+                                self.my_playground.singleRotate(action)
                                 self.dk_count = 0
-                                if (pygame.time.get_ticks() - self.dk_time) < 250:
-                                    self.doubleClick()
+                            else:    
+                                self.dk_count += 1
+                                if self.dk_count == 1:
+                                    self.dk_time = pygame.time.get_ticks()
+                                if self.dk_count == 2:
+                                    self.dk_count = 0
+                                    if (pygame.time.get_ticks() - self.dk_time) < 250:
+                                        if self.my_playground.brush_copy == 1:
+                                            self.my_playground.brushColor(hit_b,hit_f)
+            
             b_h = y_scale*30
                 
           #退出按钮，最右上角
@@ -388,7 +373,7 @@ class CubeControl:
                     b_x += x_scale*70
                 b_y += y_scale*40; b_x = x_scale*790
                      
-            self.my_playground.displayHeader()                
+            self.my_playground.displayButtons()                
             self.my_playground.displayRotation()
                   
             

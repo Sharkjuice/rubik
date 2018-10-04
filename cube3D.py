@@ -111,11 +111,11 @@ class Cube3D:
                 r = point.rotateY(self.alpha).rotateX(self.gama).rotateY(self.beta)
                 p = r.project(self.width, self.height, self.fov, self.distance, self.x_adj,self.y_adj )
                 block_vertices.append(p)
- 
+            #各面的顶点。 数组中的顺序为：F/B/L/R/U/D
             block_faces = [(0,1,3,2),(1,5,7,3),(5,4,6,7),(4,0,2,6),(0,4,5,1),(2,3,7,6)]
             
             self.blocks.append(Block3D(block_vertices,block_faces,b).resetColors())
-    def lbdLayerPos(self,pos):
+    def setLBDPos(self,pos):
         self.lbd_pos = {"RIGHT":pos[0],"FRONT":pos[1],"UP":pos[2]}
             
     def displayLayer(self,face,layer):
@@ -177,6 +177,10 @@ class Cube3D:
                     else:
                         printText(Panel.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (0,0,0))
             
+#        self.displayLayer("RIGHT",2)
+#        self.displayLayer("UP",2)
+#        self.displayLayer("FRONT",2)
+    def displayLBD(self):
         self.displayLayer("RIGHT",2)
         self.displayLayer("UP",2)
         self.displayLayer("FRONT",2)

@@ -25,7 +25,7 @@ class CubeSnapshot:
         self.level = 0		
         self.my_cube_3d = cube3D.Cube3D(cube,width,
 		    height, fov, distance, adj_x, adj_y)
-        self.my_cube_3d.lbdLayerPos([(180,-70),(480, -70),	
+        self.my_cube_3d.setLBDPos([(180,-70),(480, -70),	
 											    (160, 260)])		
     def takeSnapshot(self,cube):
         self.my_cube_3d.cube = copy.deepcopy(cube)

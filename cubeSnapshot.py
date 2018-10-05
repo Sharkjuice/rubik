@@ -30,11 +30,12 @@ class CubeSnapshot:
     def takeSnapshot(self,cube):
         self.my_cube_3d.cube = copy.deepcopy(cube)
         self.my_cube_3d.buildFaces()
-        self.displayCube()
-        
-    def displayCube(self):   
-        self.my_cube_3d.displayCube()
+        self.displayContent()
         Panel.printRight("快照窗口")
+        
+    def displayContent(self):
+        self.my_cube_3d.displayCube()
+        self.my_cube_3d.displayLBD()
 
     def cube(self):
         return self.my_cube_3d.cube 

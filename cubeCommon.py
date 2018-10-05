@@ -2,16 +2,14 @@
 import pygame
 from cubeGlobal import black,background,mouse_status
 	
-#用一个全局变量表示鼠标状态，以判断鼠标点击（pressed，released）
-mouse_pressed = 0  
 def button(screen,msg,Textsize,x,y,w,h,ic,ac,action=None,param=None):
     global mouse_status
-    mouse_current = mouse_status[0]
-
+    #mouse_current = mouse_status[0]
+    
     if x+w > mouse_status[1] > x and y+h > mouse_status[2] > y:
         pygame.draw.rect(screen, ac,(x,y,w,h))
-        mouse_current = mouse_status[0]
-        if mouse_current == 1 and action != None:
+        #mouse_current = mouse_status[0]
+        if mouse_status[0] == 1 and action != None:
             action(param)
         mouse_status[0] = 0
         mouse_status[1] = 0

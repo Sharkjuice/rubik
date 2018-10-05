@@ -3,7 +3,7 @@ import pygame,copy,math,os
 from cubeGlobal import background,green,black,red,colors
 from cubeCommon import button
 from cubePanel import Panel
-import cube3D,cubeModel,cubeLegendOLL,cubeLegendPLL
+import cubeModel,cubeLegendF2L,cubeLegendOLL,cubeLegendPLL
 
 #显示魔方区域的高度和宽度
 height = 500
@@ -30,6 +30,8 @@ class CubeLibrary:
         self.legends = []
         self.current_legend = -1
         self.build()
+        #鼠标点击状态
+        self.single_clicked = False
         
     def build(self):    
         self.snapshots = [] 
@@ -113,16 +115,18 @@ class CubeLibrary:
             return      
         if b != None:#default select current， which is default to 0
             self.setCurrent(b)
+        self.legends = []			
         file = self.snapshots_dir + self.snapshots[self.current-1][0]
-        cube = cubeModel.Cube(file)              
-        self.my_cube_3d = cube3D.Cube3D(cube,width, 
+        cube = cubeModel.Cube(file) 
+        self.my_cube_3d = cubeLegendF2L.CubeLegendF2L(cube,width, 
                    height, fov, distance, adj_x, adj_y)
         self.my_cube_3d.buildFaces()
         self.my_cube_3d.setLBDPos([(180,-70),(480, -70),  
                                                 (160, 260)])    
         self.my_cube_3d.displayCube()
         self.my_cube_3d.displayLBD()
-		
+        self.legends.append(self.my_cube_3d)
+        self.current_legend = 0	
         Panel.printLeft(u"选择了第" + str(self.current) + "份快照")
 
     def showLibLevel3(self,b=None): 
@@ -168,7 +172,6 @@ class CubeLibrary:
             cube_3d.buildFaces()
             cube_3d.displayCube()
             self.legends.append(cube_3d)            
-
             
     def showLib(self,b=None):
         if self.lib_level == 3:
@@ -277,6 +280,8 @@ class CubeLibrary:
     def level(self,value):
         if value != self.lib_level:
             self.current_legend = -1
+            self.my_cube_3d = None
+            self.single_clicked	= False		
             self.setLevel(value)
             self.showLib()
         
@@ -294,6 +299,12 @@ class CubeLibrary:
         return self.my_cube_3d.blocks
         
     def singleClick(self,x,y):
+        if self.legends == []:
+            return False
+        if self.lib_level < 3:
+            if self.my_cube_3d.hitMe(x,y):
+                self.single_clicked = True
+                return True
         count = len(self.legends)
         for i in range(count):
             l = self.legends[i]
@@ -303,6 +314,14 @@ class CubeLibrary:
                 Panel.printLeft(u"选择了第%d份快照"%(i+1))
                 self.current_legend = i
                 self.my_cube_3d = l
-                break
-        
-    
+                self.single_clicked	= True			
+                return True
+        return False
+		
+    def doubleClick(self):
+        if self.single_clicked:
+            #print("lib double clickd")
+            self.single_clicked	= False		
+            return True
+        self.single_clicked	= False		
+        return False

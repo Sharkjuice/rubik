@@ -67,12 +67,12 @@ class CubeControl:
         if cube != None:
             self.my_playground.load(cube)
             self.my_playground.rebuild()            
-            self.my_playground.displayCube()
+            self.my_playground.displayContent()
  
     def reset(self,dumy):
         my_cube = cubeModel.Cube()
         self.my_playground = cubePlayground.CubePlayground(my_cube) 
-        self.my_playground.displayCube()
+        self.my_playground.displayContent()
         self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube)
         
 
@@ -83,7 +83,7 @@ class CubeControl:
         self.his_actions = []
         self.advice = ""
         self.my_playground.rebuild()
-        self.my_playground.displayCube()   
+        self.my_playground.displayContent()   
 
 #随机生成一个初始乱的魔方
     def init2(self,init_level):
@@ -136,7 +136,7 @@ class CubeControl:
         self.his_actions = []
         self.advice = ""
         self.my_playground.rebuild()
-        self.my_playground.displayCube() 
+        self.my_playground.displayContent() 
         self.current_level = -1     
 
     def help(self,dumy):
@@ -177,8 +177,8 @@ class CubeControl:
                         mark += 1
                         
         if mark > 0:
-            self.my_playground.displayCube()
-            right.displayCube()
+            self.my_playground.displayContent()
+            self.my_snapshot.displayContent()
 
         
     def quit(self,dumy):
@@ -222,7 +222,7 @@ class CubeControl:
         outlines = res.stdout.readlines()
         adv_p = []
         for outline in outlines:
-            #print(outline)
+            ##print(outline)
             outline_str = outline.decode().strip()
             if outline_str != "" and outline_str[0] != "#":
                 adv_l = outline_str.split(";")
@@ -250,25 +250,24 @@ class CubeControl:
         self.figure = best[0].get("f",0)
         t1 = best[0].get("t1", None)
         t2 = best[0].get("t2", None)
-        #print(best[0])
+        ##print(best[0])
         return best[0]
 
-    def cancelComparing(self): 
+    def cancelComparing(self):
+        if self.right_panel != "snapshot":
+            Panel.printLeft("没有快照可以取消比较!")
+            return
+	
         self.comparing = False        
         mark = 1
         for my_b in self.my_playground.blocks():        
             if  my_b.mark != "-":
                 my_b.mark = "-"
-        if self.right_panel == "snapshot":
-            right = self.my_snapshot
-        elif self.right_panel == "library":
-            right = self.my_library
-                
-        for sn_b in right.blocks():       
+        for sn_b in self.my_snapshot.blocks():       
             if  sn_b.mark != "-":
                 sn_b.mark = "-"
-        self.my_playground.displayCube()
-        right.displayCube()
+        self.my_playground.displayContent()
+        self.my_snapshot.displayContent()
            
     def cancel(self,dumy):
         if self.my_playground.brush_copy == 1:
@@ -303,31 +302,58 @@ class CubeControl:
 
     #mouse single click
     def singleClick(self,x,y):
+        #print("single click...",x,y)
         if self.my_playground.singleClick(x,y):
+            #print("playground sinlge clicked")
             return True
-        if self.my_library.singleClick(x,y):
-            return True
+        if self.right_panel == "library":
+            if self.my_library.singleClick(x,y):
+                #print("library single clicked")
+                return True
+        #print("No single click action!")
         return False
     
+    #判断是否是双击鼠标
+    def isContEvent(self,txy1,txy2):
+        #print("is double click?",txy1,txy2)
+        t_gap = txy2[0] - txy1[0]
+        x_gap = txy2[1] - txy1[1]
+        y_gap = txy2[2] - txy1[2]
+        r_gap = x_gap*x_gap + y_gap*y_gap
+        if t_gap < 250 and r_gap < 25:
+            #print("Yes, is double click")
+            return True
+        #print("No, is not double click")
+        return False
+
     #mouse double click
     def doubleClick(self):
-        print("fdsafdsafdsa")
+        #print("doubleClick")
         if self.my_playground.doubleClick():
+            #print("playground double clicked")
             return True
         if self.my_library.doubleClick():
+            #print("library double clicked ")
+            cube = self.my_library.cube()
+            self.my_playground.load(cube)
+            self.my_playground.rebuild()            
+            self.my_playground.displayContent()
             return True
+        #print("No double click action!")
         return False
     
     #mouse drag
     def drag(self,xy1,xy2):
         if self.my_playground.drag(xy1,xy2):
+            #print("playground draged")
             return True
+        #print("No drag action")
         return False
     
     def gameLoop(self):
         global mouse_status
-        hit_b = ""
-        hit_f = -1      
+        pre_mouse_txy = (0,0,0)
+        click_times = 0
         clock = pygame.time.Clock()
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
              Panel.ft_sz,Panel.x_scale,Panel.y_scale
@@ -340,28 +366,30 @@ class CubeControl:
                         self.gameExit = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1 and (not self.my_playground.rotating):
-                        mouse_down_x,mouse_down_y = event.pos
-                        mouse_status[0] = 0
-                        mouse_status[1] = mouse_down_x
-                        mouse_status[2] = mouse_down_y
-                        self.singleClick(mouse_down_x,mouse_down_y)
+                        mouse_x,mouse_y = event.pos
+                        mouse_t = pygame.time.get_ticks()
+                        mouse_status[0] = 1
+                        mouse_status[1] = mouse_x
+                        mouse_status[2] = mouse_y
+                        #print("Mouse button down detected")
+                        if self.isContEvent(pre_mouse_txy,
+                                              (mouse_t,mouse_x,
+                                               mouse_y),
+                                              ):
+                            self.doubleClick()
+                        else:
+                            self.singleClick(mouse_x,mouse_y)
+                        pre_mouse_txy = (mouse_t,mouse_x,mouse_y)						
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and (not self.my_playground.rotating):
-                        mouse_up_x,mouse_up_y = event.pos
-                        mouse_status[0] = 1
-                        mouse_status[1] = mouse_up_x
-                        mouse_status[2] = mouse_up_y
-                        if self.drag((mouse_down_x,mouse_down_y),
-                                     (mouse_up_x,mouse_up_y)):
-                            self.dk_count = 0
-                        else:
-                            self.dk_count += 1
-                            if self.dk_count == 1:
-                                self.dk_time = pygame.time.get_ticks()
-                            if self.dk_count == 2:
-                                self.dk_count = 0
-                                if (pygame.time.get_ticks() - self.dk_time) < 250:
-                                    self.doubleClick()
+                        mouse_x,mouse_y = event.pos
+                        mouse_t = pygame.time.get_ticks()
+                        #print("Mouse button up detected")
+                        if not self.isContEvent((mouse_t,mouse_x,
+                                               mouse_y),
+                                              pre_mouse_txy):
+                            self.drag((pre_mouse_txy[1], pre_mouse_txy[2]),
+                                     (mouse_x,mouse_y))
             b_h = y_scale*30
                 
           #退出按钮，最右上角

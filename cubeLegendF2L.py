@@ -30,9 +30,6 @@ class CubeLegendF2L(Cube3D):
             if cross_y > y:
                 if (x > e[0].x and x < e[1].x) or (x < e[0].x and x > e[1].x):
                     ray_point += 1
-        if ray_point == 1:
-            pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
-            pygame.draw.polygon(self.screen,(244,244,244),pointlist,4) 
         return ray_point == 1        
     
     def outline(self):
@@ -47,4 +44,9 @@ class CubeLegendF2L(Cube3D):
         pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
         pygame.draw.polygon(self.screen,(0,0,0),pointlist,4)
         self.displayCube()		
+
+    def drawSelected(self):
+        ps = self.outline()     
+        pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
+        pygame.draw.polygon(self.screen,(244,244,244),pointlist,4)
         

@@ -18,37 +18,27 @@ class CubeLegendOLL(Cube3D):
         super(CubeLegendOLL,self).__init__(cube,width, height, fov, 
               distance,x_adj,y_adj) 
             
-    def displayLBDLayer(self):
-        blocks = [item for item in self.blocks if 
-            item.block.current.y == 1 and 
-            (item.block.current.z == 1 or
-             item.block.current.x == 1)]
-        left_blocks = [item for item in blocks if 
-                       item.block.current.z == 1]
-        face_index = l_map["RIGHT"]["FACE"]
-        for b in left_blocks:
-            c = b.colors[face_index]
-            t = b.vertices
-            pointlist = [(t[4].x, t[4].y), (t[5].x, t[5].y),
-                     (t[5].x, t[5].y-5), (t[4].x, t[4].y-5)]                
-            pygame.draw.polygon(self.screen,c,pointlist)
-            pygame.draw.polygon(self.screen,(0,0,0),pointlist,2) 
+    def displayLBD(self):
+        vs = [20,23,26,26,26,25,24]
+        bs = [b for i in vs for b in self.blocks if b.block_id == i]
+        vs = [4,4,4,5,1,1,1]
+        ps = [bs[i].vertices[vs[i]] for i in range(7)]
 
-        back_blocks = [item for item in blocks if 
-                       item.block.current.x == 1]
-        face_index = l_map["FRONT"]["FACE"]
-        for b in back_blocks:
-            c = b.colors[face_index]
-            f = b.faces[face_index]
-            t = b.vertices
-            pointlist = [(t[5].x, t[5].y), (t[1].x, t[1].y),
-                     (t[1].x, t[1].y-5), (t[5].x, t[5].y-5)]                
-            pygame.draw.polygon(self.screen,c,pointlist)
-            pygame.draw.polygon(self.screen,(0,0,0),pointlist,2) 
+        vs = [20,23,26,26,25,24]
+        bs = [b for i in vs for b in self.blocks if b.block_id == i]
+        vs = [2,2,2,1,1,1]
+        cs1 = [bs[i].colors[vs[i]] for i in range(6)]
+       
+        rs1 = [((ps[i].x,ps[i].y), (ps[i+1].x,ps[i+1].y),
+               (ps[i+1].x,ps[i+1].y-5), (ps[i].x,ps[i].y-5))
+               for i in range(6)]
 
-            
+        for i in range(6):
+            pygame.draw.polygon(self.screen,cs1[i],rs1[i])
+            pygame.draw.polygon(self.screen,(0,0,0),rs1[i],2) 
+
     #只显示魔方最上一层
-    def displayCube(self):
+    def displayContent(self):
         avg_z = []
         b_i = 0
         top = [b for b in self.blocks if b.block.origin.y == 1]
@@ -76,7 +66,7 @@ class CubeLegendOLL(Cube3D):
                 
                 pygame.draw.polygon(Panel.screen,c,pointlist)
                 pygame.draw.polygon(Panel.screen,(0,0,0),pointlist,2)
-        self.displayLBDLayer()
+        self.displayLBD()
        
     def hitMe(self,x,y):
         ps = self.outline()
@@ -90,9 +80,6 @@ class CubeLegendOLL(Cube3D):
             if cross_y > y:
                 if (x > e[0].x and x < e[1].x) or (x < e[0].x and x > e[1].x):
                     ray_point += 1
-        if ray_point == 1:
-            pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
-            pygame.draw.polygon(self.screen,(244,244,244),pointlist,4) 
         return ray_point == 1        
     
     def outline(self):
@@ -106,5 +93,10 @@ class CubeLegendOLL(Cube3D):
         ps = self.outline()     
         pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
         pygame.draw.polygon(self.screen,(0,0,0),pointlist,4)
-        self.displayCube()		
+        self.displayContent()
+		
+    def drawSelected(self):
+        ps = self.outline()     
+        pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
+        pygame.draw.polygon(self.screen,(244,244,244),pointlist,4)
         

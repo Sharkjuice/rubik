@@ -18,7 +18,7 @@ class CubeLegendPLL(Cube3D):
         super(CubeLegendPLL,self).__init__(cube,width, height, fov, 
               distance,x_adj,y_adj) 
             
-    def displayLBDLayer(self):
+    def displayLBD(self):
         vs = [20,23,26,26,26,25,24]
         bs = [b for i in vs for b in self.blocks if b.block_id == i]
         vs = [4,4,4,5,1,1,1]
@@ -50,7 +50,7 @@ class CubeLegendPLL(Cube3D):
             pygame.draw.polygon(self.screen,(0,0,0),rs2[i],2) 
             
     #只显示魔方最上一层
-    def displayCube(self):
+    def displayContent(self):
         avg_z = []
         b_i = 0
         top = [b for b in self.blocks if b.block.origin.y != -1]
@@ -78,7 +78,7 @@ class CubeLegendPLL(Cube3D):
                 
                 pygame.draw.polygon(Panel.screen,c,pointlist)
                 pygame.draw.polygon(Panel.screen,(0,0,0),pointlist,2)
-        self.displayLBDLayer()
+        self.displayLBD()
 
     def hitMe(self,x,y):
         ps = self.outline()
@@ -92,9 +92,6 @@ class CubeLegendPLL(Cube3D):
             if cross_y > y:
                 if (x > e[0].x and x < e[1].x) or (x < e[0].x and x > e[1].x):
                     ray_point += 1
-        if ray_point == 1:
-            pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
-            pygame.draw.polygon(self.screen,(244,244,244),pointlist,4) 
         return ray_point == 1        
     
     def outline(self):
@@ -108,5 +105,9 @@ class CubeLegendPLL(Cube3D):
         ps = self.outline()     
         pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
         pygame.draw.polygon(self.screen,(0,0,0),pointlist,4)
-        self.displayCube()      
+        self.displayContent()      
+    def drawSelected(self):
+        ps = self.outline()     
+        pointlist =[(ps[i].x,ps[i].y) for i in range(6)] 
+        pygame.draw.polygon(self.screen,(244,244,244),pointlist,4)
         

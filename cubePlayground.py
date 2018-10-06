@@ -55,13 +55,10 @@ class CubePlayground:
         self.my_cube_3d.buildFaces()
         self.my_cube_3d.setLBDPos([(-120, -110),(360, -110),
                                                 (-150, 305)])
-        self.my_cube_3d.displayCube()
-        self.my_cube_3d.displayLBD()
-        self.displayCenterText()
+        self.displayContent()
 
     def displayContent(self):
-        self.my_cube_3d.displayCube()
-        self.my_cube_3d.displayLBD()
+        self.my_cube_3d.displayContent()
         self.displayCenterText()
     
     def displayCenterText(self):
@@ -214,8 +211,7 @@ class CubePlayground:
         if self.rotate_angle == 90:
             self.cube().rotateCube(self.rotate_face,self.rotate_layer,self.rotate_clockwize)
             self.rebuild()
-            self.my_cube_3d.displayCube()
-            self.my_cube_3d.displayLBD()
+            self.my_cube_3d.displayContent()
             self.displayCenterText()            
             self.rotating = False
             self.rotate_angle = 0
@@ -281,17 +277,22 @@ class CubePlayground:
         return True
         
     def doubleClick(self):
+        if self.click_face == -1:
+            return False
         if self.brush_copy == 1:
             self.brushColor()
+            self.click_face = -1
             return True
         return False
         
     def drag(self,xy1,xy2):
-        if self.click_face != -1:
-            action = self.detectAction(xy1,xy2)
-            if action != "-":
-                self.singleRotate(action)
-                return True
+        if self.click_face == -1:
+            return False
+        action = self.detectAction(xy1,xy2)
+        if action != "-":
+            self.singleRotate(action)
+            self.click_face = -1
+            return True
         return False
         
   

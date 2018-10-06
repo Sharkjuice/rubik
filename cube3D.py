@@ -177,10 +177,8 @@ class Cube3D:
                     else:
                         printText(Panel.screen,self.blocks[b_i].mark, "kaiti", 20, int((t[f[0]].x + t[f[2]].x)/2.0)-5 , int((t[f[0]].y + t[f[2]].y)/2.0)-10, (0,0,0))
             
-#        self.displayLayer("RIGHT",2)
-#        self.displayLayer("UP",2)
-#        self.displayLayer("FRONT",2)
-    def displayLBD(self):
+    def displayContent(self):
+        self.displayCube()
         self.displayLayer("RIGHT",2)
         self.displayLayer("UP",2)
         self.displayLayer("FRONT",2)

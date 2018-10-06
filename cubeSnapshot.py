@@ -34,8 +34,7 @@ class CubeSnapshot:
         Panel.printRight("快照窗口")
         
     def displayContent(self):
-        self.my_cube_3d.displayCube()
-        self.my_cube_3d.displayLBD()
+        self.my_cube_3d.displayContent()
 
     def cube(self):
         return self.my_cube_3d.cube 

@@ -21,7 +21,7 @@ class CubeControl:
     def __init__(self, init_count, his_count,init_level=2):
         self.init_count = init_count
         self.resolve_method = "F2CP"
-        self.right_panel = "help"
+        self.right_panel = "library"
 
         self.gameExit = False
         self.current_level = init_level
@@ -42,21 +42,23 @@ class CubeControl:
        
     def displayAll(self):
         self.my_playground.displayContent()
-        self.my_tutorial.displayContent()  
+        #self.my_tutorial.displayContent() 
+        self.my_library.displayContent()		
         Panel.printLeft(u"当前解题方法是" + self.resolve_method + u"法")
         Panel.printHint(u"下一步提示")
 
     #flag:0 保存为mycube.clp为了进行规则计算;1:保存为mycubexx.clp
-    def save(self,flag=1):
+    def save(self,dumy):
         if self.right_panel != "library":
             Panel.clearRight() 
             self.right_panel = "library"
     
-        self.save2()
-        
-    def save2(self,flag=1,figure=0):
-        self.my_library.saveCube(self.my_playground.cube(),
-            flag, figure)            
+        self.my_library.saveCube(self.my_playground.cube())
+                                         
+    #非界面调用    
+    def save2(self,figure):
+        self.my_library.saveCube2(self.my_playground.cube(),
+                                 figure)            
             
     def load(self,dumy):
         cube = None
@@ -193,7 +195,7 @@ class CubeControl:
         if self.right_panel != "library":
             Panel.printLeft(u"当前是帮助窗口，不能删除.")
         else:
-            self.my_library.deleteSnapshot()
+            self.my_library.deleteCurrent()
         
     def hint(self,show):
         advice = self.hint2()
@@ -209,7 +211,7 @@ class CubeControl:
                    my_b.block.current.z == int(t2[2])):
                         my_b.mark = "2"
         if t1 != None:
-            self.my_playground.displayCube()
+            self.my_playground.displayContent()
         hint = advice.get("h","No Advise")
         Panel.printHint(hint)
         
@@ -281,7 +283,7 @@ class CubeControl:
         if self.right_panel != "library":
             Panel.clearRight() 
             self.right_panel = "library"
-            self.my_library.showLib()
+            self.my_library.displayContent()
 
     def method(self,method):
         self.resolve_method = method
@@ -296,7 +298,8 @@ class CubeControl:
         self.current_level = l
         total = self.my_library.getTotal()
         r = math.ceil(random.random() * total)
-        self.my_library.selectSnapshot(r)
+        self.my_library.setCurrent((-1,r))
+        self.my_library.displayContent()
         self.load(0)
         Panel.printLeft(u"当前是第" + str(r) + u"题")
 

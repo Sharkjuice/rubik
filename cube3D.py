@@ -116,7 +116,9 @@ class Cube3D:
             
             self.blocks.append(Block3D(block_vertices,block_faces,b).resetColors())
     def setLBDPos(self,pos):
-        self.lbd_pos = {"RIGHT":pos[0],"FRONT":pos[1],"UP":pos[2]}
+        scaled_pos = [(p[0]*self.x_scale,p[1]*self.y_scale) for p in pos]	    
+        self.lbd_pos = {"RIGHT":scaled_pos[0],"FRONT":scaled_pos[1],
+				        "UP":scaled_pos[2]}
             
     def displayLayer(self,face,layer):
         face_index = l_map[face]["FACE"]

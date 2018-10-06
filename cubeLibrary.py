@@ -223,6 +223,7 @@ class CubeLibrary:
             self.current_page =1
             if c[0] != -1:
                 self.current = c[0]
+                self.current_legend = -1         
             if c[1] != -1:
                 m,r = divmod(c[1] - 1,15)
                 self.current = m + 1
@@ -231,6 +232,7 @@ class CubeLibrary:
             self.current_page =1
             if c[0] != -1:
                 self.current = c[0]
+                self.current_legend = -1         
             if c[1] != -1:
                 m,r = divmod(c[1] - 1,12)
                 self.current = m + 1
@@ -330,10 +332,15 @@ class CubeLibrary:
         self.build()
 
     def cube(self):
-        return self.my_cube_3d.cube 
-
+        if self.my_cube_3d != None:
+            return self.my_cube_3d.cube 
+        else:
+            return None
     def blocks(self):
-        return self.my_cube_3d.blocks
+        if self.my_cube_3d != None:
+            return self.my_cube_3d.blocks 
+        else:
+            return None
         
     def singleClick(self,x,y):
         if self.legends == []:

@@ -28,9 +28,9 @@ class CubeLegendOLL(Cube3D):
         bs = [b for i in vs for b in self.blocks if b.block_id == i]
         vs = [2,2,2,1,1,1]
         cs1 = [bs[i].colors[vs[i]] for i in range(6)]
-       
+        w = 5*self.y_scale
         rs1 = [((ps[i].x,ps[i].y), (ps[i+1].x,ps[i+1].y),
-               (ps[i+1].x,ps[i+1].y-5), (ps[i].x,ps[i].y-5))
+               (ps[i+1].x,ps[i+1].y-w), (ps[i].x,ps[i].y-w))
                for i in range(6)]
 
         for i in range(6):

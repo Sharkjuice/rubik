@@ -1,4 +1,4 @@
-import argparse,pygame,ctypes
+import argparse,pygame,sys
 from cubeControl import  CubeControl
 from cubePanel import Panel 
 
@@ -15,4 +15,5 @@ if __name__ == "__main__":
     cubeControl.displayAll()	
     cubeControl.gameLoop()
     pygame.quit()
+    sys.exit()
   

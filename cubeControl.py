@@ -427,7 +427,6 @@ class CubeControl:
                 self.my_library.displayHeader()
             elif self.right_panel == "help":
                 self.my_tutorial.displayHeader()
-           
             clock.tick(50)
             pygame.display.update()
     

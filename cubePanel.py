@@ -5,11 +5,21 @@ from cubeCommon import printText
 #屏幕的最小宽度和高度
 min_scn_w = 1350
 min_scn_h = 768
+
+#手形鼠标
+xormask = (6,0,15,0,15,0,15,0,15,0,15,0,15,0,15,0,15,248,
+		   63,248,127,255,255,255,255,255,255,255,255,255,
+		   255,255,127,255,63,255,31,255,15,254,15,252,15,
+		   252,15,252,15,252)
+
+andmask = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
  
 class Panel():
     #文本框背景颜色
     gray = (128,128,128)
-
+    hand = None
     @classmethod
     def display(cls):
         #初始化pygame屏幕
@@ -25,7 +35,6 @@ class Panel():
         cls.y_scale = scn_h/min_scn_h
         cls.ft_sz = int(cls.x_scale*25)
         
-        #setDisplayParams(screen,25,x_scale,y_scale)    
         pt1 = (0,0)# top left point
         pt2 = (scn_w-2,0)#top right point
         pt3 = (0, scn_h-2)#bottom left point
@@ -50,7 +59,8 @@ class Panel():
                 (cls.x_scale*210,cls.y_scale*680),
                       (cls.x_scale*210,scn_h*680),
                                                2)
-    
+        pygame.mouse.set_cursor((16, 24), (7, 0),xormask,andmask)	
+
     @classmethod
     def printLeft(cls,msg): 
         #screen,ft_sz,x_scale,y_scale= getDisplayParams()

@@ -7,6 +7,7 @@ prerequsite:
 features:
 - Can give advise based on F2CP method
 - Auto rotate based on F2CP method
+- Auto rotate based on 7 steps method
 - 3D animation effect rotating
 - Both short-cut keys and mouse draging 
 - Set init rubik layout
@@ -15,3 +16,4 @@ features:
 - Save to and load from files
 - Take snapshot and compare between current and snapshot 
 - Record history action and revoke when something wrong
+- Timing

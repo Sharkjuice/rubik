@@ -47,6 +47,8 @@ andmask = [0 for i in hand_shape]
 class Panel():
     #文本框背景颜色
     gray = (128,128,128)
+    white = (255,255,255)
+	
     hand = None
     @classmethod
     def display(cls):
@@ -69,21 +71,21 @@ class Panel():
         pt4 = (scn_w-2, scn_h-2)
         
         #最外面的框
-        pygame.draw.rect(cls.screen,(128,128,128),
-                            (0,0,scn_w-1,scn_h-1),
-                                               2)
+        pygame.draw.rect(cls.screen,cls.gray,
+                   (0,0,scn_w-1,scn_h-1),
+                                      2)
         #竖分割线
-        pygame.draw.line(cls.screen,(128,128,128),
+        pygame.draw.line(cls.screen,cls.gray,
                               (cls.x_scale*810,0),
                 (cls.x_scale*810,cls.y_scale*680),
                                                2)
         #底部横线
-        pygame.draw.line(cls.screen,(128,128,128),
+        pygame.draw.line(cls.screen,cls.gray,
                 (cls.x_scale*210,cls.y_scale*680),
                         (scn_w-2,cls.y_scale*680),
                                                2)
         #底部竖线
-        pygame.draw.line(cls.screen,(128,128,128),
+        pygame.draw.line(cls.screen,cls.gray,
                 (cls.x_scale*210,cls.y_scale*680),
                       (cls.x_scale*210,scn_h*680),
                                                2)
@@ -91,7 +93,6 @@ class Panel():
 
     @classmethod
     def printLeft(cls,msg): 
-        #screen,ft_sz,x_scale,y_scale= getDisplayParams()
         pygame.draw.rect(
             cls.screen,cls.gray,
             (cls.x_scale*220,cls.y_scale*690,
@@ -99,7 +100,7 @@ class Panel():
         printText(
             cls.screen, msg, "fangsong", 
             cls.ft_sz, cls.x_scale*225, 
-            cls.y_scale*693, background)
+            cls.y_scale*693, black)
 
     @classmethod
     def printHint(cls,msg): 
@@ -108,7 +109,7 @@ class Panel():
             pygame.draw.rect(cls.screen,cls.gray,(cls.x_scale*220,
                    cls.y_scale*730,cls.x_scale*560,cls.y_scale*30))            
             printText(cls.screen, msg, "fangsong", cls.ft_sz, 
-                cls.x_scale*225, cls.y_scale*733, background)
+                cls.x_scale*225, cls.y_scale*733, black)
 
     @classmethod
     def printRight(cls,msg):    
@@ -130,3 +131,11 @@ class Panel():
         pygame.draw.rect(cls.screen,background,
               (right_x,right_y,right_w,right_h))
         
+    @classmethod
+    def printTime(cls,msg): 
+        pygame.draw.rect(
+                cls.screen,background,
+                (cls.x_scale*50, cls.y_scale*730,
+                 cls.x_scale*120, cls.y_scale*30))            
+        printText(cls.screen, msg, "fangsong", cls.ft_sz, 
+               cls.x_scale*53, cls.y_scale*733, cls.white)

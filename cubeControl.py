@@ -27,6 +27,10 @@ class CubeControl:
         self.current_level = init_level
         self.dk_count = 0
         self.dk_time = 0
+        
+        self.timing_started = False
+        self.timing_start = 0.0
+        self.timing_stop = 0.0
 
         self.comparing = False
         #初始化数据模型,判断mycube.clp文件在不在，
@@ -43,7 +47,7 @@ class CubeControl:
     def displayAll(self):
         self.my_playground.displayContent()
         #self.my_tutorial.displayContent() 
-        self.my_library.displayContent()		
+        self.my_library.displayContent()        
         Panel.printLeft(u"当前解题方法是" + self.resolve_method + u"法")
         Panel.printHint(u"下一步提示")
 
@@ -70,12 +74,23 @@ class CubeControl:
             self.my_playground.load(cube)
             self.my_playground.rebuild()            
             self.my_playground.displayContent()
- 
+    #此函数暂时没有用到
     def reset(self,dumy):
         my_cube = cubeModel.Cube()
         self.my_playground = cubePlayground.CubePlayground(my_cube) 
         self.my_playground.displayContent()
         self.my_snapshot = cubeSnapshot.CubeSnapshot(my_cube)
+
+    def timing(self,dumy):
+        if self.timing_started:#已经在计时,结束计时
+            self.timing_stop = time.time()
+            self.timing_started = False
+            Panel.printHint("计时结束! 总共用时:%d秒"%
+             (int(self.timing_stop - self.timing_start)))
+        else:#没有在计时,开始计时
+            self.timing_start = time.time()
+            self.timing_started = True
+            Panel.printHint("计时开始......")
         
 
 #随机生成一个初始乱的魔方
@@ -259,7 +274,7 @@ class CubeControl:
         if self.right_panel != "snapshot":
             Panel.printLeft("没有快照可以取消比较!")
             return
-	
+    
         self.comparing = False        
         mark = 1
         for my_b in self.my_playground.blocks():        
@@ -301,7 +316,7 @@ class CubeControl:
         self.my_library.setCurrent((-1,r))
         self.my_library.displayContent()
         self.load(0)
-        Panel.printLeft(u"当前是第" + str(r) + u"题")
+        Panel.printRight(u"当前是第%s题"%(str(r)))
 
     #mouse single click
     def singleClick(self,x,y):
@@ -357,6 +372,7 @@ class CubeControl:
         global mouse_status
         pre_mouse_txy = (0,0,0)
         click_times = 0
+        tick_times = 0
         clock = pygame.time.Clock()
         screen,ft_sz,x_scale,y_scale= Panel.screen, \
              Panel.ft_sz,Panel.x_scale,Panel.y_scale
@@ -382,7 +398,7 @@ class CubeControl:
                             self.doubleClick()
                         else:
                             self.singleClick(mouse_x,mouse_y)
-                        pre_mouse_txy = (mouse_t,mouse_x,mouse_y)						
+                        pre_mouse_txy = (mouse_t,mouse_x,mouse_y)                       
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1 and (not self.my_playground.rotating):
                         mouse_x,mouse_y = event.pos
@@ -402,7 +418,7 @@ class CubeControl:
                     ("7步",self.method,"Simple"),("F2CP",self.method,"F2CP"),
                     (u"保存",self.save,1),(u"帮助",self.help,0),
                     (u"删除",self.delete,0), (u"提示",self.hint,1),
-                    (u"开始",self.reset,0)],
+                    (u"计时",self.timing,0)],
                      [(u"<-|",self.load,0),(u"|->",self.snapshot,0),
                      (u"对比",self.compare,0),("打乱",self.init,1),
                      (u"进阶",self.next,2),(u"出题",self.quitz,0),
@@ -428,6 +444,13 @@ class CubeControl:
             elif self.right_panel == "help":
                 self.my_tutorial.displayHeader()
             clock.tick(50)
+            if tick_times == 0:#每秒刷新一次时间
+                msg = time.strftime("%X")
+                Panel.printTime(msg)
+            tick_times += 1
+            if tick_times == 20:
+                tick_times = 0
+            
             pygame.display.update()
     
   

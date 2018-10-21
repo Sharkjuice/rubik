@@ -269,6 +269,7 @@ class CubePlayground:
             
         button(screen,u"完成",ft_sz, b_x, b_y, x_scale*60, b_h,
             (224,224,224),red,self.endBrush,"x")
+        #显示时间
                 
     def singleClick(self,x,y):
         self.click_block,self.click_face = self.my_cube_3d.hitBlock(x,y)

@@ -161,6 +161,8 @@ class CubeControl:
             Panel.clearRight() 
             self.right_panel = "help"
             self.my_tutorial.nextOrPrevious(0)
+            self.comparing = False
+			
 
     def snapshot(self,dumy): 
         if self.right_panel != "snapshot":
@@ -273,6 +275,7 @@ class CubeControl:
     def cancelComparing(self):
         if self.right_panel != "snapshot":
             Panel.printLeft("没有快照可以取消比较!")
+            self.comparing = False        
             return
     
         self.comparing = False        
@@ -299,6 +302,7 @@ class CubeControl:
             Panel.clearRight() 
             self.right_panel = "library"
             self.my_library.displayContent()
+            self.comparing = False
 
     def method(self,method):
         self.resolve_method = method

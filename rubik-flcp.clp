@@ -981,7 +981,7 @@
 (assert (pll-macro 1 5 1938 "x'(R2D2)(R'U'R)D2(R'UR')x"))
 (assert (pll-macro 2 6 1938 "x'(RU'R)D2(R'UR)(D2R2)x"))
 (assert (pll-macro 1 7 1170 "x'(RU'R'D)(RUR'D')(RUR'D)(RU'R'D')x"));this is a symetric pattern
-(assert (pll-macro 2 22 1170 "U2"));this is a pseudo pattern
+(assert (pll-macro 2 22 1170 "y"));this is a pseudo pattern
 (assert (pll-macro 5 8 2947 "(RUR'U')(R'F)(R2U'R'U')(RUR'F')"))
 (assert (pll-macro 5 9 3857 "(R'U'F')(RUR'U')(R'F)(R2U'R'U')(RUR'UR)"))
 (assert (pll-macro 5 10 3171 "(R'UR')(d'R'F')(R2U')(R'UR')(FRF)"))
@@ -1185,9 +1185,9 @@
 	(phase 5)
 	(pll-macro ?d ?f&7|22 ?pv ?h)
 	(block (id ?id1) (layer 3) (type corner))
-	(facelet (id ?id1) (pos ?p1) (side U))
-	(facelet (id ?id2) (pos ?p2&:(= 2 (distance ?p2 ?p1))) (side U))
-	(facelet (id ?id3) (pos ?p3&:(= 4 (distance ?p3 ?p1))) (side U))	
+	(facelet (id ?id1) (pos 3) (side U))
+	(facelet (id ?id2) (pos 5) (side U))
+	(facelet (id ?id3) (pos 1) (side U))	
 	(facelet (id ?id1) (type V1) (color ?c1))
 	(facelet (id ?id2) (type V1) (side ?s2))
 	(facelet (id ?id3) (type V1) (side ?s3))

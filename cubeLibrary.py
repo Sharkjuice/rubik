@@ -27,7 +27,7 @@ class CubeLibrary:
         self.my_cube_3d = None
         self.snapshots_dir = ".\\snapshots_0\\"
         self.legends = []
-        self.current_legend = 0
+        self.current_legend = -1
         self.total_legend = 0
         
         #鼠标点击状态
